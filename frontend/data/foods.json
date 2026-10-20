@@ -1,0 +1,1680 @@
+{
+  "north": {
+    "label": "Miền Bắc",
+    "icon": "🌿",
+    "color": "#0D3B1E",
+    "tags": [
+      "Thanh đạm",
+      "Ít ngọt",
+      "Nước dùng trong",
+      "Hà Nội · Hải Phòng · Sapa · Nam Định"
+    ],
+    "desc": "Ẩm thực miền Bắc mang vẻ đẹp tinh tế, thanh đạm — ít gia vị nhưng đậm chiều sâu. Hà Nội là cái nôi với những tô phở trong vắt, bát bún thang tỉ mỉ và hàng trăm món ăn vặt gắn với ký ức tuổi thơ.",
+    "featured": {
+      "emoji": "🍜",
+      "name": "Phở Hà Nội",
+      "desc": "Bát phở chuẩn Hà Nội có nước dùng trong vắt, xương bò ninh 12 tiếng, thơm hồi quế nhẹ nhàng. Bánh phở mềm, thịt thái mỏng — không chan tương, không giá sống như phở Nam."
+    },
+    "foods": [
+      {
+        "emoji": "🍖",
+        "name": "Bún chả",
+        "region": "Hà Nội",
+        "desc": "Thịt lợn nướng thơm lừng trên than hoa, chấm bún vào nước mắm chua ngọt pha loãng, kèm rau thơm và giò sống. Barack Obama từng thưởng thức cùng Anthony Bourdain tại Hà Nội năm 2016.",
+        "tags": [
+          "Nướng than",
+          "Trưa",
+          "Nổi tiếng quốc tế"
+        ]
+      },
+      {
+        "emoji": "🐟",
+        "name": "Chả cá Lã Vọng",
+        "region": "Hà Nội",
+        "desc": "Cá lăng ướp nghệ, nướng rồi rán lại trên chảo mỡ ngay tại bàn. Ăn cùng bún, mắm tôm, thìa là, hành lá tươi. Phố Chả Cá là địa chỉ kinh điển không thể bỏ qua.",
+        "tags": [
+          "Đặc sản phố cổ",
+          "Nổi tiếng"
+        ]
+      },
+      {
+        "emoji": "🌯",
+        "name": "Bánh cuốn",
+        "region": "Hà Nội · Hải Phòng",
+        "desc": "Lá bánh tráng gạo mỏng tang tráng tay, cuộn nhân thịt băm mộc nhĩ, chấm với nước mắm nhĩ pha loãng và chả quế thơm giòn. Bánh cuốn Thanh Trì nổi tiếng nhất.",
+        "tags": [
+          "Điểm sáng",
+          "Sáng sớm"
+        ]
+      },
+      {
+        "emoji": "🍚",
+        "name": "Xôi Hà Nội",
+        "region": "Hà Nội",
+        "desc": "Xôi xéo phủ đậu xanh tán mịn và hành phi vàng ruộm, hay xôi gà nghi ngút khói — bữa sáng nhanh, no lâu. Xôi Yến Nguyễn Hữu Huân là địa chỉ kinh điển hơn 60 năm.",
+        "tags": [
+          "Sáng",
+          "Gánh hàng rong"
+        ]
+      },
+      {
+        "emoji": "🦆",
+        "name": "Bún thang",
+        "region": "Hà Nội",
+        "desc": "Món bún cầu kỳ nhất Hà Nội: nước dùng từ xương gà, tôm khô, mắm tôm. Topping gồm thịt gà xé, trứng tráng thái chỉ, giò lụa, mắm tôm — hơn 20 nguyên liệu kết hợp tinh tế.",
+        "tags": [
+          "Cầu kỳ",
+          "Tinh tế"
+        ]
+      },
+      {
+        "emoji": "🍢",
+        "name": "Nem cuốn Hà Nội",
+        "region": "Hà Nội",
+        "desc": "Gỏi cuốn miền Bắc với tôm luộc, thịt heo, bún, rau thơm cuộn bánh tráng tươi. Chấm cùng nước mắm tỏi ớt hoặc tương đen giã lạc — thanh mát, nhẹ nhàng.",
+        "tags": [
+          "Thanh mát",
+          "Hè"
+        ]
+      },
+      {
+        "emoji": "🥣",
+        "name": "Bún riêu cua",
+        "region": "Hà Nội · Hải Phòng",
+        "desc": "Nước dùng cà chua chua ngọt, riêu cua đồng kết tảng vàng ươm, đậu phụ chiên, mắm tôm — tô bún riêu đậm hương quê Bắc Bộ, ăn kèm rau muống chẻ và giấm bỗng.",
+        "tags": [
+          "Chua ngọt",
+          "Đậm đà"
+        ]
+      },
+      {
+        "emoji": "🫔",
+        "name": "Bánh mì Hà Nội",
+        "region": "Hà Nội",
+        "desc": "Ổ bánh mì vỏ giòn tan nhỏ hơn bánh mì Sài Gòn, nhân pa-tê, giò chả và ít rau thơm — đơn giản nhưng hương vị rất riêng. Bánh mì phố Hàng Khay là nơi nổi tiếng.",
+        "tags": [
+          "Sáng",
+          "Nhanh gọn"
+        ]
+      },
+      {
+        "emoji": "🍲",
+        "name": "Canh bún",
+        "region": "Hà Nội",
+        "desc": "Bún nấu với riêu cua, rau muống, mắm tôm — một biến thể đậm đà của bún riêu. Nước dùng đặc sánh, chua mặn kích thích vị giác mùa hè oi bức.",
+        "tags": [
+          "Bình dân",
+          "Trưa"
+        ]
+      },
+      {
+        "emoji": "🐠",
+        "name": "Bún cá Hải Phòng",
+        "region": "Hải Phòng",
+        "desc": "Nước dùng trong từ cá thu, cá quả nướng thơm. Thêm chút mắm tôm, ớt tươi và rau thì là — hương vị biển đặc trưng của đất cảng Hải Phòng.",
+        "tags": [
+          "Hải Phòng",
+          "Hải sản"
+        ]
+      },
+      {
+        "emoji": "🥩",
+        "name": "Thắng cố Sapa",
+        "region": "Sapa · Lào Cai",
+        "desc": "Món lẩu truyền thống của người H'Mông: nội tạng ngựa, bò ninh với thảo dược núi rừng. Đặc sản chợ phiên vùng cao, ấm bụng giữa cái lạnh Sapa se sắt.",
+        "tags": [
+          "Vùng cao",
+          "Độc đáo"
+        ]
+      },
+      {
+        "emoji": "🍡",
+        "name": "Bánh đúc nóng",
+        "region": "Hà Nội",
+        "desc": "Bánh đúc gạo tẻ nóng hổi chan nước thịt băm, mộc nhĩ, hành phi thơm. Món ăn vặt mùa đông của người Hà Nội, giá bình dân mà no căng bụng.",
+        "tags": [
+          "Mùa đông",
+          "Ăn vặt"
+        ]
+      },
+      {
+        "emoji": "🥮",
+        "name": "Bánh trôi bánh chay",
+        "region": "Hà Nội",
+        "desc": "Bánh trôi nặn từ bột nếp, nhân đường phèn, luộc chín nổi lên mặt nước. Tết Hàn Thực 3/3 âm lịch là dịp ăn bánh trôi truyền thống của người Hà Nội.",
+        "tags": [
+          "Truyền thống",
+          "Tết"
+        ]
+      },
+      {
+        "emoji": "🐙",
+        "name": "Bún bạch tuộc",
+        "region": "Hải Phòng",
+        "desc": "Bạch tuộc tươi luộc hoặc xào thái lát, chan nước dùng hải sản ngọt thanh. Đặc sản vùng ven biển Hải Phòng, Quảng Ninh — ít nơi có.",
+        "tags": [
+          "Hải sản",
+          "Độc lạ"
+        ]
+      },
+      {
+        "emoji": "🫙",
+        "name": "Mắm tôm Hà Nội",
+        "region": "Hà Nội",
+        "desc": "Mắm tôm pha chanh ớt đánh bông, chấm thịt luộc, bún đậu, chả cá — linh hồn của nhiều món ăn Bắc. Người Hà Nội dùng mắm tôm như người Sài Gòn dùng tương hoisin.",
+        "tags": [
+          "Gia vị",
+          "Đặc trưng"
+        ]
+      },
+      {
+        "emoji": "🍱",
+        "name": "Cơm rang Hà Nội",
+        "region": "Hà Nội",
+        "desc": "Cơm rang dưa bò hoặc cơm rang thập cẩm — món tận dụng cơm nguội của người Hà Nội. Hạt cơm rang phải tơi, không dính, thơm mỡ hành.",
+        "tags": [
+          "Tận dụng cơm nguội",
+          "Nhanh"
+        ]
+      },
+      {
+        "emoji": "🧁",
+        "name": "Bánh cốm",
+        "region": "Hà Nội",
+        "desc": "Cốm Vòng non xanh gói trong lá chuối, nhân đậu xanh mịn trộn đường. Mùa thu Hà Nội là mùa cốm — hương thơm ngai ngái đặc trưng không lẫn vào đâu được.",
+        "tags": [
+          "Mùa thu",
+          "Đặc sản Hà Nội"
+        ]
+      },
+      {
+        "emoji": "🦑",
+        "name": "Chả mực Hạ Long",
+        "region": "Quảng Ninh",
+        "desc": "Mực tươi giã tay thô, nặn bánh rán vàng giòn. Chả mực Hạ Long phải giã tay mới dai và thơm — không xay máy. Đặc sản quà biếu số một của vùng Đông Bắc.",
+        "tags": [
+          "Quảng Ninh",
+          "Hải sản"
+        ]
+      },
+      {
+        "emoji": "🍝",
+        "name": "Phở khô Hà Giang",
+        "region": "Hà Giang",
+        "desc": "Sợi phở trần qua nước sôi, chan xíu mại, thịt xay, hành phi — ăn khô trộn đều rồi húp bát nước dùng riêng. Phong cách ăn độc đáo của vùng cao nguyên đá.",
+        "tags": [
+          "Hà Giang",
+          "Vùng cao"
+        ]
+      },
+      {
+        "emoji": "🥗",
+        "name": "Nộm bò khô",
+        "region": "Hà Nội",
+        "desc": "Bò khô thái sợi trộn cùng đu đủ bào, cà rốt, lạc rang, rau thơm, nước mắm chua ngọt. Món ăn vặt buổi chiều quen thuộc của người Hà Nội trên phố cổ.",
+        "tags": [
+          "Ăn vặt",
+          "Chua ngọt"
+        ]
+      },
+      {
+        "emoji": "🍢",
+        "name": "Bún đậu mắm tôm",
+        "region": "Hà Nội",
+        "desc": "Đậu phụ rán vàng giòn, bún lá, chả cốm, lòng dồi chấm mắm tôm đánh bông với chanh, ớt. Món ăn vỉa hè giản dị mà gây nghiện của người Hà Nội.",
+        "tags": [
+          "Bình dân",
+          "Mắm tôm"
+        ]
+      },
+      {
+        "emoji": "🍤",
+        "name": "Bánh tôm Hồ Tây",
+        "region": "Hà Nội",
+        "desc": "Tôm nhỏ và khoai lang thái sợi tẩm bột chiên giòn, ăn cùng rau sống và nước chấm chua ngọt. Món ăn vặt gắn với khu vực Hồ Tây.",
+        "tags": [
+          "Chiên giòn",
+          "Ăn vặt"
+        ]
+      },
+      {
+        "emoji": "🌯",
+        "name": "Phở cuốn",
+        "region": "Hà Nội",
+        "desc": "Lá phở mỏng cuộn thịt bò xào, rau thơm, chấm nước mắm chua ngọt. Cách thưởng thức phở khác lạ, nhẹ nhàng và thanh mát.",
+        "tags": [
+          "Thanh mát",
+          "Hà Nội"
+        ]
+      },
+      {
+        "emoji": "🐌",
+        "name": "Bún ốc",
+        "region": "Hà Nội",
+        "desc": "Ốc bươu giòn sần sật, nước dùng chua thanh từ cà chua và giấm bỗng, thêm đậu rán và rau sống. Món ăn hợp những ngày se lạnh.",
+        "tags": [
+          "Chua thanh",
+          "Ăn vặt"
+        ]
+      },
+      {
+        "emoji": "🥣",
+        "name": "Miến lươn",
+        "region": "Hà Nội",
+        "desc": "Lươn đồng xào giòn hoặc để mềm, ăn cùng miến dong trong nước dùng ngọt từ xương. Hành răm và hạt tiêu làm dậy mùi.",
+        "tags": [
+          "Lươn đồng",
+          "Nước dùng ngọt"
+        ]
+      },
+      {
+        "emoji": "🥢",
+        "name": "Nem rán Hà Nội",
+        "region": "Hà Nội",
+        "desc": "Nem nhân thịt, miến, mộc nhĩ cuộn bánh đa nem rồi rán vàng giòn. Ăn kèm bún, rau thơm và nước chấm chua ngọt, thường có mặt trong mâm cỗ ngày Tết.",
+        "tags": [
+          "Mâm cỗ",
+          "Chiên giòn"
+        ]
+      },
+      {
+        "emoji": "🍙",
+        "name": "Xôi ngũ sắc",
+        "region": "Tây Bắc",
+        "desc": "Xôi nhuộm màu tự nhiên từ lá cây rừng, thường thấy ở bản làng người Thái, Tày. Ăn cùng muối vừng hoặc thịt nướng, đẹp mắt và thơm dẻo.",
+        "tags": [
+          "Dân tộc",
+          "Màu tự nhiên"
+        ]
+      },
+      {
+        "emoji": "🥩",
+        "name": "Thịt trâu gác bếp",
+        "region": "Tây Bắc",
+        "desc": "Thịt trâu tẩm gia vị núi rừng như mắc khén, hạt dổi rồi treo gác bếp hun khói nhiều ngày. Thái mỏng nhâm nhi cùng rượu hoặc xôi nếp.",
+        "tags": [
+          "Hun khói",
+          "Đặc sản vùng cao"
+        ]
+      },
+      {
+        "emoji": "🐟",
+        "name": "Pa pỉnh tộp",
+        "region": "Sơn La",
+        "desc": "Cá suối kẹp que, tẩm mắc khén, hạt dổi, nướng chín trên than hồng. Tên gọi theo tiếng Thái nghĩa là cá nướng, thơm cay đặc trưng Tây Bắc.",
+        "tags": [
+          "Sơn La",
+          "Cá suối"
+        ]
+      },
+      {
+        "emoji": "🦆",
+        "name": "Vịt quay Lạng Sơn",
+        "region": "Lạng Sơn",
+        "desc": "Vịt nuôi thả, tẩm lá mắc mật rồi quay giòn da, thịt thơm ngọt. Thường ăn kèm bánh cuốn hoặc nước chấm riêng của xứ Lạng.",
+        "tags": [
+          "Lạng Sơn",
+          "Lá mắc mật"
+        ]
+      },
+      {
+        "emoji": "🍜",
+        "name": "Phở chua Lạng Sơn",
+        "region": "Lạng Sơn",
+        "desc": "Bánh phở trộn cùng thịt quay, lạp xưởng, rau thơm, rưới nước sốt chua ngọt đậm đà. Ăn kiểu trộn khá khác phở nước quen thuộc.",
+        "tags": [
+          "Ăn trộn",
+          "Lạng Sơn"
+        ]
+      },
+      {
+        "emoji": "🥞",
+        "name": "Bánh cuốn Trùng Khánh",
+        "region": "Cao Bằng",
+        "desc": "Bánh tráng mỏng, mềm, dùng kèm nước dùng xương ninh ngọt thanh và hành phi. Đặc sản nổi tiếng vùng biên giới Cao Bằng.",
+        "tags": [
+          "Cao Bằng",
+          "Nước dùng xương"
+        ]
+      },
+      {
+        "emoji": "🦀",
+        "name": "Bánh đa cua Hải Phòng",
+        "region": "Hải Phòng",
+        "desc": "Sợi bánh đa đỏ dai mềm, riêu cua đồng, chả lá lốt, rau muống chẻ. Nước dùng đậm vị cua đồng, một biểu tượng ẩm thực của đất cảng.",
+        "tags": [
+          "Hải Phòng",
+          "Cua đồng"
+        ]
+      },
+      {
+        "emoji": "🥖",
+        "name": "Bánh mì cay Hải Phòng",
+        "region": "Hải Phòng",
+        "desc": "Ổ bánh mì nhỏ nhân pa-tê, thịt nguội và nước sốt cay đặc trưng. Món ăn nhanh gắn liền với người dân thành phố cảng.",
+        "tags": [
+          "Cay",
+          "Ăn nhanh"
+        ]
+      },
+      {
+        "emoji": "🐛",
+        "name": "Sá sùng Vân Đồn",
+        "region": "Quảng Ninh",
+        "desc": "Loài hải sản sống trong bùn cát ven biển, thường nấu cháo, xào hoặc nấu miến. Được xem là đặc sản của vùng biển Vân Đồn.",
+        "tags": [
+          "Quảng Ninh",
+          "Hải sản"
+        ]
+      },
+      {
+        "emoji": "🍘",
+        "name": "Cơm cháy Ninh Bình",
+        "region": "Ninh Bình",
+        "desc": "Lớp cơm cháy vàng giòn rán nóng, ăn cùng thịt dê hoặc chà bông. Là món quà quen thuộc của du khách khi ghé cố đô Hoa Lư.",
+        "tags": [
+          "Ninh Bình",
+          "Giòn tan"
+        ]
+      },
+      {
+        "emoji": "🐐",
+        "name": "Dê núi Ninh Bình",
+        "region": "Ninh Bình",
+        "desc": "Thịt dê núi tái chanh, nướng, hấp hoặc nấu lẩu. Thịt săn chắc, ít mùi, thường ăn kèm rau và lá mơ.",
+        "tags": [
+          "Ninh Bình",
+          "Đặc sản"
+        ]
+      },
+      {
+        "emoji": "☕",
+        "name": "Cà phê trứng",
+        "region": "Hà Nội",
+        "desc": "Lòng đỏ trứng đánh bông cùng đường và cà phê đậm. Lớp kem béo mịn nằm trên mặt cà phê, một thức uống đặc trưng của phố cổ Hà Nội.",
+        "tags": [
+          "Thức uống",
+          "Phố cổ"
+        ]
+      },
+      {
+        "emoji": "🥟",
+        "name": "Bánh gối Hà Nội",
+        "region": "Hà Nội",
+        "desc": "Vỏ bột mì chiên vàng giòn, nhân thịt, miến, mộc nhĩ. Chấm nước mắm chua ngọt, là món ăn vặt quen thuộc mùa đông.",
+        "tags": [
+          "Ăn vặt",
+          "Mùa lạnh"
+        ]
+      },
+      {
+        "emoji": "🍲",
+        "name": "Lẩu cá tầm Sapa",
+        "region": "Sapa · Lào Cai",
+        "desc": "Cá tầm nuôi nguồn nước lạnh vùng cao, thịt ngọt chắc, nấu lẩu cùng rau rừng. Món ăn ấm bụng giữa khí hậu se lạnh của Sapa.",
+        "tags": [
+          "Vùng cao",
+          "Lẩu"
+        ]
+      },
+      {
+        "emoji": "🎍",
+        "name": "Bánh chưng",
+        "region": "Hà Nội · Cả nước",
+        "desc": "Bánh vuông gói lá dong, nhân đậu xanh và thịt ba chỉ, luộc nhiều giờ. Không thể thiếu trên mâm cỗ và bàn thờ ngày Tết cổ truyền của người Việt.",
+        "tags": [
+          "Tết",
+          "Truyền thống"
+        ],
+        "imageQuery": [
+          "Bánh chưng",
+          "Bánh chưng và bánh tét"
+        ]
+      },
+      {
+        "emoji": "🍥",
+        "name": "Giò lụa",
+        "region": "Hà Nội",
+        "desc": "Thịt lợn giã nhuyễn, gói lá chuối rồi luộc chín. Miếng giò mịn, thơm, cắt lát ăn với bánh chưng, xôi hoặc kẹp bánh mì.",
+        "tags": [
+          "Mâm cỗ",
+          "Thịt nguội"
+        ],
+        "imageQuery": [
+          "Giò lụa",
+          "Chả lụa"
+        ]
+      },
+      {
+        "emoji": "🥟",
+        "name": "Bánh giò",
+        "region": "Hà Nội",
+        "desc": "Bánh bột gạo mềm nhân thịt băm, mộc nhĩ, hành khô, gói lá chuối hấp nóng. Món ăn sáng bình dân, ăn kèm tương ớt.",
+        "tags": [
+          "Món sáng",
+          "Hấp lá chuối"
+        ],
+        "imageQuery": [
+          "Bánh giò",
+          "Bánh"
+        ]
+      },
+      {
+        "emoji": "🦆",
+        "name": "Bún măng vịt",
+        "region": "Hà Nội",
+        "desc": "Thịt vịt luộc mềm, măng chua ngọt, bún, nước dùng thanh. Chấm gừng pha mắm, ăn ấm bụng vào mùa lạnh.",
+        "tags": [
+          "Thanh nhẹ",
+          "Mùa lạnh"
+        ],
+        "imageQuery": [
+          "Bún măng vịt",
+          "Bún"
+        ]
+      },
+      {
+        "emoji": "🍦",
+        "name": "Kem Tràng Tiền",
+        "region": "Hà Nội",
+        "desc": "Que kem lạnh, vị đậu xanh, sôcôla hay dừa, gắn với khu phố Tràng Tiền. Ký ức mùa hè của nhiều thế hệ người Hà Nội.",
+        "tags": [
+          "Giải nhiệt",
+          "Ký ức"
+        ],
+        "imageQuery": [
+          "Kem Tràng Tiền",
+          "Kem"
+        ]
+      },
+      {
+        "emoji": "🍃",
+        "name": "Bánh khúc",
+        "region": "Hà Nội · Nam Định",
+        "desc": "Vỏ nếp trộn rau khúc, nhân đậu xanh với thịt, xôi dẻo thơm mùi lá khúc. Món bánh ấm của những ngày đông miền Bắc.",
+        "tags": [
+          "Mùa đông",
+          "Dân dã"
+        ],
+        "imageQuery": [
+          "Bánh khúc",
+          "Xôi"
+        ]
+      },
+      {
+        "emoji": "🍬",
+        "name": "Chè lam Thạch Xá",
+        "region": "Hà Nội",
+        "desc": "Chè làm từ bột nếp, gừng, mật mía, lạc rang, cắt miếng dẻo thơm. Đặc sản quà biếu nổi tiếng của vùng Thạch Thất.",
+        "tags": [
+          "Quà biếu",
+          "Gừng · Lạc"
+        ],
+        "imageQuery": [
+          "Chè lam",
+          "Kẹo lạc"
+        ]
+      },
+      {
+        "emoji": "🍪",
+        "name": "Bánh cáy",
+        "region": "Nam Định · Thái Bình",
+        "desc": "Bánh làm từ nếp cẩm rang, mạch nha, lạc và mè, thơm ngọt, màu nâu đậm. Món quà quê Bắc Bộ, hợp nhâm nhi với trà.",
+        "tags": [
+          "Quà quê",
+          "Nếp"
+        ],
+        "imageQuery": [
+          "Bánh cáy",
+          "Bánh"
+        ]
+      },
+      {
+        "emoji": "🍮",
+        "name": "Bánh phu thê",
+        "region": "Bắc Ninh",
+        "desc": "Bánh xanh vàng làm từ bột nếp, nhân đậu xanh, bọc lá dừa. Mang ý nghĩa vợ chồng gắn bó, thường dùng trong lễ cưới.",
+        "tags": [
+          "Quan họ",
+          "Lễ cưới"
+        ],
+        "imageQuery": [
+          "Bánh phu thê",
+          "Bánh"
+        ]
+      },
+      {
+        "emoji": "🐟",
+        "name": "Cá kho Vũ Đại",
+        "region": "Hà Nam",
+        "desc": "Cá trắm kho trong niêu đất cùng riềng, nghệ, thịt ba chỉ nhiều giờ cho đến xương mềm. Hương vị đậm đà, thơm mùi riềng.",
+        "tags": [
+          "Kho niêu",
+          "Đặc sản"
+        ],
+        "imageQuery": [
+          "Cá kho",
+          "Cá kho tộ"
+        ]
+      }
+    ]
+  },
+  "center": {
+    "label": "Miền Trung",
+    "icon": "🌶",
+    "color": "#4A0E00",
+    "tags": [
+      "Cay đậm",
+      "Nhiều gia vị",
+      "Nước màu đỏ",
+      "Huế · Hội An · Đà Nẵng · Nha Trang"
+    ],
+    "desc": "Ẩm thực miền Trung nổi tiếng cay và đậm vị. Huế là đỉnh cao với ẩm thực cung đình tinh tế; Hội An nơi giao thoa Đông Tây để lại những món ăn độc đáo không thể tìm thấy ở đâu khác.",
+    "featured": {
+      "emoji": "🍲",
+      "name": "Bún bò Huế",
+      "desc": "Nước dùng màu đỏ sẫm từ ruốc Huế và ớt, thơm sả, ngọt xương bò — đây là linh hồn của tô bún bò. Mang cái cay nồng quyết liệt đặc trưng cố đô, khác hoàn toàn với phở Hà Nội hay hủ tiếu Sài Gòn."
+    },
+    "foods": [
+      {
+        "emoji": "🍜",
+        "name": "Mì Quảng",
+        "region": "Quảng Nam",
+        "desc": "Sợi mì vàng nghệ to bản, ít nước dùng đậm — không phải canh như phở. Có tôm, thịt, trứng, rau sống, bánh đa giòn. Linh hồn ẩm thực xứ Quảng, ăn một lần nhớ mãi.",
+        "tags": [
+          "Ít nước dùng",
+          "Quảng Nam"
+        ]
+      },
+      {
+        "emoji": "🍝",
+        "name": "Cao lầu",
+        "region": "Hội An",
+        "desc": "Sợi mì dai vàng từ nước giếng Bá Lễ, thịt xá xíu, rau sống, bánh đa giòn. Chỉ có ở Hội An — mang đi nơi khác làm sẽ không còn đúng vị. Di sản ẩm thực UNESCO.",
+        "tags": [
+          "Độc nhất",
+          "Di sản"
+        ]
+      },
+      {
+        "emoji": "🦪",
+        "name": "Cơm hến",
+        "region": "Huế",
+        "desc": "Hến cồn Hến xào gia vị cay, bày lên cơm nguội, rắc tóp mỡ, đậu phộng rang, rau sống thập cẩm. Bát cơm hến chứa cả mười mấy loại topping — ăn sáng bình dân mà tinh tế.",
+        "tags": [
+          "Cay · Chua",
+          "Bình dân"
+        ]
+      },
+      {
+        "emoji": "🥞",
+        "name": "Bánh xèo miền Trung",
+        "region": "Đà Nẵng",
+        "desc": "Nhỏ hơn, giòn hơn bánh xèo Nam. Ăn cuộn cùng hàng chục loại rau sống và nước chấm đặc biệt pha tương hoisin, lạc rang. Đường Trần Khánh Dư Đà Nẵng nổi tiếng nhất.",
+        "tags": [
+          "Giòn",
+          "Nhiều rau sống"
+        ]
+      },
+      {
+        "emoji": "🥟",
+        "name": "Bánh bèo Huế",
+        "region": "Huế",
+        "desc": "Đĩa bánh bèo bột gạo trắng mịn, bày tôm chấy đỏ hồng trên mặt, chan nước mắm ngọt béo. Ăn một lần dùng hàng chục đĩa nhỏ — đặc trưng tinh tế ẩm thực cung đình cố đô.",
+        "tags": [
+          "Tinh tế",
+          "Cung đình"
+        ]
+      },
+      {
+        "emoji": "🌮",
+        "name": "Bánh tráng cuốn thịt heo",
+        "region": "Đà Nẵng",
+        "desc": "Thịt heo luộc cuộn cùng bánh tráng mè nướng, rau sống, khế, chuối xanh, chấm mắm nêm đặc sánh thơm nức. Đặc sản không thể bỏ qua khi đến Đà Nẵng.",
+        "tags": [
+          "Đà Nẵng",
+          "Đặc sản"
+        ]
+      },
+      {
+        "emoji": "🍱",
+        "name": "Cơm bình dân Huế",
+        "region": "Huế",
+        "desc": "Mâm cơm Huế đơn giản mà phong phú: canh rau muống, cá kho, dưa cải, tôm rim — cân bằng hoàn hảo giữa mặn, chua, ngọt, cay. Người Huế ăn nhiều món nhỏ trong một bữa.",
+        "tags": [
+          "Bình dân",
+          "Cân bằng"
+        ]
+      },
+      {
+        "emoji": "🧆",
+        "name": "Bánh căn Nha Trang",
+        "region": "Nha Trang",
+        "desc": "Bánh căn đổ từ bột gạo trong khuôn đất nung nóng, thêm trứng cút hay tôm. Chấm nước sốt cà chua cay, ăn kèm chả cá thơm lừng — đặc sản buổi chiều vỉa hè Nha Trang.",
+        "tags": [
+          "Nha Trang",
+          "Chả cá"
+        ]
+      },
+      {
+        "emoji": "🫕",
+        "name": "Lẩu bò Huế",
+        "region": "Huế",
+        "desc": "Nồi lẩu nước dùng bún bò Huế cay thơm, nhúng tái bò, bắp bò, rau muống, hoa chuối — đậm vị hơn bún bò thường, phù hợp buổi tối đông người quây quần.",
+        "tags": [
+          "Cay",
+          "Tối"
+        ]
+      },
+      {
+        "emoji": "🍤",
+        "name": "Nem lụi Nha Trang",
+        "region": "Nha Trang",
+        "desc": "Nem thịt nướng trên que sả, ăn cuốn bánh tráng cùng rau sống, khế chua, chấm mắm nêm pha dứa. Hương sả thơm quyện khói nướng — đặc sản bờ biển không thể bỏ.",
+        "tags": [
+          "Nướng",
+          "Biển"
+        ]
+      },
+      {
+        "emoji": "🥣",
+        "name": "Cháo lươn xứ Nghệ",
+        "region": "Nghệ An",
+        "desc": "Lươn đồng xào nghệ thơm béo, chan lên cháo gạo tẻ đặc sánh, rắc hành ngò, ớt tươi. Vị cay nồng đặc trưng ẩm thực xứ Nghệ — ấm bụng mùa đông miền Trung.",
+        "tags": [
+          "Nghệ An",
+          "Đặc sản"
+        ]
+      },
+      {
+        "emoji": "🐚",
+        "name": "Bún sứa Nha Trang",
+        "region": "Nha Trang",
+        "desc": "Sứa biển tươi trắng giòn trong, chan nước dùng cá nhạt thanh, thêm tôm, rau sống và ớt xanh. Một tô bún gợi hương biển sáng sớm — chỉ có ở vùng biển Nha Trang.",
+        "tags": [
+          "Hải sản",
+          "Thanh mát"
+        ]
+      },
+      {
+        "emoji": "🫓",
+        "name": "Bánh mì Hội An",
+        "region": "Hội An",
+        "desc": "Bánh mì Phượng được CNN bình chọn ngon nhất thế giới. Ổ bánh giòn nhỏ, nhân phong phú gồm thịt xíu mại, pa-tê, rau thơm, tương ớt — hàng người xếp dài mua mỗi sáng.",
+        "tags": [
+          "Nổi tiếng thế giới",
+          "Sáng"
+        ]
+      },
+      {
+        "emoji": "🥗",
+        "name": "Gỏi cá Nam Ô",
+        "region": "Đà Nẵng",
+        "desc": "Cá trích tươi băm nhỏ trộn với gừng, tỏi, ớt, mè rang, lá đinh lăng — ăn sống hoàn toàn. Người dân làng chài Nam Ô giữ bí quyết làm gỏi từ hàng trăm năm nay.",
+        "tags": [
+          "Ăn sống",
+          "Làng chài"
+        ]
+      },
+      {
+        "emoji": "🍛",
+        "name": "Bánh ướt thịt nướng",
+        "region": "Huế",
+        "desc": "Bánh ướt mềm mịn cuộn thịt heo nướng than hoa thơm lừng, chan nước mắm tỏi ớt ngọt. Món ăn sáng dân dã của người Huế — giản dị mà đậm đà khó quên.",
+        "tags": [
+          "Sáng",
+          "Dân dã"
+        ]
+      },
+      {
+        "emoji": "🌊",
+        "name": "Bánh đập Đà Nẵng",
+        "region": "Đà Nẵng",
+        "desc": "Bánh tráng nướng giòn và bánh ướt mềm ép chặt rồi đập vỡ — tên bánh đập ra đời từ đó. Chấm mắm nêm hoặc mắm cái, ăn kèm hến xào — vị giác đối lập hài hòa.",
+        "tags": [
+          "Giòn mềm",
+          "Đà Nẵng"
+        ]
+      },
+      {
+        "emoji": "🦐",
+        "name": "Tôm chua Huế",
+        "region": "Huế",
+        "desc": "Tôm đất muối chua lên men với tỏi, ớt, riềng — mùi thơm cay đặc trưng. Ăn kèm thịt luộc, bánh tráng, rau sống thập cẩm. Quà biếu đặc sản Huế số một.",
+        "tags": [
+          "Lên men",
+          "Đặc sản quà"
+        ]
+      },
+      {
+        "emoji": "🍢",
+        "name": "Chả bò Đà Nẵng",
+        "region": "Đà Nẵng",
+        "desc": "Chả bò Đà Nẵng dai, thơm, vị mặn ngọt vừa phải — khác hẳn chả lụa Hà Nội hay Sài Gòn. Ăn không, hay kẹp bánh mì, hay thái lát bày cùng các món khác.",
+        "tags": [
+          "Đặc sản",
+          "Quà biếu"
+        ]
+      },
+      {
+        "emoji": "🥘",
+        "name": "Cá ngừ đại dương Phú Yên",
+        "region": "Phú Yên",
+        "desc": "Cá ngừ đại dương đánh bắt ngoài khơi Phú Yên — thịt đỏ thẫm, chắc, ngọt tự nhiên. Ăn sashimi, nướng muối ớt hay kho tộ — cách nào cũng ngon xuất sắc.",
+        "tags": [
+          "Phú Yên",
+          "Hải sản cao cấp"
+        ]
+      },
+      {
+        "emoji": "🍮",
+        "name": "Bánh ít lá gai",
+        "region": "Bình Định",
+        "desc": "Vỏ bánh xanh đen từ lá gai giã nhuyễn trộn bột nếp, nhân đậu xanh dừa ngọt bùi. Đặc sản Bình Định, thường xuất hiện trong mâm cúng và quà tặng dịp lễ tết.",
+        "tags": [
+          "Bình Định",
+          "Truyền thống"
+        ]
+      },
+      {
+        "emoji": "🍗",
+        "name": "Cơm gà Hội An",
+        "region": "Hội An",
+        "desc": "Cơm nấu bằng nước luộc gà, thêm gà xé phay, hành tây, rau răm và nước mắm. Món ăn bình dân nhưng được nhiều thực khách yêu thích.",
+        "tags": [
+          "Hội An",
+          "Bình dân"
+        ]
+      },
+      {
+        "emoji": "🥟",
+        "name": "Bánh bột lọc Huế",
+        "region": "Huế",
+        "desc": "Vỏ bánh trong từ bột năng, nhân tôm thịt, gói lá chuối hấp chín. Chấm nước mắm tỏi ớt cay nhẹ, một món cung đình bình dân của xứ Huế.",
+        "tags": [
+          "Huế",
+          "Hấp lá chuối"
+        ]
+      },
+      {
+        "emoji": "🫓",
+        "name": "Bánh nậm Huế",
+        "region": "Huế",
+        "desc": "Bột gạo mềm mịn gói lá dong, nhân tôm xay và thịt. Ăn nóng cùng nước mắm ngọt, thơm hương lá và bột gạo.",
+        "tags": [
+          "Huế",
+          "Hấp lá"
+        ]
+      },
+      {
+        "emoji": "🍮",
+        "name": "Chè Huế",
+        "region": "Huế",
+        "desc": "Chè đa dạng từ chè hạt sen, chè bắp, chè đậu ván đến chè bột lọc. Món ngọt tinh tế, được bày trong ly nhỏ xinh xắn.",
+        "tags": [
+          "Tráng miệng",
+          "Cố đô"
+        ]
+      },
+      {
+        "emoji": "🥓",
+        "name": "Nem chua Thanh Hóa",
+        "region": "Thanh Hóa",
+        "desc": "Thịt heo lên men chua nhẹ, gói lá chuối hoặc lá ổi, ăn cùng tỏi và ớt. Món nhắm và quà biếu quen thuộc của xứ Thanh.",
+        "tags": [
+          "Thanh Hóa",
+          "Lên men"
+        ]
+      },
+      {
+        "emoji": "🍥",
+        "name": "Bún chả cá Đà Nẵng",
+        "region": "Đà Nẵng",
+        "desc": "Chả cá chiên tươi, nước dùng ngọt thanh từ xương và cà chua, thêm rau sống. Món sáng bình dân dễ tìm khắp Đà Nẵng.",
+        "tags": [
+          "Đà Nẵng",
+          "Hải sản"
+        ]
+      },
+      {
+        "emoji": "🍜",
+        "name": "Bún mắm nêm Đà Nẵng",
+        "region": "Đà Nẵng",
+        "desc": "Bún tươi ăn kèm thịt luộc, rau sống và mắm nêm pha chua ngọt, thêm dứa và ớt. Hương vị đậm đà đặc trưng miền Trung.",
+        "tags": [
+          "Mắm nêm",
+          "Đà Nẵng"
+        ]
+      },
+      {
+        "emoji": "🐖",
+        "name": "Bê thui Cầu Mống",
+        "region": "Quảng Nam",
+        "desc": "Thịt bê non thui vàng, thái mỏng, chấm tương gừng hoặc mắm nêm, ăn cùng rau sống và bánh tráng. Món ăn nổi tiếng của Quảng Nam.",
+        "tags": [
+          "Quảng Nam",
+          "Thịt bê"
+        ]
+      },
+      {
+        "emoji": "🧄",
+        "name": "Gỏi tỏi Lý Sơn",
+        "region": "Lý Sơn",
+        "desc": "Tỏi Lý Sơn tạo độ cay thơm riêng, trộn cùng hải sản hoặc rau củ. Hòn đảo nổi tiếng với vựa tỏi, hành tím.",
+        "tags": [
+          "Lý Sơn",
+          "Đảo"
+        ]
+      },
+      {
+        "emoji": "🥞",
+        "name": "Bánh xèo tôm nhảy Quy Nhơn",
+        "region": "Quy Nhơn",
+        "desc": "Bánh xèo nhỏ giòn, nhân tôm nhảy tươi nhỏ, cuốn rau sống chấm nước mắm. Món đặc sản gây ấn tượng với du khách tới Bình Định.",
+        "tags": [
+          "Bình Định",
+          "Hải sản"
+        ]
+      },
+      {
+        "emoji": "🍤",
+        "name": "Chả ram tôm đất",
+        "region": "Quy Nhơn",
+        "desc": "Chả cuốn bánh tráng, nhân tôm đất giã nhuyễn, chiên vàng giòn. Ăn kèm rau sống và nước chấm chua ngọt.",
+        "tags": [
+          "Bình Định",
+          "Chiên giòn"
+        ]
+      },
+      {
+        "emoji": "🍢",
+        "name": "Nem nướng Ninh Hòa",
+        "region": "Khánh Hòa",
+        "desc": "Nem heo nướng thơm, cuốn bánh tráng cùng rau sống và chuối chát, chấm nước sốt đậm. Đặc sản nổi tiếng của vùng Ninh Hòa.",
+        "tags": [
+          "Khánh Hòa",
+          "Nướng"
+        ]
+      },
+      {
+        "emoji": "🍜",
+        "name": "Bánh hỏi lòng heo",
+        "region": "Nha Trang",
+        "desc": "Bánh hỏi mềm ăn cùng lòng heo luộc, rau thơm, chấm mắm tôm hoặc nước mắm. Món sáng quen thuộc của người dân Khánh Hòa.",
+        "tags": [
+          "Khánh Hòa",
+          "Món sáng"
+        ]
+      },
+      {
+        "emoji": "☕",
+        "name": "Cà phê Buôn Ma Thuột",
+        "region": "Đắk Lắk",
+        "desc": "Cà phê vùng đất đỏ bazan, hương thơm đậm, hậu vị bền. Tây Nguyên là vùng trồng cà phê lớn nhất Việt Nam.",
+        "tags": [
+          "Tây Nguyên",
+          "Thức uống"
+        ]
+      },
+      {
+        "emoji": "🍜",
+        "name": "Phở khô Gia Lai",
+        "region": "Gia Lai",
+        "desc": "Sợi phở mỏng trộn đều thịt băm, hành phi, rau sống, kèm bát nước dùng riêng. Món ăn đặc trưng của thành phố Pleiku.",
+        "tags": [
+          "Gia Lai",
+          "Ăn khô"
+        ]
+      },
+      {
+        "emoji": "🌮",
+        "name": "Bánh tráng nướng Đà Lạt",
+        "region": "Đà Lạt",
+        "desc": "Bánh tráng nướng than hồng, phủ trứng, hành lá, ruốc và xúc xích. Món ăn vặt ấm nóng khi trời đêm Đà Lạt se lạnh.",
+        "tags": [
+          "Đà Lạt",
+          "Ăn vặt"
+        ]
+      },
+      {
+        "emoji": "🍲",
+        "name": "Lẩu gà lá é",
+        "region": "Đà Lạt",
+        "desc": "Gà ta nấu cùng lá é thơm nồng, thêm rau rừng và nấm. Nước lẩu thanh, cay nhẹ, hợp ngày mưa lạnh vùng cao nguyên.",
+        "tags": [
+          "Đà Lạt",
+          "Lẩu"
+        ]
+      },
+      {
+        "emoji": "🥢",
+        "name": "Bánh ướt lòng gà",
+        "region": "Đà Lạt",
+        "desc": "Bánh ướt mềm ăn cùng lòng gà, trứng non, hành phi và nước mắm chua ngọt. Bữa sáng quen thuộc của dân Đà Lạt.",
+        "tags": [
+          "Đà Lạt",
+          "Món sáng"
+        ]
+      },
+      {
+        "emoji": "🐑",
+        "name": "Cừu nướng Ninh Thuận",
+        "region": "Ninh Thuận",
+        "desc": "Cừu thả nuôi vùng nắng gió, ướp gia vị nướng, thịt thơm và ít mỡ. Thường ăn cùng rau sống và muối ớt xanh.",
+        "tags": [
+          "Ninh Thuận",
+          "Nướng"
+        ]
+      },
+      {
+        "emoji": "🍜",
+        "name": "Bánh canh Nam Phổ",
+        "region": "Huế",
+        "desc": "Sợi bánh canh dày dai, tôm, chả, nước dùng sệt đậm vị hải sản. Món ăn dân dã nổi tiếng ở làng Nam Phổ ngoại ô Huế.",
+        "tags": [
+          "Huế",
+          "Bình dân"
+        ]
+      },
+      {
+        "emoji": "🥞",
+        "name": "Bánh khoái Huế",
+        "region": "Huế",
+        "desc": "Bánh bột gạo chiên giòn nhân tôm, thịt, giá, chấm tương đậu phộng. Món ăn cung đình tinh tế, thường ăn cùng rau sống.",
+        "tags": [
+          "Huế",
+          "Cung đình"
+        ],
+        "imageQuery": [
+          "Bánh khoái",
+          "Bánh xèo"
+        ]
+      },
+      {
+        "emoji": "🥢",
+        "name": "Tré Huế",
+        "region": "Huế",
+        "desc": "Thịt heo thái sợi trộn bì, thính, riềng, tỏi ớt, gói lá chuối rồi lên men nhẹ. Cay chua, ăn cùng rau thơm và bánh tráng.",
+        "tags": [
+          "Lên men",
+          "Cay"
+        ],
+        "imageQuery": [
+          "Tré",
+          "Nem chua"
+        ]
+      },
+      {
+        "emoji": "🍬",
+        "name": "Mè xửng Huế",
+        "region": "Huế",
+        "desc": "Kẹo dẻo làm từ mạch nha, đường, mè, đậu phộng, thơm ngọt bùi. Quà biếu quen thuộc của du khách khi về Cố đô.",
+        "tags": [
+          "Quà biếu",
+          "Kẹo truyền thống"
+        ],
+        "imageQuery": [
+          "Mè xửng",
+          "Kẹo mè"
+        ]
+      },
+      {
+        "emoji": "🍚",
+        "name": "Cơm âm phủ",
+        "region": "Huế",
+        "desc": "Cơm trộn thịt heo, tôm, chả, trứng, rau thơm, chan nước sốt đậm. Món ăn dân dã đặc trưng của thành phố Huế.",
+        "tags": [
+          "Huế",
+          "Bình dân"
+        ],
+        "imageQuery": [
+          "Cơm âm phủ",
+          "Cơm"
+        ]
+      },
+      {
+        "emoji": "🌹",
+        "name": "Bánh bao bánh vạc",
+        "region": "Hội An",
+        "desc": "Bánh bột gạo trong, nhân tôm hoặc thịt, xếp hình bông hồng trắng. Món ăn tinh tế gắn với phố cổ Hội An.",
+        "tags": [
+          "Hội An",
+          "Bông hồng trắng"
+        ],
+        "imageQuery": [
+          "Bánh bao bánh vạc",
+          "Bánh vạc"
+        ]
+      },
+      {
+        "emoji": "🥟",
+        "name": "Bánh ram ít",
+        "region": "Quảng Ngãi",
+        "desc": "Bánh gồm lớp bột nếp rán giòn bên dưới, bánh ít hấp mềm bên trên, nhân tôm thịt. Chấm nước mắm chua ngọt, vị lạ mà đậm đà.",
+        "tags": [
+          "Quảng Ngãi",
+          "Giòn và dẻo"
+        ],
+        "imageQuery": [
+          "Bánh ram ít",
+          "Bánh ít"
+        ]
+      },
+      {
+        "emoji": "🐚",
+        "name": "Don Quảng Ngãi",
+        "region": "Quảng Ngãi",
+        "desc": "Con don là loài sò nhỏ, xào hoặc nấu cháo, ăn cùng bánh tráng nướng. Món ăn vặt đặc trưng vùng biển Sa Huỳnh, Quảng Ngãi.",
+        "tags": [
+          "Hải sản",
+          "Đặc sản"
+        ],
+        "imageQuery": [
+          "Don Quảng Ngãi",
+          "Sò"
+        ]
+      },
+      {
+        "emoji": "🥣",
+        "name": "Cháo canh Quảng Bình",
+        "region": "Quảng Bình",
+        "desc": "Sợi bánh canh bột gạo nấu sệt cùng tôm, cá, chả, hành phi. Món ăn sáng bình dân của người dân xứ Quảng.",
+        "tags": [
+          "Quảng Bình",
+          "Món sáng"
+        ],
+        "imageQuery": [
+          "Cháo canh",
+          "Bánh canh"
+        ]
+      },
+      {
+        "emoji": "🍗",
+        "name": "Gà nướng cơm lam",
+        "region": "Gia Lai · Kon Tum",
+        "desc": "Gà ta ướp mắc khén, nướng than hồng, ăn cùng cơm lam nếp dẻo nướng trong ống nứa. Hương vị núi rừng Tây Nguyên.",
+        "tags": [
+          "Tây Nguyên",
+          "Nướng"
+        ],
+        "imageQuery": [
+          "Cơm lam",
+          "Gà nướng"
+        ]
+      },
+      {
+        "emoji": "🍜",
+        "name": "Bún chả cá Quy Nhơn",
+        "region": "Quy Nhơn",
+        "desc": "Bún tươi chan nước dùng ngọt thanh nấu từ cá, thêm chả cá chiên, rau sống và ớt. Món sáng quen thuộc của người Bình Định.",
+        "tags": [
+          "Bình Định",
+          "Hải sản"
+        ],
+        "imageQuery": [
+          "Bún chả cá",
+          "Chả cá"
+        ]
+      }
+    ]
+  },
+  "south": {
+    "label": "Miền Nam",
+    "icon": "🌊",
+    "color": "#0D2A4A",
+    "tags": [
+      "Ngọt · Mát",
+      "Nhiều nước cốt dừa",
+      "Đa dạng topping",
+      "Sài Gòn · Cần Thơ · Mỹ Tho · Bạc Liêu"
+    ],
+    "desc": "Miền Nam ăn ngọt — ngọt trong nước dùng, ngọt trong nước chấm. Đây là vùng đất phù sa màu mỡ, sản vật dồi dào từ đồng bằng sông Cửu Long, nơi văn hóa Việt–Hoa–Khmer giao thoa tạo nên kho tàng ẩm thực phong phú bậc nhất.",
+    "featured": {
+      "emoji": "🍱",
+      "name": "Cơm tấm Sài Gòn",
+      "desc": "Hạt gạo tấm vỡ thơm, sườn nướng mỡ hành, bì, chả trứng, đồ chua và nước mắm tỏi ớt ngọt. Ăn sáng, trưa hay tối đều đúng với người Sài Gòn — quán cơm tấm mở 24/7 là chuyện bình thường."
+    },
+    "foods": [
+      {
+        "emoji": "🍜",
+        "name": "Phở Nam",
+        "region": "Sài Gòn",
+        "desc": "Nước dùng ngọt hơn từ xương và củ cải, bày giá sống, rau húng quế, tương đen, tương đỏ bên cạnh. Tô lớn, chan nhiều gia vị — phong cách phóng khoáng đặc trưng người miền Nam.",
+        "tags": [
+          "Ngọt nước dùng",
+          "Giá sống"
+        ]
+      },
+      {
+        "emoji": "🍲",
+        "name": "Hủ tiếu",
+        "region": "Mỹ Tho · Sài Gòn",
+        "desc": "Sợi hủ tiếu dai trong, nước dùng xương heo ngọt thanh, tôm, thịt, gan, trứng cút. Hủ tiếu Mỹ Tho nổi tiếng ăn khô — trộn sợi rồi chan nước riêng, vừa ăn vừa húp.",
+        "tags": [
+          "Khô · Nước",
+          "Người Hoa"
+        ]
+      },
+      {
+        "emoji": "🥖",
+        "name": "Bánh mì Sài Gòn",
+        "region": "Sài Gòn",
+        "desc": "Ổ bánh mì giòn, nhân pa-tê, chả lụa, xíu mại, dưa leo, đồ chua, tương ớt, hành ngò. CNN từng vinh danh là sandwich xuất sắc nhất thế giới — biểu tượng ẩm thực đường phố Việt Nam.",
+        "tags": [
+          "Thế giới biết đến",
+          "Giao thoa"
+        ]
+      },
+      {
+        "emoji": "🫕",
+        "name": "Lẩu mắm",
+        "region": "Sài Gòn · Cần Thơ",
+        "desc": "Nước lẩu từ mắm cá linh, cá sặc — mùi đậm, vị ngọt, béo nước cốt dừa. Nhúng cá kèo, tôm, bông súng, rau nhút... Tinh hoa ẩm thực miền sông nước Cửu Long.",
+        "tags": [
+          "Sông nước",
+          "Đậm đà"
+        ]
+      },
+      {
+        "emoji": "🍛",
+        "name": "Bún nước lèo",
+        "region": "Sóc Trăng · Trà Vinh",
+        "desc": "Nước dùng từ mắm bò hóc Khmer, cá lóc, tôm, heo quay. Ăn kèm bông súng, ngó sen, rau muống bằm — đậm dấu ấn văn hóa Khmer miền Tây sông nước.",
+        "tags": [
+          "Sóc Trăng",
+          "Khmer"
+        ]
+      },
+      {
+        "emoji": "🥥",
+        "name": "Bánh tằm bì",
+        "region": "Bạc Liêu",
+        "desc": "Sợi bánh tằm mềm mại phủ bì thịt heo thái sợi, chan nước cốt dừa béo ngậy, ăn kèm dưa leo và đồ chua. Ngọt bùi đậm chất miền Tây — ít nơi bên ngoài Bạc Liêu làm đúng vị.",
+        "tags": [
+          "Bạc Liêu",
+          "Nước cốt dừa"
+        ]
+      },
+      {
+        "emoji": "🍢",
+        "name": "Bánh canh Trảng Bàng",
+        "region": "Tây Ninh",
+        "desc": "Sợi bánh canh to, trắng trong, dai mềm từ bột gạo tươi, chan nước dùng heo trong vắt. Ăn kèm thịt heo luộc cuộn bánh tráng muối, rau rừng Tây Ninh đặc trưng.",
+        "tags": [
+          "Tây Ninh",
+          "Bánh tráng"
+        ]
+      },
+      {
+        "emoji": "🦞",
+        "name": "Lẩu cua đồng",
+        "region": "Đồng Tháp · Long An",
+        "desc": "Cua đồng giã lọc nước ngọt ngào, nấu với bạc hà (dọc mùng), kèo nèo, cà chua. Lẩu dân dã của đồng bằng, thơm mùi cua đặc trưng mùa nước nổi tháng 9–11.",
+        "tags": [
+          "Đồng bằng",
+          "Mùa nước nổi"
+        ]
+      },
+      {
+        "emoji": "🌯",
+        "name": "Bánh xèo miền Nam",
+        "region": "Sài Gòn · Cần Thơ",
+        "desc": "To bản như chiếc nón, vỏ giòn tan vàng nghệ, nhân tôm thịt giá đỗ dồi dào. Ăn cuộn lá cải xanh, rau thơm, chấm nước mắm chua ngọt tỏi ớt — phóng khoáng như người Nam.",
+        "tags": [
+          "To · Giòn",
+          "Rau sống"
+        ]
+      },
+      {
+        "emoji": "🍮",
+        "name": "Chè ba màu",
+        "region": "Sài Gòn",
+        "desc": "Ba lớp chè đậu đỏ, đậu xanh, thạch sương sa xếp chồng, chan nước cốt dừa thơm, thêm đá bào mát lạnh. Món tráng miệng vỉa hè cổ điển của Sài Gòn — giải nhiệt hoàn hảo.",
+        "tags": [
+          "Tráng miệng",
+          "Mát lạnh"
+        ]
+      },
+      {
+        "emoji": "🦀",
+        "name": "Bún riêu cua Sài Gòn",
+        "region": "Sài Gòn",
+        "desc": "Phiên bản miền Nam ngọt hơn, có thêm đậu hũ chiên, mắm ruốc, huyết heo. Nước dùng đỏ tươi từ cà chua, riêu cua nổi tảng vàng ươm hấp dẫn — phong phú hơn bản Bắc.",
+        "tags": [
+          "Ngọt hơn",
+          "Đậu hũ chiên"
+        ]
+      },
+      {
+        "emoji": "🥘",
+        "name": "Cá kho tộ",
+        "region": "Sài Gòn · Miền Tây",
+        "desc": "Cá tra hoặc cá basa kho trong tộ đất với nước dừa, nước màu, tiêu hạt — cá thấm đậm, nước kho sánh đặc. Ăn với cơm trắng nóng hổi là bữa cơm gia đình hoàn hảo.",
+        "tags": [
+          "Cơm nhà",
+          "Đậm đà"
+        ]
+      },
+      {
+        "emoji": "🍜",
+        "name": "Bún mắm",
+        "region": "Cần Thơ · Sóc Trăng",
+        "desc": "Nước dùng từ mắm cá đồng pha loãng thơm béo, chan lên bún với cá lóc, tôm, mực, heo quay. Rau sống bông súng, rau muống — tinh hoa ẩm thực miền sông nước.",
+        "tags": [
+          "Cần Thơ",
+          "Sông nước"
+        ]
+      },
+      {
+        "emoji": "🫙",
+        "name": "Hủ tiếu Nam Vang",
+        "region": "Sài Gòn",
+        "desc": "Phong cách Campuchia du nhập vào Sài Gòn: nước dùng xương heo trong vắt, tôm, thịt, gan, trứng cút, hẹ. Có thể ăn khô hoặc nước, thêm tương đen và ớt xay tùy khẩu vị.",
+        "tags": [
+          "Ảnh hưởng Khmer",
+          "Đêm khuya"
+        ]
+      },
+      {
+        "emoji": "🌴",
+        "name": "Bánh tét miền Nam",
+        "region": "Miền Tây",
+        "desc": "Đòn bánh tét nhân đậu xanh, thịt ba chỉ gói lá chuối nấu suốt đêm. Tết Nguyên Đán miền Nam không thể thiếu bánh tét — cắt thành khoanh tròn ăn với dưa hành.",
+        "tags": [
+          "Tết",
+          "Truyền thống"
+        ]
+      },
+      {
+        "emoji": "🦐",
+        "name": "Bánh khọt Vũng Tàu",
+        "region": "Vũng Tàu · Bà Rịa",
+        "desc": "Bánh khọt nhỏ xinh đúc trong khuôn tròn, vỏ gạo giòn bên ngoài mềm trong, trên tôm sú tươi và mỡ hành. Chấm nước mắm chua ngọt, cuốn rau sống — đặc sản Vũng Tàu.",
+        "tags": [
+          "Vũng Tàu",
+          "Biển"
+        ]
+      },
+      {
+        "emoji": "🎋",
+        "name": "Cơm lam ống tre",
+        "region": "Tây Nguyên · Kon Tum",
+        "desc": "Gạo nếp nhét vào ống tre non, nướng trên than hồng đến khi cơm chín dẻo thơm mùi tre. Đặc sản dân tộc Tây Nguyên, ăn cùng muối mè hoặc thịt nướng rừng.",
+        "tags": [
+          "Tây Nguyên",
+          "Dân tộc"
+        ]
+      },
+      {
+        "emoji": "🍡",
+        "name": "Chè chuối nước cốt dừa",
+        "region": "Miền Tây",
+        "desc": "Chuối sứ chín vừa nấu cùng nước cốt dừa thơm béo, bột năng sệt mịn, rắc mè rang. Chè dân dã miền Tây — nguyên liệu bình dị nhưng hương vị thơm ngọt khó quên.",
+        "tags": [
+          "Tráng miệng",
+          "Miền Tây"
+        ]
+      },
+      {
+        "emoji": "🐊",
+        "name": "Đặc sản cá sấu",
+        "region": "Cà Mau · An Giang",
+        "desc": "Thịt cá sấu nuôi xào sả ớt, lẩu hay nướng muối ớt — dai, ngọt, ít mỡ. Đặc sản độc lạ của vùng U Minh Hạ Cà Mau, thu hút nhiều du khách muốn thử trải nghiệm mới.",
+        "tags": [
+          "Độc lạ",
+          "Cà Mau"
+        ]
+      },
+      {
+        "emoji": "🥗",
+        "name": "Gỏi cuốn tôm thịt",
+        "region": "Sài Gòn",
+        "desc": "Tôm luộc đỏ hồng, thịt heo, bún, rau thơm, giá cuộn bánh tráng tươi trong suốt. Chấm tương hoisin pha tương ớt, rắc đậu phộng giã — thanh mát, lành, không chiên dầu.",
+        "tags": [
+          "Thanh mát",
+          "Lành"
+        ]
+      },
+      {
+        "emoji": "🥗",
+        "name": "Bánh tráng trộn",
+        "region": "Sài Gòn",
+        "desc": "Bánh tráng cắt sợi trộn khô bò, trứng cút, rau răm, xoài, hành phi, nước sốt mặn ngọt cay. Món ăn vặt vỉa hè phổ biến của giới trẻ.",
+        "tags": [
+          "Ăn vặt",
+          "Sài Gòn"
+        ]
+      },
+      {
+        "emoji": "🍳",
+        "name": "Bột chiên",
+        "region": "Sài Gòn",
+        "desc": "Bột gạo cắt miếng chiên trên chảo cùng trứng, hành lá, đu đủ bào, chấm tương ớt. Món ăn đường phố của người Hoa ở Chợ Lớn.",
+        "tags": [
+          "Chợ Lớn",
+          "Chiên"
+        ]
+      },
+      {
+        "emoji": "🐚",
+        "name": "Ốc Sài Gòn",
+        "region": "Sài Gòn",
+        "desc": "Ốc hương, ốc len, ốc tỏi... xào bơ, nướng muối ớt hoặc hấp sả. Các quán ốc về đêm khu Vĩnh Khánh, Quận 4 rất nhộn nhịp.",
+        "tags": [
+          "Về đêm",
+          "Hải sản"
+        ]
+      },
+      {
+        "emoji": "🍖",
+        "name": "Bún thịt nướng",
+        "region": "Sài Gòn",
+        "desc": "Bún tươi, thịt heo nướng thơm sả, rau sống, đồ chua, chả giò, chan nước mắm. Món bún trộn quen thuộc của người miền Nam.",
+        "tags": [
+          "Bún trộn",
+          "Nướng"
+        ]
+      },
+      {
+        "emoji": "🥣",
+        "name": "Hủ tiếu gõ",
+        "region": "Sài Gòn",
+        "desc": "Gánh hủ tiếu rao bằng tiếng gõ, nước dùng ngọt thanh, thịt bằm, tôm. Hương vị hoài niệm của đường phố Sài Gòn xưa.",
+        "tags": [
+          "Hoài niệm",
+          "Đêm khuya"
+        ]
+      },
+      {
+        "emoji": "🍮",
+        "name": "Bánh flan",
+        "region": "Sài Gòn",
+        "desc": "Bánh trứng sữa mềm mịn phủ caramel, thường ăn cùng cà phê hoặc đá bào. Món tráng miệng mát lạnh giải nhiệt ngày nóng.",
+        "tags": [
+          "Tráng miệng",
+          "Mát lạnh"
+        ]
+      },
+      {
+        "emoji": "☕",
+        "name": "Cà phê sữa đá",
+        "region": "Sài Gòn",
+        "desc": "Cà phê pha phin đậm đà, thêm sữa đặc và đá. Thức uống gắn với nhịp sống sôi động của thành phố.",
+        "tags": [
+          "Thức uống",
+          "Phin"
+        ]
+      },
+      {
+        "emoji": "🐟",
+        "name": "Bún cá Châu Đốc",
+        "region": "Châu Đốc",
+        "desc": "Nước dùng nghệ vàng thơm, cá lóc, cá linh, ăn cùng rau sống và bông súng. Đặc sản đậm hương vị miền sông nước An Giang.",
+        "tags": [
+          "An Giang",
+          "Nghệ"
+        ]
+      },
+      {
+        "emoji": "🍜",
+        "name": "Bún kèn Phú Quốc",
+        "region": "Phú Quốc",
+        "desc": "Bún ăn cùng cá, nước cốt dừa, rau thơm, nước dùng thơm béo. Món ăn đặc trưng của người dân đảo ngọc.",
+        "tags": [
+          "Phú Quốc",
+          "Nước cốt dừa"
+        ]
+      },
+      {
+        "emoji": "🥗",
+        "name": "Gỏi cá trích Phú Quốc",
+        "region": "Phú Quốc",
+        "desc": "Cá trích tươi, dừa nạo, rau thơm cuốn bánh tráng, chấm nước mắm đậu phộng. Món gỏi đặc sản biển đảo thanh mát.",
+        "tags": [
+          "Phú Quốc",
+          "Gỏi cá"
+        ]
+      },
+      {
+        "emoji": "🥮",
+        "name": "Bánh pía Sóc Trăng",
+        "region": "Sóc Trăng",
+        "desc": "Bánh nhiều lớp mỏng, nhân đậu xanh, sầu riêng hoặc trứng muối. Quà biếu nổi tiếng của Sóc Trăng, bánh có nhiều biến tấu.",
+        "tags": [
+          "Sóc Trăng",
+          "Quà biếu"
+        ]
+      },
+      {
+        "emoji": "🔥",
+        "name": "Cá lóc nướng trui",
+        "region": "Miền Tây",
+        "desc": "Cá lóc nguyên con nướng trên rơm lửa, cuốn bánh tráng, rau sống, chấm mắm me. Món ăn dân dã của miền sông nước.",
+        "tags": [
+          "Miền Tây",
+          "Nướng rơm"
+        ]
+      },
+      {
+        "emoji": "🍲",
+        "name": "Lẩu cá linh bông điên điển",
+        "region": "Đồng Tháp · An Giang",
+        "desc": "Cá linh mùa nước nổi nấu cùng bông điên điển, rau đồng nội. Hương vị đồng bằng vào mùa nước lên.",
+        "tags": [
+          "Mùa nước nổi",
+          "Dân dã"
+        ]
+      },
+      {
+        "emoji": "🥢",
+        "name": "Nem Lai Vung",
+        "region": "Đồng Tháp",
+        "desc": "Nem thịt heo lên men chua nhẹ, ăn cùng rau sống và bánh tráng. Đặc sản quen thuộc của vùng Lai Vung, Đồng Tháp.",
+        "tags": [
+          "Đồng Tháp",
+          "Lên men"
+        ]
+      },
+      {
+        "emoji": "🦆",
+        "name": "Vịt nấu chao",
+        "region": "Sóc Trăng · Cần Thơ",
+        "desc": "Thịt vịt nấu cùng chao, sả, gừng, nước dùng đậm đà, thơm mùi đặc biệt. Thường ăn với bún hoặc bánh mì.",
+        "tags": [
+          "Miền Tây",
+          "Món nhậu"
+        ]
+      },
+      {
+        "emoji": "🍘",
+        "name": "Bánh tráng phơi sương",
+        "region": "Tây Ninh",
+        "desc": "Bánh tráng phơi qua đêm cho dẻo mềm, cuốn thịt luộc, rau sống, chấm mắm nêm. Đặc sản nổi tiếng của vùng Trảng Bàng, Tây Ninh.",
+        "tags": [
+          "Tây Ninh",
+          "Cuốn"
+        ]
+      },
+      {
+        "emoji": "🥩",
+        "name": "Bò tơ Tây Ninh",
+        "region": "Tây Ninh",
+        "desc": "Thịt bê non thái mỏng, ăn cùng bánh tráng, rau sống và muối tôm. Đặc sản quen thuộc khi ghé Tây Ninh.",
+        "tags": [
+          "Tây Ninh",
+          "Thịt bê"
+        ]
+      },
+      {
+        "emoji": "🥥",
+        "name": "Kẹo dừa Bến Tre",
+        "region": "Bến Tre",
+        "desc": "Kẹo nấu từ nước cốt dừa và mạch nha, dẻo thơm béo ngậy. Quà lưu niệm đặc trưng xứ dừa Bến Tre.",
+        "tags": [
+          "Bến Tre",
+          "Quà lưu niệm"
+        ]
+      },
+      {
+        "emoji": "🧆",
+        "name": "Bánh cống",
+        "region": "Sóc Trăng · Cà Mau",
+        "desc": "Bánh chiên giòn nhân đậu xanh, tôm, thịt, ăn cùng rau sống và nước chấm chua ngọt. Món ăn vặt dân dã của miền Tây.",
+        "tags": [
+          "Chiên giòn",
+          "Miền Tây"
+        ]
+      },
+      {
+        "emoji": "🍰",
+        "name": "Bánh bò thốt nốt",
+        "region": "An Giang",
+        "desc": "Bánh bò làm từ đường thốt nốt, mềm xốp, thơm ngọt thanh. Đặc sản gắn với vùng Tri Tôn, Tịnh Biên, An Giang.",
+        "tags": [
+          "An Giang",
+          "Thốt nốt"
+        ]
+      },
+      {
+        "emoji": "🍲",
+        "name": "Bò kho",
+        "region": "Sài Gòn",
+        "desc": "Thịt bò hầm mềm cùng cà rốt, sả, quế, hồi trong nước sốt màu cam thơm. Ăn với bánh mì hoặc bún, rắc ngò gai và hành.",
+        "tags": [
+          "Hầm",
+          "Ăn sáng"
+        ],
+        "imageQuery": [
+          "Bò kho",
+          "Bánh mì bò kho"
+        ]
+      },
+      {
+        "emoji": "🍮",
+        "name": "Chè bưởi",
+        "region": "Miền Tây",
+        "desc": "Cùi bưởi dai giòn, đậu xanh, nước cốt dừa ngọt thanh, ăn mát lạnh. Món chè công phu, thường thấy ở Bến Tre, Sài Gòn.",
+        "tags": [
+          "Tráng miệng",
+          "Mát lạnh"
+        ],
+        "imageQuery": [
+          "Chè bưởi",
+          "Chè"
+        ]
+      },
+      {
+        "emoji": "🍌",
+        "name": "Bánh chuối nướng",
+        "region": "Sài Gòn · Miền Tây",
+        "desc": "Chuối chín gói trong bánh mì, nướng với nước cốt dừa. Bánh vàng, ngọt thơm, thường ăn nóng với nước cốt dừa.",
+        "tags": [
+          "Nướng",
+          "Nước cốt dừa"
+        ],
+        "imageQuery": [
+          "Bánh chuối nướng",
+          "Chuối"
+        ]
+      },
+      {
+        "emoji": "🥗",
+        "name": "Gỏi ngó sen",
+        "region": "Đồng Tháp",
+        "desc": "Ngó sen giòn trộn tôm, thịt, rau thơm, lạc rang, nước mắm chua ngọt. Món gỏi thanh mát của vùng Đồng Tháp Mười.",
+        "tags": [
+          "Đồng Tháp",
+          "Thanh mát"
+        ],
+        "imageQuery": [
+          "Gỏi ngó sen",
+          "Gỏi"
+        ]
+      },
+      {
+        "emoji": "🥣",
+        "name": "Cháo lòng",
+        "region": "Sài Gòn",
+        "desc": "Cháo gạo nấu nhuyễn cùng lòng, dồi, gan heo, hành phi, tiêu. Ăn với quẩy và chanh ớt, hợp bữa sáng hoặc đêm khuya.",
+        "tags": [
+          "Bình dân",
+          "Đêm khuya"
+        ],
+        "imageQuery": [
+          "Cháo lòng",
+          "Cháo"
+        ]
+      },
+      {
+        "emoji": "🎋",
+        "name": "Bánh ú nước tro",
+        "region": "Miền Tây",
+        "desc": "Bánh gạo ngâm nước tro rơm, màu vàng trong, chấm đường hoặc mật. Thường ăn vào Tết Đoan Ngọ, dai mềm và mát.",
+        "tags": [
+          "Đoan Ngọ",
+          "Truyền thống"
+        ],
+        "imageQuery": [
+          "Bánh ú tro",
+          "Bánh tro"
+        ]
+      },
+      {
+        "emoji": "🐟",
+        "name": "Mắm thái Châu Đốc",
+        "region": "Châu Đốc",
+        "desc": "Mắm cá linh, cá sặc ủ cùng thơm, đu đủ, riềng sợi, tạo hương vị đậm đà. Ăn kèm rau sống, thịt luộc, nhất là mùa nước nổi.",
+        "tags": [
+          "An Giang",
+          "Mắm"
+        ],
+        "imageQuery": [
+          "Mắm thái",
+          "Mắm cá"
+        ]
+      },
+      {
+        "emoji": "🍜",
+        "name": "Hủ tiếu Sa Đéc",
+        "region": "Đồng Tháp",
+        "desc": "Sợi hủ tiếu dai làm từ bột gạo Sa Đéc, nước dùng xương ngọt thanh, thêm thịt, tôm. Món ăn quen thuộc của miền sông nước.",
+        "tags": [
+          "Sa Đéc",
+          "Nước dùng ngọt"
+        ],
+        "imageQuery": [
+          "Hủ tiếu Sa Đéc",
+          "Hủ tiếu"
+        ]
+      },
+      {
+        "emoji": "🥒",
+        "name": "Tôm khô củ kiệu",
+        "region": "Miền Nam",
+        "desc": "Củ kiệu muối chua ngọt ăn kèm tôm khô, thịt kho nước dừa. Món ăn không thể thiếu trong mâm cơm Tết miền Nam.",
+        "tags": [
+          "Tết",
+          "Chua ngọt"
+        ],
+        "imageQuery": [
+          "Củ kiệu",
+          "Tôm khô"
+        ]
+      },
+      {
+        "emoji": "🐟",
+        "name": "Cá bống kho tiêu",
+        "region": "Miền Nam",
+        "desc": "Cá bống nhỏ kho trong tộ đất cùng tiêu, nước mắm, đường. Món cơm nhà đậm đà, ăn với cơm trắng nóng.",
+        "tags": [
+          "Cơm nhà",
+          "Kho tộ"
+        ],
+        "imageQuery": [
+          "Cá bống kho tiêu",
+          "Cá kho"
+        ]
+      }
+    ]
+  }
+}

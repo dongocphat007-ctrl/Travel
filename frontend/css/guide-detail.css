@@ -1,0 +1,419 @@
+/* ==========================================================================
+   Trang hồ sơ Hướng dẫn viên (guide.html?id=...)
+   ========================================================================== */
+
+:root {
+  --bg: #e4e1da;
+  --surface: #f5f3ee;
+  --surface-2: #ebe8e0;
+  --border: rgba(13, 33, 55, 0.24);
+  --text: #0d2137;
+  --muted: #566170;
+  --accent: #b3261e;
+  --navy: #0d2137;
+  --shadow: none;
+  --status-ok: #1f6b4a;
+  --status-ok-bg: rgba(31, 107, 74, 0.12);
+  --status-warn: #8a5a12;
+  --status-warn-bg: rgba(138, 90, 18, 0.12);
+  --status-off: #566170;
+  --status-off-bg: rgba(86, 97, 112, 0.12);
+  --busy: #b3261e;
+  --busy-bg: rgba(179, 38, 30, 0.12);
+  --font-display: "Newsreader", "Times New Roman", serif;
+  --font-text:
+    "Be Vietnam Pro", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+body {
+  font-family: var(--font-text);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 16px;
+  line-height: 1.6;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.hidden {
+  display: none;
+}
+
+/* =========================
+   HEADER
+========================= */
+.header {
+  background: var(--surface);
+  border-bottom: 2px dotted var(--border);
+  box-shadow: none;
+}
+
+.header .container {
+  height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.logo,
+.back {
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.logo {
+  font-family: var(--font-display);
+  font-size: 1.65rem;
+  font-weight: 500;
+}
+
+.back {
+  font-weight: 600;
+  font-size: 1rem;
+  opacity: 1;
+}
+
+.logo:hover,
+.back:hover {
+  text-decoration: underline;
+}
+
+main {
+  padding: 24px 0 56px;
+}
+
+/* =========================
+   LOADING / ERROR
+========================= */
+.loading,
+.error {
+  text-align: center;
+  padding: 48px 16px;
+  color: var(--muted);
+}
+
+.error h2 {
+  color: var(--text);
+  margin: 6px 0;
+}
+
+.error a,
+.retry-btn {
+  color: var(--accent);
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  margin: 0 auto 10px;
+  border-radius: 50%;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.retry-btn {
+  padding: 9px 18px;
+  border-radius: 10px;
+  background: var(--accent);
+  color: #fff;
+  border: 0;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* =========================
+   THÔNG TIN GUIDE
+========================= */
+.guide-hero {
+  display: flex;
+  gap: 22px;
+  align-items: center;
+  background: var(--surface);
+  border: 0;
+  border-left: 4px dotted var(--accent);
+  border-radius: 2px;
+  padding: 22px;
+  box-shadow: none;
+}
+
+.guide-avatar {
+  width: 112px;
+  height: 112px;
+  border-radius: 2px;
+  object-fit: cover;
+  flex: none;
+  background: var(--surface-2);
+  border: 0;
+  filter: grayscale(1) contrast(1.05);
+}
+
+/* Không có ảnh (hoặc ảnh lỗi) thì hiện chữ cái đầu */
+.guide-avatar-fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 2rem;
+  color: var(--surface);
+  background: var(--navy);
+}
+
+.guide-hero-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.guide-hero-info h1 {
+  margin: 0 0 4px;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.2;
+}
+
+.guide-meta {
+  color: var(--muted);
+  font-size: 0.95rem;
+  margin-bottom: 8px;
+}
+
+.guide-status {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 2px;
+  white-space: nowrap;
+}
+
+.guide-status.active {
+  color: var(--status-ok);
+  background: var(--status-ok-bg);
+}
+
+.guide-status.busy {
+  color: var(--status-warn);
+  background: var(--status-warn-bg);
+}
+
+.guide-status.off {
+  color: var(--status-off);
+  background: var(--status-off-bg);
+}
+
+.guide-languages {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.language-tag {
+  font-size: 0.76rem;
+  padding: 2px 10px;
+  border-radius: 2px;
+  background: var(--surface-2);
+  border: 0;
+  color: var(--text);
+}
+
+.guide-section {
+  margin-top: 24px;
+  background: transparent;
+  border: 0;
+  border-top: 2px dotted var(--border);
+  border-radius: 0;
+  padding: 22px 0;
+}
+
+.guide-section h2 {
+  margin: 0 0 10px;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
+.guide-bio {
+  margin: 0;
+  line-height: 1.65;
+}
+
+.guide-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 10px;
+}
+
+.fact-item {
+  background: var(--surface-2);
+  border-radius: 2px;
+  padding: 8px 12px;
+}
+
+.fact-item dt {
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.fact-item dd {
+  margin: 2px 0 0;
+  font-weight: 600;
+}
+
+/* =========================
+   LỊCH BẬN (busyDates)
+========================= */
+.calendar-note {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.calendar-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+}
+
+.calendar-title {
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 6px;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+}
+
+.calendar-dow {
+  text-align: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--muted);
+  padding: 2px 0;
+}
+
+.calendar-day {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 2px;
+  font-size: 0.85rem;
+  background: var(--surface-2);
+  border: 2px solid transparent;
+}
+
+.calendar-day.empty {
+  background: none;
+}
+
+.calendar-day.past {
+  opacity: 0.4;
+}
+
+.calendar-day.busy {
+  background: var(--busy-bg);
+  color: var(--busy);
+  font-weight: 700;
+  text-decoration: line-through;
+}
+
+.calendar-day.today {
+  border-color: var(--accent);
+  font-weight: 700;
+}
+
+.calendar-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin: 12px 0 0;
+  font-size: 0.84rem;
+  color: var(--muted);
+}
+
+.legend-dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  vertical-align: -1px;
+  margin-right: 5px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+}
+
+.legend-dot.busy {
+  background: var(--busy-bg);
+  border-color: var(--busy);
+}
+
+.legend-dot.today {
+  border: 2px solid var(--accent);
+}
+
+.busy-line {
+  margin-top: 14px;
+  font-size: 0.9rem;
+}
+
+.busy-line b {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.busy-date {
+  display: inline-block;
+  margin: 0 6px 6px 0;
+  padding: 2px 10px;
+  border-radius: 2px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--busy);
+  background: var(--busy-bg);
+}
+
+.no-busy {
+  color: var(--muted);
+}
+
+/* =========================
+   MOBILE
+========================= */
+@media (max-width: 640px) {
+  .guide-hero {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .guide-languages {
+    justify-content: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation-duration: 2s;
+  }
+}

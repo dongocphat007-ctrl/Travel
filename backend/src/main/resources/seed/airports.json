@@ -1,0 +1,107 @@
+[
+ {
+  "code": "HAN",
+  "city": "Hà Nội",
+  "name": "Nội Bài",
+  "country": "VN",
+  "utcOffset": 7
+ },
+ {
+  "code": "SGN",
+  "city": "TP. Hồ Chí Minh",
+  "name": "Tân Sơn Nhất",
+  "country": "VN",
+  "utcOffset": 7
+ },
+ {
+  "code": "DAD",
+  "city": "Đà Nẵng",
+  "name": "Đà Nẵng",
+  "country": "VN",
+  "utcOffset": 7
+ },
+ {
+  "code": "CXR",
+  "city": "Nha Trang",
+  "name": "Cam Ranh",
+  "country": "VN",
+  "utcOffset": 7
+ },
+ {
+  "code": "PQC",
+  "city": "Phú Quốc",
+  "name": "Phú Quốc",
+  "country": "VN",
+  "utcOffset": 7
+ },
+ {
+  "code": "HUI",
+  "city": "Huế",
+  "name": "Phú Bài",
+  "country": "VN",
+  "utcOffset": 7
+ },
+ {
+  "code": "DLI",
+  "city": "Đà Lạt",
+  "name": "Liên Khương",
+  "country": "VN",
+  "utcOffset": 7
+ },
+ {
+  "code": "HPH",
+  "city": "Hải Phòng",
+  "name": "Cát Bi",
+  "country": "VN",
+  "utcOffset": 7
+ },
+ {
+  "code": "VII",
+  "city": "Vinh",
+  "name": "Vinh",
+  "country": "VN",
+  "utcOffset": 7
+ },
+ {
+  "code": "VCA",
+  "city": "Cần Thơ",
+  "name": "Cần Thơ",
+  "country": "VN",
+  "utcOffset": 7
+ },
+ {
+  "code": "BKK",
+  "city": "Bangkok",
+  "name": "Suvarnabhumi",
+  "country": "TH",
+  "utcOffset": 7
+ },
+ {
+  "code": "SIN",
+  "city": "Singapore",
+  "name": "Changi",
+  "country": "SG",
+  "utcOffset": 8
+ },
+ {
+  "code": "NRT",
+  "city": "Tokyo",
+  "name": "Narita",
+  "country": "JP",
+  "utcOffset": 9
+ },
+ {
+  "code": "ICN",
+  "city": "Seoul",
+  "name": "Incheon",
+  "country": "KR",
+  "utcOffset": 9
+ },
+ {
+  "code": "HKG",
+  "city": "Hồng Kông",
+  "name": "Hong Kong Intl",
+  "country": "HK",
+  "utcOffset": 8
+ }
+]

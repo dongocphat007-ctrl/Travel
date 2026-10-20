@@ -1,0 +1,2452 @@
+[
+ {
+  "id": "HT001",
+  "name": "Grand Phố Cổ Resort",
+  "city": "Hà Nội",
+  "address": "Khu Phố Cổ, Hà Nội",
+  "stars": 5,
+  "kind": "Resort & Spa",
+  "rating": 8.2,
+  "reviews": 697,
+  "distCenter": 2.7,
+  "amenities": [
+   "Wi-Fi miễn phí",
+   "Bãi đỗ xe",
+   "Gym",
+   "Nhà hàng"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 3600000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 4860000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 6840000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT002",
+  "name": "Riverside Hồ Tây Hotel",
+  "city": "Hà Nội",
+  "address": "Khu Hồ Tây, Hà Nội",
+  "stars": 4,
+  "kind": "Hotel",
+  "rating": 8.3,
+  "reviews": 317,
+  "distCenter": 5.9,
+  "amenities": [
+   "Spa",
+   "Wi-Fi miễn phí",
+   "Nhà hàng",
+   "Bãi đỗ xe"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 1800000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 2430000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 3420000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT003",
+  "name": "Central Hoàn Kiếm Hotel",
+  "city": "Hà Nội",
+  "address": "Khu Hoàn Kiếm, Hà Nội",
+  "stars": 4,
+  "kind": "Hotel",
+  "rating": 8.4,
+  "reviews": 1065,
+  "distCenter": 0.9,
+  "amenities": [
+   "Nhà hàng",
+   "Wi-Fi miễn phí",
+   "Gym",
+   "Bãi đỗ xe"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 1500000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 2020000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 2850000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT004",
+  "name": "Boutique Phố Cổ Boutique",
+  "city": "Hà Nội",
+  "address": "Khu Phố Cổ, Hà Nội",
+  "stars": 3,
+  "kind": "Boutique",
+  "rating": 9.3,
+  "reviews": 333,
+  "distCenter": 3.9,
+  "amenities": [
+   "Nhà hàng",
+   "Wi-Fi miễn phí",
+   "Bữa sáng",
+   "Bãi đỗ xe"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 900000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 1210000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 1710000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT005",
+  "name": "Garden Inn Hồ Tây Hotel",
+  "city": "Hà Nội",
+  "address": "Khu Hồ Tây, Hà Nội",
+  "stars": 3,
+  "kind": "Hotel",
+  "rating": 8.6,
+  "reviews": 625,
+  "distCenter": 2.1,
+  "amenities": [
+   "Hồ bơi",
+   "Gym",
+   "Wi-Fi miễn phí",
+   "Nhà hàng"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 650000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 870000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 1230000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT006",
+  "name": "Grand Quận 1 Resort",
+  "city": "TP. Hồ Chí Minh",
+  "address": "Khu Quận 1, TP. Hồ Chí Minh",
+  "stars": 5,
+  "kind": "Resort & Spa",
+  "rating": 8.2,
+  "reviews": 820,
+  "distCenter": 0.9,
+  "amenities": [
+   "Spa",
+   "Hồ bơi",
+   "Wi-Fi miễn phí",
+   "Gym"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 3600000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 4860000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 6840000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT007",
+  "name": "Riverside Bình Thạnh Hotel",
+  "city": "TP. Hồ Chí Minh",
+  "address": "Khu Bình Thạnh, TP. Hồ Chí Minh",
+  "stars": 4,
+  "kind": "Hotel",
+  "rating": 8.9,
+  "reviews": 2391,
+  "distCenter": 0.7,
+  "amenities": [
+   "Spa",
+   "Bãi đỗ xe",
+   "Đưa đón sân bay",
+   "Gym"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 1800000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 2430000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 3420000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT008",
+  "name": "Central Quận 3 Hotel",
+  "city": "TP. Hồ Chí Minh",
+  "address": "Khu Quận 3, TP. Hồ Chí Minh",
+  "stars": 4,
+  "kind": "Hotel",
+  "rating": 8.4,
+  "reviews": 1366,
+  "distCenter": 3.2,
+  "amenities": [
+   "Bãi đỗ xe",
+   "Hồ bơi",
+   "Nhà hàng",
+   "Bữa sáng"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 1500000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 2020000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 2850000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT009",
+  "name": "Boutique Quận 1 Boutique",
+  "city": "TP. Hồ Chí Minh",
+  "address": "Khu Quận 1, TP. Hồ Chí Minh",
+  "stars": 3,
+  "kind": "Boutique",
+  "rating": 9.0,
+  "reviews": 1079,
+  "distCenter": 0.8,
+  "amenities": [
+   "Gym",
+   "Bãi đỗ xe",
+   "Spa",
+   "Hồ bơi"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 900000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 1210000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 1710000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT010",
+  "name": "Garden Inn Bình Thạnh Hotel",
+  "city": "TP. Hồ Chí Minh",
+  "address": "Khu Bình Thạnh, TP. Hồ Chí Minh",
+  "stars": 3,
+  "kind": "Hotel",
+  "rating": 8.9,
+  "reviews": 1259,
+  "distCenter": 4.1,
+  "amenities": [
+   "Bữa sáng",
+   "Wi-Fi miễn phí",
+   "Gym",
+   "Spa"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 650000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 870000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 1230000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT011",
+  "name": "Grand Mỹ Khê Resort",
+  "city": "Đà Nẵng",
+  "address": "Khu Mỹ Khê, Đà Nẵng",
+  "stars": 5,
+  "kind": "Resort & Spa",
+  "rating": 7.9,
+  "reviews": 1481,
+  "distCenter": 1.2,
+  "amenities": [
+   "Bãi đỗ xe",
+   "Spa",
+   "Wi-Fi miễn phí",
+   "Đưa đón sân bay"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 3600000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 4860000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 6840000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT012",
+  "name": "Riverside Sơn Trà Hotel",
+  "city": "Đà Nẵng",
+  "address": "Khu Sơn Trà, Đà Nẵng",
+  "stars": 4,
+  "kind": "Hotel",
+  "rating": 9.0,
+  "reviews": 1365,
+  "distCenter": 2.4,
+  "amenities": [
+   "Đưa đón sân bay",
+   "Gym",
+   "Spa",
+   "Nhà hàng"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 1800000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 2430000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 3420000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT013",
+  "name": "Central Sông Hàn Hotel",
+  "city": "Đà Nẵng",
+  "address": "Khu Sông Hàn, Đà Nẵng",
+  "stars": 4,
+  "kind": "Hotel",
+  "rating": 9.0,
+  "reviews": 361,
+  "distCenter": 5.5,
+  "amenities": [
+   "Gym",
+   "Spa",
+   "Đưa đón sân bay",
+   "Wi-Fi miễn phí"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 1500000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 2020000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 2850000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT014",
+  "name": "Boutique Mỹ Khê Boutique",
+  "city": "Đà Nẵng",
+  "address": "Khu Mỹ Khê, Đà Nẵng",
+  "stars": 3,
+  "kind": "Boutique",
+  "rating": 7.7,
+  "reviews": 1348,
+  "distCenter": 4.3,
+  "amenities": [
+   "Bãi đỗ xe",
+   "Hồ bơi",
+   "Đưa đón sân bay",
+   "Spa"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 900000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 1210000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 1710000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT015",
+  "name": "Garden Inn Sơn Trà Hotel",
+  "city": "Đà Nẵng",
+  "address": "Khu Sơn Trà, Đà Nẵng",
+  "stars": 3,
+  "kind": "Hotel",
+  "rating": 9.2,
+  "reviews": 1501,
+  "distCenter": 0.4,
+  "amenities": [
+   "Bãi đỗ xe",
+   "Hồ bơi",
+   "Bữa sáng",
+   "Gym"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 650000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 870000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 1230000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT016",
+  "name": "Grand Trần Phú Resort",
+  "city": "Nha Trang",
+  "address": "Khu Trần Phú, Nha Trang",
+  "stars": 5,
+  "kind": "Resort & Spa",
+  "rating": 7.8,
+  "reviews": 321,
+  "distCenter": 1.7,
+  "amenities": [
+   "Gym",
+   "Bữa sáng",
+   "Đưa đón sân bay",
+   "Nhà hàng"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 3600000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 4860000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 6840000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT017",
+  "name": "Riverside Bãi Dài Hotel",
+  "city": "Nha Trang",
+  "address": "Khu Bãi Dài, Nha Trang",
+  "stars": 4,
+  "kind": "Hotel",
+  "rating": 8.3,
+  "reviews": 2113,
+  "distCenter": 0.8,
+  "amenities": [
+   "Bãi đỗ xe",
+   "Spa",
+   "Gym",
+   "Hồ bơi"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 1800000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 2430000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 3420000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT018",
+  "name": "Central Vĩnh Hòa Hotel",
+  "city": "Nha Trang",
+  "address": "Khu Vĩnh Hòa, Nha Trang",
+  "stars": 4,
+  "kind": "Hotel",
+  "rating": 9.2,
+  "reviews": 1843,
+  "distCenter": 5.7,
+  "amenities": [
+   "Gym",
+   "Đưa đón sân bay",
+   "Spa",
+   "Hồ bơi"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 1500000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 2020000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 2850000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT019",
+  "name": "Boutique Trần Phú Boutique",
+  "city": "Nha Trang",
+  "address": "Khu Trần Phú, Nha Trang",
+  "stars": 3,
+  "kind": "Boutique",
+  "rating": 8.8,
+  "reviews": 1638,
+  "distCenter": 6.2,
+  "amenities": [
+   "Hồ bơi",
+   "Wi-Fi miễn phí",
+   "Bữa sáng",
+   "Đưa đón sân bay"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 900000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 1210000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 1710000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT020",
+  "name": "Garden Inn Bãi Dài Hotel",
+  "city": "Nha Trang",
+  "address": "Khu Bãi Dài, Nha Trang",
+  "stars": 3,
+  "kind": "Hotel",
+  "rating": 8.0,
+  "reviews": 1035,
+  "distCenter": 0.4,
+  "amenities": [
+   "Hồ bơi",
+   "Bãi đỗ xe",
+   "Nhà hàng",
+   "Wi-Fi miễn phí"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 650000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 870000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 1230000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT021",
+  "name": "Grand Dương Đông Resort",
+  "city": "Phú Quốc",
+  "address": "Khu Dương Đông, Phú Quốc",
+  "stars": 5,
+  "kind": "Resort & Spa",
+  "rating": 7.9,
+  "reviews": 2269,
+  "distCenter": 2.6,
+  "amenities": [
+   "Đưa đón sân bay",
+   "Bữa sáng",
+   "Bãi đỗ xe",
+   "Gym"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 4130000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 5570000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 7840000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT022",
+  "name": "Riverside Bãi Sao Hotel",
+  "city": "Phú Quốc",
+  "address": "Khu Bãi Sao, Phú Quốc",
+  "stars": 4,
+  "kind": "Hotel",
+  "rating": 9.3,
+  "reviews": 301,
+  "distCenter": 3.1,
+  "amenities": [
+   "Nhà hàng",
+   "Spa",
+   "Bãi đỗ xe",
+   "Đưa đón sân bay"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 2060000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 2780000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 3910000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT023",
+  "name": "Central Long Beach Hotel",
+  "city": "Phú Quốc",
+  "address": "Khu Long Beach, Phú Quốc",
+  "stars": 4,
+  "kind": "Hotel",
+  "rating": 7.8,
+  "reviews": 1720,
+  "distCenter": 0.7,
+  "amenities": [
+   "Bữa sáng",
+   "Bãi đỗ xe",
+   "Spa",
+   "Nhà hàng"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 1720000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 2320000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 3260000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT024",
+  "name": "Boutique Dương Đông Boutique",
+  "city": "Phú Quốc",
+  "address": "Khu Dương Đông, Phú Quốc",
+  "stars": 3,
+  "kind": "Boutique",
+  "rating": 7.8,
+  "reviews": 295,
+  "distCenter": 0.9,
+  "amenities": [
+   "Hồ bơi",
+   "Gym",
+   "Wi-Fi miễn phí",
+   "Bãi đỗ xe"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 1030000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 1390000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 1950000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT025",
+  "name": "Garden Inn Bãi Sao Hotel",
+  "city": "Phú Quốc",
+  "address": "Khu Bãi Sao, Phú Quốc",
+  "stars": 3,
+  "kind": "Hotel",
+  "rating": 8.7,
+  "reviews": 368,
+  "distCenter": 5.7,
+  "amenities": [
+   "Nhà hàng",
+   "Bữa sáng",
+   "Đưa đón sân bay",
+   "Hồ bơi"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 740000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 990000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 1400000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT026",
+  "name": "Grand Kim Long Resort",
+  "city": "Huế",
+  "address": "Khu Kim Long, Huế",
+  "stars": 5,
+  "kind": "Resort & Spa",
+  "rating": 9.3,
+  "reviews": 1571,
+  "distCenter": 3.2,
+  "amenities": [
+   "Bữa sáng",
+   "Nhà hàng",
+   "Spa",
+   "Đưa đón sân bay"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 2880000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 3880000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 5470000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT027",
+  "name": "Riverside Vĩ Dạ Hotel",
+  "city": "Huế",
+  "address": "Khu Vĩ Dạ, Huế",
+  "stars": 4,
+  "kind": "Hotel",
+  "rating": 8.5,
+  "reviews": 1357,
+  "distCenter": 0.8,
+  "amenities": [
+   "Bữa sáng",
+   "Đưa đón sân bay",
+   "Hồ bơi",
+   "Nhà hàng"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 1440000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 1940000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 2730000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT028",
+  "name": "Central Phú Hội Hotel",
+  "city": "Huế",
+  "address": "Khu Phú Hội, Huế",
+  "stars": 4,
+  "kind": "Hotel",
+  "rating": 8.5,
+  "reviews": 741,
+  "distCenter": 3.5,
+  "amenities": [
+   "Spa",
+   "Gym",
+   "Hồ bơi",
+   "Bữa sáng"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 1200000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 1620000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 2280000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT029",
+  "name": "Boutique Kim Long Boutique",
+  "city": "Huế",
+  "address": "Khu Kim Long, Huế",
+  "stars": 3,
+  "kind": "Boutique",
+  "rating": 8.8,
+  "reviews": 190,
+  "distCenter": 5.0,
+  "amenities": [
+   "Gym",
+   "Đưa đón sân bay",
+   "Wi-Fi miễn phí",
+   "Hồ bơi"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 720000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 970000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 1360000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT030",
+  "name": "Garden Inn Vĩ Dạ Hotel",
+  "city": "Huế",
+  "address": "Khu Vĩ Dạ, Huế",
+  "stars": 3,
+  "kind": "Hotel",
+  "rating": 8.5,
+  "reviews": 764,
+  "distCenter": 2.5,
+  "amenities": [
+   "Spa",
+   "Gym",
+   "Nhà hàng",
+   "Đưa đón sân bay"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 520000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 700000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 980000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT031",
+  "name": "Grand Hồ Xuân Hương Resort",
+  "city": "Đà Lạt",
+  "address": "Khu Hồ Xuân Hương, Đà Lạt",
+  "stars": 5,
+  "kind": "Resort & Spa",
+  "rating": 8.2,
+  "reviews": 993,
+  "distCenter": 4.1,
+  "amenities": [
+   "Spa",
+   "Nhà hàng",
+   "Bữa sáng",
+   "Bãi đỗ xe"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 3060000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 4130000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 5810000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT032",
+  "name": "Riverside Cầu Đất Hotel",
+  "city": "Đà Lạt",
+  "address": "Khu Cầu Đất, Đà Lạt",
+  "stars": 4,
+  "kind": "Hotel",
+  "rating": 8.9,
+  "reviews": 1008,
+  "distCenter": 1.5,
+  "amenities": [
+   "Bãi đỗ xe",
+   "Hồ bơi",
+   "Đưa đón sân bay",
+   "Wi-Fi miễn phí"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 1530000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 2060000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 2900000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT033",
+  "name": "Central Trại Mát Hotel",
+  "city": "Đà Lạt",
+  "address": "Khu Trại Mát, Đà Lạt",
+  "stars": 4,
+  "kind": "Hotel",
+  "rating": 9.4,
+  "reviews": 1224,
+  "distCenter": 3.2,
+  "amenities": [
+   "Spa",
+   "Đưa đón sân bay",
+   "Gym",
+   "Hồ bơi"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 1270000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 1710000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 2410000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT034",
+  "name": "Boutique Hồ Xuân Hương Boutique",
+  "city": "Đà Lạt",
+  "address": "Khu Hồ Xuân Hương, Đà Lạt",
+  "stars": 3,
+  "kind": "Boutique",
+  "rating": 8.4,
+  "reviews": 1511,
+  "distCenter": 6.2,
+  "amenities": [
+   "Đưa đón sân bay",
+   "Wi-Fi miễn phí",
+   "Bữa sáng",
+   "Nhà hàng"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 760000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 1020000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 1440000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT035",
+  "name": "Garden Inn Cầu Đất Hotel",
+  "city": "Đà Lạt",
+  "address": "Khu Cầu Đất, Đà Lạt",
+  "stars": 3,
+  "kind": "Hotel",
+  "rating": 8.0,
+  "reviews": 885,
+  "distCenter": 2.4,
+  "amenities": [
+   "Bãi đỗ xe",
+   "Gym",
+   "Nhà hàng",
+   "Wi-Fi miễn phí"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 550000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 740000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 1040000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT036",
+  "name": "Grand Lê Chân Resort",
+  "city": "Hải Phòng",
+  "address": "Khu Lê Chân, Hải Phòng",
+  "stars": 5,
+  "kind": "Resort & Spa",
+  "rating": 8.5,
+  "reviews": 1489,
+  "distCenter": 5.3,
+  "amenities": [
+   "Bữa sáng",
+   "Nhà hàng",
+   "Đưa đón sân bay",
+   "Wi-Fi miễn phí"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 3060000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 4130000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 5810000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT037",
+  "name": "Riverside Ngô Quyền Hotel",
+  "city": "Hải Phòng",
+  "address": "Khu Ngô Quyền, Hải Phòng",
+  "stars": 4,
+  "kind": "Hotel",
+  "rating": 9.2,
+  "reviews": 896,
+  "distCenter": 3.3,
+  "amenities": [
+   "Hồ bơi",
+   "Spa",
+   "Đưa đón sân bay",
+   "Bãi đỗ xe"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 1530000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 2060000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 2900000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT038",
+  "name": "Central Cát Bà Hotel",
+  "city": "Hải Phòng",
+  "address": "Khu Cát Bà, Hải Phòng",
+  "stars": 4,
+  "kind": "Hotel",
+  "rating": 7.8,
+  "reviews": 1701,
+  "distCenter": 3.2,
+  "amenities": [
+   "Bữa sáng",
+   "Đưa đón sân bay",
+   "Bãi đỗ xe",
+   "Nhà hàng"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 1270000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 1710000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 2410000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT039",
+  "name": "Boutique Lê Chân Boutique",
+  "city": "Hải Phòng",
+  "address": "Khu Lê Chân, Hải Phòng",
+  "stars": 3,
+  "kind": "Boutique",
+  "rating": 9.4,
+  "reviews": 192,
+  "distCenter": 1.2,
+  "amenities": [
+   "Bãi đỗ xe",
+   "Nhà hàng",
+   "Đưa đón sân bay",
+   "Bữa sáng"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 760000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 1020000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 1440000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT040",
+  "name": "Garden Inn Ngô Quyền Hotel",
+  "city": "Hải Phòng",
+  "address": "Khu Ngô Quyền, Hải Phòng",
+  "stars": 3,
+  "kind": "Hotel",
+  "rating": 8.7,
+  "reviews": 2022,
+  "distCenter": 4.4,
+  "amenities": [
+   "Đưa đón sân bay",
+   "Bữa sáng",
+   "Gym",
+   "Bãi đỗ xe"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 550000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 740000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 1040000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT041",
+  "name": "Grand Phố Cổ Resort",
+  "city": "Hội An",
+  "address": "Khu Phố Cổ, Hội An",
+  "stars": 5,
+  "kind": "Resort & Spa",
+  "rating": 7.8,
+  "reviews": 138,
+  "distCenter": 5.3,
+  "amenities": [
+   "Bữa sáng",
+   "Gym",
+   "Đưa đón sân bay",
+   "Bãi đỗ xe"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 3420000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 4610000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 6490000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT042",
+  "name": "Riverside Cửa Đại Hotel",
+  "city": "Hội An",
+  "address": "Khu Cửa Đại, Hội An",
+  "stars": 4,
+  "kind": "Hotel",
+  "rating": 8.4,
+  "reviews": 877,
+  "distCenter": 5.4,
+  "amenities": [
+   "Spa",
+   "Wi-Fi miễn phí",
+   "Hồ bơi",
+   "Bữa sáng"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 1710000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 2300000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 3240000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT043",
+  "name": "Central An Bàng Hotel",
+  "city": "Hội An",
+  "address": "Khu An Bàng, Hội An",
+  "stars": 4,
+  "kind": "Hotel",
+  "rating": 8.1,
+  "reviews": 1065,
+  "distCenter": 5.0,
+  "amenities": [
+   "Đưa đón sân bay",
+   "Hồ bơi",
+   "Gym",
+   "Spa"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 1420000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 1910000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 2690000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT044",
+  "name": "Boutique Phố Cổ Boutique",
+  "city": "Hội An",
+  "address": "Khu Phố Cổ, Hội An",
+  "stars": 3,
+  "kind": "Boutique",
+  "rating": 9.1,
+  "reviews": 329,
+  "distCenter": 5.9,
+  "amenities": [
+   "Đưa đón sân bay",
+   "Spa",
+   "Bãi đỗ xe",
+   "Gym"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 850000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 1140000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 1610000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT045",
+  "name": "Garden Inn Cửa Đại Hotel",
+  "city": "Hội An",
+  "address": "Khu Cửa Đại, Hội An",
+  "stars": 3,
+  "kind": "Hotel",
+  "rating": 9.1,
+  "reviews": 2196,
+  "distCenter": 2.9,
+  "amenities": [
+   "Hồ bơi",
+   "Gym",
+   "Bữa sáng",
+   "Nhà hàng"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 610000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 820000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 1150000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT046",
+  "name": "Grand Trung Tâm Resort",
+  "city": "Sa Pa",
+  "address": "Khu Trung Tâm, Sa Pa",
+  "stars": 5,
+  "kind": "Resort & Spa",
+  "rating": 8.5,
+  "reviews": 1882,
+  "distCenter": 5.1,
+  "amenities": [
+   "Wi-Fi miễn phí",
+   "Nhà hàng",
+   "Bữa sáng",
+   "Đưa đón sân bay"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 2880000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 3880000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 5470000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT047",
+  "name": "Riverside Cát Cát Hotel",
+  "city": "Sa Pa",
+  "address": "Khu Cát Cát, Sa Pa",
+  "stars": 4,
+  "kind": "Hotel",
+  "rating": 7.9,
+  "reviews": 572,
+  "distCenter": 3.8,
+  "amenities": [
+   "Đưa đón sân bay",
+   "Bãi đỗ xe",
+   "Gym",
+   "Nhà hàng"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 1440000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 1940000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 2730000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT048",
+  "name": "Central Mường Hoa Hotel",
+  "city": "Sa Pa",
+  "address": "Khu Mường Hoa, Sa Pa",
+  "stars": 4,
+  "kind": "Hotel",
+  "rating": 8.6,
+  "reviews": 514,
+  "distCenter": 5.8,
+  "amenities": [
+   "Wi-Fi miễn phí",
+   "Bữa sáng",
+   "Nhà hàng",
+   "Hồ bơi"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 1200000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 1620000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 2280000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT049",
+  "name": "Boutique Trung Tâm Boutique",
+  "city": "Sa Pa",
+  "address": "Khu Trung Tâm, Sa Pa",
+  "stars": 3,
+  "kind": "Boutique",
+  "rating": 7.7,
+  "reviews": 480,
+  "distCenter": 3.4,
+  "amenities": [
+   "Wi-Fi miễn phí",
+   "Nhà hàng",
+   "Bãi đỗ xe",
+   "Spa"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 720000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 970000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 1360000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT050",
+  "name": "Garden Inn Cát Cát Hotel",
+  "city": "Sa Pa",
+  "address": "Khu Cát Cát, Sa Pa",
+  "stars": 3,
+  "kind": "Hotel",
+  "rating": 8.2,
+  "reviews": 2150,
+  "distCenter": 4.1,
+  "amenities": [
+   "Spa",
+   "Đưa đón sân bay",
+   "Hồ bơi",
+   "Bãi đỗ xe"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 520000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 700000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 980000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT051",
+  "name": "Grand Sukhumvit Resort",
+  "city": "Bangkok",
+  "address": "Khu Sukhumvit, Bangkok",
+  "stars": 5,
+  "kind": "Resort & Spa",
+  "rating": 8.5,
+  "reviews": 2038,
+  "distCenter": 3.4,
+  "amenities": [
+   "Spa",
+   "Đưa đón sân bay",
+   "Gym",
+   "Hồ bơi"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 3240000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 4370000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 6150000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT052",
+  "name": "Riverside Silom Hotel",
+  "city": "Bangkok",
+  "address": "Khu Silom, Bangkok",
+  "stars": 4,
+  "kind": "Hotel",
+  "rating": 9.3,
+  "reviews": 909,
+  "distCenter": 5.5,
+  "amenities": [
+   "Hồ bơi",
+   "Spa",
+   "Wi-Fi miễn phí",
+   "Nhà hàng"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 1620000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 2180000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 3070000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT053",
+  "name": "Central Riverside Hotel",
+  "city": "Bangkok",
+  "address": "Khu Riverside, Bangkok",
+  "stars": 4,
+  "kind": "Hotel",
+  "rating": 8.4,
+  "reviews": 377,
+  "distCenter": 4.5,
+  "amenities": [
+   "Nhà hàng",
+   "Wi-Fi miễn phí",
+   "Bữa sáng",
+   "Hồ bơi"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 1350000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 1820000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 2560000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT054",
+  "name": "Boutique Sukhumvit Boutique",
+  "city": "Bangkok",
+  "address": "Khu Sukhumvit, Bangkok",
+  "stars": 3,
+  "kind": "Boutique",
+  "rating": 9.0,
+  "reviews": 712,
+  "distCenter": 6.1,
+  "amenities": [
+   "Đưa đón sân bay",
+   "Bữa sáng",
+   "Hồ bơi",
+   "Nhà hàng"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 810000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 1090000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 1530000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT055",
+  "name": "Garden Inn Silom Hotel",
+  "city": "Bangkok",
+  "address": "Khu Silom, Bangkok",
+  "stars": 3,
+  "kind": "Hotel",
+  "rating": 9.3,
+  "reviews": 979,
+  "distCenter": 4.9,
+  "amenities": [
+   "Bữa sáng",
+   "Spa",
+   "Nhà hàng",
+   "Bãi đỗ xe"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 580000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 780000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 1100000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT056",
+  "name": "Grand Marina Resort",
+  "city": "Singapore",
+  "address": "Khu Marina, Singapore",
+  "stars": 5,
+  "kind": "Resort & Spa",
+  "rating": 9.4,
+  "reviews": 996,
+  "distCenter": 1.3,
+  "amenities": [
+   "Nhà hàng",
+   "Gym",
+   "Spa",
+   "Hồ bơi"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 7920000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 10690000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 15040000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT057",
+  "name": "Riverside Orchard Hotel",
+  "city": "Singapore",
+  "address": "Khu Orchard, Singapore",
+  "stars": 4,
+  "kind": "Hotel",
+  "rating": 8.4,
+  "reviews": 1540,
+  "distCenter": 2.3,
+  "amenities": [
+   "Đưa đón sân bay",
+   "Wi-Fi miễn phí",
+   "Hồ bơi",
+   "Gym"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 3960000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 5340000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 7520000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT058",
+  "name": "Central Sentosa Hotel",
+  "city": "Singapore",
+  "address": "Khu Sentosa, Singapore",
+  "stars": 4,
+  "kind": "Hotel",
+  "rating": 8.4,
+  "reviews": 154,
+  "distCenter": 2.7,
+  "amenities": [
+   "Gym",
+   "Bãi đỗ xe",
+   "Wi-Fi miễn phí",
+   "Đưa đón sân bay"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 3300000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 4450000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 6270000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT059",
+  "name": "Boutique Marina Boutique",
+  "city": "Singapore",
+  "address": "Khu Marina, Singapore",
+  "stars": 3,
+  "kind": "Boutique",
+  "rating": 9.4,
+  "reviews": 1016,
+  "distCenter": 6.3,
+  "amenities": [
+   "Bữa sáng",
+   "Wi-Fi miễn phí",
+   "Hồ bơi",
+   "Đưa đón sân bay"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 1980000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 2670000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 3760000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT060",
+  "name": "Garden Inn Orchard Hotel",
+  "city": "Singapore",
+  "address": "Khu Orchard, Singapore",
+  "stars": 3,
+  "kind": "Hotel",
+  "rating": 7.7,
+  "reviews": 823,
+  "distCenter": 2.0,
+  "amenities": [
+   "Hồ bơi",
+   "Nhà hàng",
+   "Spa",
+   "Bãi đỗ xe"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 1430000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 1930000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 2710000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT061",
+  "name": "Grand Shinjuku Resort",
+  "city": "Tokyo",
+  "address": "Khu Shinjuku, Tokyo",
+  "stars": 5,
+  "kind": "Resort & Spa",
+  "rating": 8.3,
+  "reviews": 2277,
+  "distCenter": 6.0,
+  "amenities": [
+   "Bãi đỗ xe",
+   "Đưa đón sân bay",
+   "Hồ bơi",
+   "Wi-Fi miễn phí"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 6120000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 8260000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 11620000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT062",
+  "name": "Riverside Asakusa Hotel",
+  "city": "Tokyo",
+  "address": "Khu Asakusa, Tokyo",
+  "stars": 4,
+  "kind": "Hotel",
+  "rating": 8.1,
+  "reviews": 830,
+  "distCenter": 2.9,
+  "amenities": [
+   "Bữa sáng",
+   "Hồ bơi",
+   "Wi-Fi miễn phí",
+   "Đưa đón sân bay"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 3060000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 4130000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 5810000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT063",
+  "name": "Central Ginza Hotel",
+  "city": "Tokyo",
+  "address": "Khu Ginza, Tokyo",
+  "stars": 4,
+  "kind": "Hotel",
+  "rating": 9.0,
+  "reviews": 423,
+  "distCenter": 4.1,
+  "amenities": [
+   "Spa",
+   "Wi-Fi miễn phí",
+   "Hồ bơi",
+   "Nhà hàng"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 2550000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 3440000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 4840000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT064",
+  "name": "Boutique Shinjuku Boutique",
+  "city": "Tokyo",
+  "address": "Khu Shinjuku, Tokyo",
+  "stars": 3,
+  "kind": "Boutique",
+  "rating": 8.4,
+  "reviews": 1469,
+  "distCenter": 6.5,
+  "amenities": [
+   "Nhà hàng",
+   "Hồ bơi",
+   "Gym",
+   "Bữa sáng"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 1530000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 2060000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 2900000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT065",
+  "name": "Garden Inn Asakusa Hotel",
+  "city": "Tokyo",
+  "address": "Khu Asakusa, Tokyo",
+  "stars": 3,
+  "kind": "Hotel",
+  "rating": 7.7,
+  "reviews": 1056,
+  "distCenter": 6.1,
+  "amenities": [
+   "Hồ bơi",
+   "Bãi đỗ xe",
+   "Wi-Fi miễn phí",
+   "Bữa sáng"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 1100000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 1480000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 2090000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT066",
+  "name": "Grand Myeongdong Resort",
+  "city": "Seoul",
+  "address": "Khu Myeongdong, Seoul",
+  "stars": 5,
+  "kind": "Resort & Spa",
+  "rating": 8.0,
+  "reviews": 1357,
+  "distCenter": 4.2,
+  "amenities": [
+   "Spa",
+   "Hồ bơi",
+   "Bãi đỗ xe",
+   "Gym"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 5040000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 6800000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 9570000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT067",
+  "name": "Riverside Gangnam Hotel",
+  "city": "Seoul",
+  "address": "Khu Gangnam, Seoul",
+  "stars": 4,
+  "kind": "Hotel",
+  "rating": 8.8,
+  "reviews": 1188,
+  "distCenter": 2.5,
+  "amenities": [
+   "Wi-Fi miễn phí",
+   "Hồ bơi",
+   "Bãi đỗ xe",
+   "Đưa đón sân bay"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 2520000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 3400000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 4780000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT068",
+  "name": "Central Hongdae Hotel",
+  "city": "Seoul",
+  "address": "Khu Hongdae, Seoul",
+  "stars": 4,
+  "kind": "Hotel",
+  "rating": 7.6,
+  "reviews": 2151,
+  "distCenter": 3.7,
+  "amenities": [
+   "Spa",
+   "Gym",
+   "Bãi đỗ xe",
+   "Bữa sáng"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 2100000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 2830000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 3990000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT069",
+  "name": "Boutique Myeongdong Boutique",
+  "city": "Seoul",
+  "address": "Khu Myeongdong, Seoul",
+  "stars": 3,
+  "kind": "Boutique",
+  "rating": 9.3,
+  "reviews": 515,
+  "distCenter": 4.4,
+  "amenities": [
+   "Nhà hàng",
+   "Đưa đón sân bay",
+   "Spa",
+   "Gym"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 1260000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 1700000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 2390000,
+    "capacity": 4
+   }
+  ]
+ },
+ {
+  "id": "HT070",
+  "name": "Garden Inn Gangnam Hotel",
+  "city": "Seoul",
+  "address": "Khu Gangnam, Seoul",
+  "stars": 3,
+  "kind": "Hotel",
+  "rating": 9.1,
+  "reviews": 1690,
+  "distCenter": 6.3,
+  "amenities": [
+   "Gym",
+   "Đưa đón sân bay",
+   "Bữa sáng",
+   "Nhà hàng"
+  ],
+  "refundable": true,
+  "rooms": [
+   {
+    "type": "Standard",
+    "rate": 910000,
+    "capacity": 2
+   },
+   {
+    "type": "Deluxe",
+    "rate": 1220000,
+    "capacity": 2
+   },
+   {
+    "type": "Family",
+    "rate": 1720000,
+    "capacity": 4
+   }
+  ]
+ }
+]

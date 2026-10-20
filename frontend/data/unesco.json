@@ -1,0 +1,52 @@
+{
+  "sites": [
+    {
+      "name": "Quần thể di tích Cố đô Huế",
+      "year": 1993,
+      "loc": "Thừa Thiên Huế",
+      "emoji": "🏯"
+    },
+    {
+      "name": "Vịnh Hạ Long",
+      "year": 1994,
+      "loc": "Quảng Ninh",
+      "emoji": "🏝️"
+    },
+    {
+      "name": "Phố cổ Hội An",
+      "year": 1999,
+      "loc": "Quảng Nam",
+      "emoji": "🏮"
+    },
+    {
+      "name": "Thánh địa Mỹ Sơn",
+      "year": 1999,
+      "loc": "Quảng Nam",
+      "emoji": "🛕"
+    },
+    {
+      "name": "Vườn QG Phong Nha – Kẻ Bàng",
+      "year": 2003,
+      "loc": "Quảng Bình",
+      "emoji": "🌿"
+    },
+    {
+      "name": "Hoàng thành Thăng Long",
+      "year": 2010,
+      "loc": "Hà Nội",
+      "emoji": "⛩️"
+    },
+    {
+      "name": "Thành Nhà Hồ",
+      "year": 2011,
+      "loc": "Thanh Hóa",
+      "emoji": "🗿"
+    },
+    {
+      "name": "Tràng An",
+      "year": 2014,
+      "loc": "Ninh Bình",
+      "emoji": "⛰️"
+    }
+  ]
+}

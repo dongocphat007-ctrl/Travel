@@ -1,0 +1,6321 @@
+[
+ {
+  "input": {
+   "price": 0,
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "hdvOn": false,
+   "hdvHours": 8,
+   "days": 1,
+   "voucher": null
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "pax": 1,
+   "base": 0,
+   "hdv": 0,
+   "subtotal": 0,
+   "discount": 0,
+   "voucherCode": "",
+   "final": 0,
+   "depositPct": 20,
+   "deposit": 0,
+   "remaining": 0
+  }
+ },
+ {
+  "input": {
+   "price": 0,
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "hdvOn": true,
+   "hdvHours": 10,
+   "days": 2,
+   "voucher": {
+    "code": "W10",
+    "type": "percent",
+    "value": 10,
+    "maxDiscount": 0
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "pax": 1,
+   "base": 0,
+   "hdv": 3800000,
+   "subtotal": 3800000,
+   "discount": 380000,
+   "voucherCode": "W10",
+   "final": 3420000,
+   "depositPct": 20,
+   "deposit": 684000,
+   "remaining": 2736000
+  }
+ },
+ {
+  "input": {
+   "price": 0,
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "hdvOn": true,
+   "hdvHours": 12,
+   "days": "4",
+   "voucher": {
+    "code": "G15",
+    "type": "percent",
+    "value": 15,
+    "maxDiscount": 200000
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "pax": 1,
+   "base": 0,
+   "hdv": 9200000,
+   "subtotal": 9200000,
+   "discount": 200000,
+   "voucherCode": "G15",
+   "final": 9000000,
+   "depositPct": 20,
+   "deposit": 1800000,
+   "remaining": 7200000
+  }
+ },
+ {
+  "input": {
+   "price": 0,
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "hdvOn": true,
+   "hdvHours": 8,
+   "days": 3,
+   "voucher": {
+    "code": "BIG",
+    "type": "fixed",
+    "value": 99999999
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "pax": 1,
+   "base": 0,
+   "hdv": 4500000,
+   "subtotal": 4500000,
+   "discount": 4500000,
+   "voucherCode": "BIG",
+   "final": 0,
+   "depositPct": 20,
+   "deposit": 0,
+   "remaining": 0
+  }
+ },
+ {
+  "input": {
+   "price": 0,
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "hdvOn": true,
+   "hdvHours": "x",
+   "days": 0,
+   "voucher": {
+    "code": "ODD",
+    "type": "percent",
+    "value": 33.3333
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "pax": 1,
+   "base": 0,
+   "hdv": 1500000,
+   "subtotal": 1500000,
+   "discount": 500000,
+   "voucherCode": "ODD",
+   "final": 1000000,
+   "depositPct": 20,
+   "deposit": 200000,
+   "remaining": 800000
+  }
+ },
+ {
+  "input": {
+   "price": 0,
+   "adults": 2,
+   "kids": 1,
+   "infants": 1,
+   "hdvOn": false,
+   "hdvHours": 8,
+   "days": 1,
+   "voucher": {
+    "code": "W10",
+    "type": "percent",
+    "value": 10,
+    "maxDiscount": 0
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 1,
+   "infants": 1,
+   "pax": 4,
+   "base": 0,
+   "hdv": 0,
+   "subtotal": 0,
+   "discount": 0,
+   "voucherCode": "",
+   "final": 0,
+   "depositPct": 20,
+   "deposit": 0,
+   "remaining": 0
+  }
+ },
+ {
+  "input": {
+   "price": 0,
+   "adults": 2,
+   "kids": 1,
+   "infants": 1,
+   "hdvOn": true,
+   "hdvHours": 10,
+   "days": 2,
+   "voucher": {
+    "code": "G15",
+    "type": "percent",
+    "value": 15,
+    "maxDiscount": 200000
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 1,
+   "infants": 1,
+   "pax": 4,
+   "base": 0,
+   "hdv": 3800000,
+   "subtotal": 3800000,
+   "discount": 200000,
+   "voucherCode": "G15",
+   "final": 3600000,
+   "depositPct": 20,
+   "deposit": 720000,
+   "remaining": 2880000
+  }
+ },
+ {
+  "input": {
+   "price": 0,
+   "adults": 2,
+   "kids": 1,
+   "infants": 1,
+   "hdvOn": true,
+   "hdvHours": 12,
+   "days": "4",
+   "voucher": {
+    "code": "F",
+    "type": "fixed",
+    "value": 300000
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 1,
+   "infants": 1,
+   "pax": 4,
+   "base": 0,
+   "hdv": 9200000,
+   "subtotal": 9200000,
+   "discount": 300000,
+   "voucherCode": "F",
+   "final": 8900000,
+   "depositPct": 20,
+   "deposit": 1780000,
+   "remaining": 7120000
+  }
+ },
+ {
+  "input": {
+   "price": 0,
+   "adults": 2,
+   "kids": 1,
+   "infants": 1,
+   "hdvOn": true,
+   "hdvHours": 8,
+   "days": 3,
+   "voucher": {
+    "code": "ODD",
+    "type": "percent",
+    "value": 33.3333
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 1,
+   "infants": 1,
+   "pax": 4,
+   "base": 0,
+   "hdv": 4500000,
+   "subtotal": 4500000,
+   "discount": 1499999,
+   "voucherCode": "ODD",
+   "final": 3000001,
+   "depositPct": 20,
+   "deposit": 600000,
+   "remaining": 2400001
+  }
+ },
+ {
+  "input": {
+   "price": 0,
+   "adults": 3,
+   "kids": 2,
+   "infants": 5,
+   "hdvOn": true,
+   "hdvHours": "x",
+   "days": 0,
+   "voucher": null
+  },
+  "expected": {
+   "adults": 3,
+   "kids": 4,
+   "infants": 3,
+   "pax": 10,
+   "base": 0,
+   "hdv": 1500000,
+   "subtotal": 1500000,
+   "discount": 0,
+   "voucherCode": "",
+   "final": 1500000,
+   "depositPct": 20,
+   "deposit": 300000,
+   "remaining": 1200000
+  }
+ },
+ {
+  "input": {
+   "price": 0,
+   "adults": 3,
+   "kids": 2,
+   "infants": 5,
+   "hdvOn": false,
+   "hdvHours": 8,
+   "days": 1,
+   "voucher": {
+    "code": "G15",
+    "type": "percent",
+    "value": 15,
+    "maxDiscount": 200000
+   }
+  },
+  "expected": {
+   "adults": 3,
+   "kids": 4,
+   "infants": 3,
+   "pax": 10,
+   "base": 0,
+   "hdv": 0,
+   "subtotal": 0,
+   "discount": 0,
+   "voucherCode": "",
+   "final": 0,
+   "depositPct": 20,
+   "deposit": 0,
+   "remaining": 0
+  }
+ },
+ {
+  "input": {
+   "price": 0,
+   "adults": 3,
+   "kids": 2,
+   "infants": 5,
+   "hdvOn": true,
+   "hdvHours": 10,
+   "days": 2,
+   "voucher": {
+    "code": "F",
+    "type": "fixed",
+    "value": 300000
+   }
+  },
+  "expected": {
+   "adults": 3,
+   "kids": 4,
+   "infants": 3,
+   "pax": 10,
+   "base": 0,
+   "hdv": 3800000,
+   "subtotal": 3800000,
+   "discount": 300000,
+   "voucherCode": "F",
+   "final": 3500000,
+   "depositPct": 20,
+   "deposit": 700000,
+   "remaining": 2800000
+  }
+ },
+ {
+  "input": {
+   "price": 0,
+   "adults": 3,
+   "kids": 2,
+   "infants": 5,
+   "hdvOn": true,
+   "hdvHours": 12,
+   "days": "4",
+   "voucher": {
+    "code": "BIG",
+    "type": "fixed",
+    "value": 99999999
+   }
+  },
+  "expected": {
+   "adults": 3,
+   "kids": 4,
+   "infants": 3,
+   "pax": 10,
+   "base": 0,
+   "hdv": 9200000,
+   "subtotal": 9200000,
+   "discount": 9200000,
+   "voucherCode": "BIG",
+   "final": 0,
+   "depositPct": 20,
+   "deposit": 0,
+   "remaining": 0
+  }
+ },
+ {
+  "input": {
+   "price": 0,
+   "adults": 1,
+   "kids": 3,
+   "infants": 2,
+   "hdvOn": true,
+   "hdvHours": 8,
+   "days": 3,
+   "voucher": null
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 4,
+   "infants": 1,
+   "pax": 6,
+   "base": 0,
+   "hdv": 4500000,
+   "subtotal": 4500000,
+   "discount": 0,
+   "voucherCode": "",
+   "final": 4500000,
+   "depositPct": 20,
+   "deposit": 900000,
+   "remaining": 3600000
+  }
+ },
+ {
+  "input": {
+   "price": 0,
+   "adults": 1,
+   "kids": 3,
+   "infants": 2,
+   "hdvOn": true,
+   "hdvHours": "x",
+   "days": 0,
+   "voucher": {
+    "code": "W10",
+    "type": "percent",
+    "value": 10,
+    "maxDiscount": 0
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 4,
+   "infants": 1,
+   "pax": 6,
+   "base": 0,
+   "hdv": 1500000,
+   "subtotal": 1500000,
+   "discount": 150000,
+   "voucherCode": "W10",
+   "final": 1350000,
+   "depositPct": 20,
+   "deposit": 270000,
+   "remaining": 1080000
+  }
+ },
+ {
+  "input": {
+   "price": 0,
+   "adults": 1,
+   "kids": 3,
+   "infants": 2,
+   "hdvOn": false,
+   "hdvHours": 8,
+   "days": 1,
+   "voucher": {
+    "code": "F",
+    "type": "fixed",
+    "value": 300000
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 4,
+   "infants": 1,
+   "pax": 6,
+   "base": 0,
+   "hdv": 0,
+   "subtotal": 0,
+   "discount": 0,
+   "voucherCode": "",
+   "final": 0,
+   "depositPct": 20,
+   "deposit": 0,
+   "remaining": 0
+  }
+ },
+ {
+  "input": {
+   "price": 0,
+   "adults": 1,
+   "kids": 3,
+   "infants": 2,
+   "hdvOn": true,
+   "hdvHours": 10,
+   "days": 2,
+   "voucher": {
+    "code": "BIG",
+    "type": "fixed",
+    "value": 99999999
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 4,
+   "infants": 1,
+   "pax": 6,
+   "base": 0,
+   "hdv": 3800000,
+   "subtotal": 3800000,
+   "discount": 3800000,
+   "voucherCode": "BIG",
+   "final": 0,
+   "depositPct": 20,
+   "deposit": 0,
+   "remaining": 0
+  }
+ },
+ {
+  "input": {
+   "price": 0,
+   "adults": 1,
+   "kids": 3,
+   "infants": 2,
+   "hdvOn": true,
+   "hdvHours": 12,
+   "days": "4",
+   "voucher": {
+    "code": "ODD",
+    "type": "percent",
+    "value": 33.3333
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 4,
+   "infants": 1,
+   "pax": 6,
+   "base": 0,
+   "hdv": 9200000,
+   "subtotal": 9200000,
+   "discount": 3066664,
+   "voucherCode": "ODD",
+   "final": 6133336,
+   "depositPct": 20,
+   "deposit": 1226667,
+   "remaining": 4906669
+  }
+ },
+ {
+  "input": {
+   "price": 0,
+   "adults": 0,
+   "kids": 0,
+   "infants": 0,
+   "hdvOn": true,
+   "hdvHours": 8,
+   "days": 3,
+   "voucher": {
+    "code": "W10",
+    "type": "percent",
+    "value": 10,
+    "maxDiscount": 0
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "pax": 1,
+   "base": 0,
+   "hdv": 4500000,
+   "subtotal": 4500000,
+   "discount": 450000,
+   "voucherCode": "W10",
+   "final": 4050000,
+   "depositPct": 20,
+   "deposit": 810000,
+   "remaining": 3240000
+  }
+ },
+ {
+  "input": {
+   "price": 0,
+   "adults": 0,
+   "kids": 0,
+   "infants": 0,
+   "hdvOn": true,
+   "hdvHours": "x",
+   "days": 0,
+   "voucher": {
+    "code": "G15",
+    "type": "percent",
+    "value": 15,
+    "maxDiscount": 200000
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "pax": 1,
+   "base": 0,
+   "hdv": 1500000,
+   "subtotal": 1500000,
+   "discount": 200000,
+   "voucherCode": "G15",
+   "final": 1300000,
+   "depositPct": 20,
+   "deposit": 260000,
+   "remaining": 1040000
+  }
+ },
+ {
+  "input": {
+   "price": 0,
+   "adults": 0,
+   "kids": 0,
+   "infants": 0,
+   "hdvOn": false,
+   "hdvHours": 8,
+   "days": 1,
+   "voucher": {
+    "code": "BIG",
+    "type": "fixed",
+    "value": 99999999
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "pax": 1,
+   "base": 0,
+   "hdv": 0,
+   "subtotal": 0,
+   "discount": 0,
+   "voucherCode": "",
+   "final": 0,
+   "depositPct": 20,
+   "deposit": 0,
+   "remaining": 0
+  }
+ },
+ {
+  "input": {
+   "price": 0,
+   "adults": 0,
+   "kids": 0,
+   "infants": 0,
+   "hdvOn": true,
+   "hdvHours": 10,
+   "days": 2,
+   "voucher": {
+    "code": "ODD",
+    "type": "percent",
+    "value": 33.3333
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "pax": 1,
+   "base": 0,
+   "hdv": 3800000,
+   "subtotal": 3800000,
+   "discount": 1266665,
+   "voucherCode": "ODD",
+   "final": 2533335,
+   "depositPct": 20,
+   "deposit": 506667,
+   "remaining": 2026668
+  }
+ },
+ {
+  "input": {
+   "price": 0,
+   "adults": 60,
+   "kids": 60,
+   "infants": 60,
+   "hdvOn": true,
+   "hdvHours": 12,
+   "days": "4",
+   "voucher": null
+  },
+  "expected": {
+   "adults": 50,
+   "kids": 50,
+   "infants": 50,
+   "pax": 150,
+   "base": 0,
+   "hdv": 9200000,
+   "subtotal": 9200000,
+   "discount": 0,
+   "voucherCode": "",
+   "final": 9200000,
+   "depositPct": 20,
+   "deposit": 1840000,
+   "remaining": 7360000
+  }
+ },
+ {
+  "input": {
+   "price": 0,
+   "adults": 60,
+   "kids": 60,
+   "infants": 60,
+   "hdvOn": true,
+   "hdvHours": 8,
+   "days": 3,
+   "voucher": {
+    "code": "G15",
+    "type": "percent",
+    "value": 15,
+    "maxDiscount": 200000
+   }
+  },
+  "expected": {
+   "adults": 50,
+   "kids": 50,
+   "infants": 50,
+   "pax": 150,
+   "base": 0,
+   "hdv": 4500000,
+   "subtotal": 4500000,
+   "discount": 200000,
+   "voucherCode": "G15",
+   "final": 4300000,
+   "depositPct": 20,
+   "deposit": 860000,
+   "remaining": 3440000
+  }
+ },
+ {
+  "input": {
+   "price": 0,
+   "adults": 60,
+   "kids": 60,
+   "infants": 60,
+   "hdvOn": true,
+   "hdvHours": "x",
+   "days": 0,
+   "voucher": {
+    "code": "F",
+    "type": "fixed",
+    "value": 300000
+   }
+  },
+  "expected": {
+   "adults": 50,
+   "kids": 50,
+   "infants": 50,
+   "pax": 150,
+   "base": 0,
+   "hdv": 1500000,
+   "subtotal": 1500000,
+   "discount": 300000,
+   "voucherCode": "F",
+   "final": 1200000,
+   "depositPct": 20,
+   "deposit": 240000,
+   "remaining": 960000
+  }
+ },
+ {
+  "input": {
+   "price": 0,
+   "adults": 60,
+   "kids": 60,
+   "infants": 60,
+   "hdvOn": false,
+   "hdvHours": 8,
+   "days": 1,
+   "voucher": {
+    "code": "ODD",
+    "type": "percent",
+    "value": 33.3333
+   }
+  },
+  "expected": {
+   "adults": 50,
+   "kids": 50,
+   "infants": 50,
+   "pax": 150,
+   "base": 0,
+   "hdv": 0,
+   "subtotal": 0,
+   "discount": 0,
+   "voucherCode": "",
+   "final": 0,
+   "depositPct": 20,
+   "deposit": 0,
+   "remaining": 0
+  }
+ },
+ {
+  "input": {
+   "price": 0,
+   "adults": 2,
+   "kids": "2",
+   "infants": "1",
+   "hdvOn": true,
+   "hdvHours": 10,
+   "days": 2,
+   "voucher": null
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 2,
+   "infants": 1,
+   "pax": 5,
+   "base": 0,
+   "hdv": 3800000,
+   "subtotal": 3800000,
+   "discount": 0,
+   "voucherCode": "",
+   "final": 3800000,
+   "depositPct": 20,
+   "deposit": 760000,
+   "remaining": 3040000
+  }
+ },
+ {
+  "input": {
+   "price": 0,
+   "adults": 2,
+   "kids": "2",
+   "infants": "1",
+   "hdvOn": true,
+   "hdvHours": 12,
+   "days": "4",
+   "voucher": {
+    "code": "W10",
+    "type": "percent",
+    "value": 10,
+    "maxDiscount": 0
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 2,
+   "infants": 1,
+   "pax": 5,
+   "base": 0,
+   "hdv": 9200000,
+   "subtotal": 9200000,
+   "discount": 920000,
+   "voucherCode": "W10",
+   "final": 8280000,
+   "depositPct": 20,
+   "deposit": 1656000,
+   "remaining": 6624000
+  }
+ },
+ {
+  "input": {
+   "price": 0,
+   "adults": 2,
+   "kids": "2",
+   "infants": "1",
+   "hdvOn": true,
+   "hdvHours": 8,
+   "days": 3,
+   "voucher": {
+    "code": "F",
+    "type": "fixed",
+    "value": 300000
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 2,
+   "infants": 1,
+   "pax": 5,
+   "base": 0,
+   "hdv": 4500000,
+   "subtotal": 4500000,
+   "discount": 300000,
+   "voucherCode": "F",
+   "final": 4200000,
+   "depositPct": 20,
+   "deposit": 840000,
+   "remaining": 3360000
+  }
+ },
+ {
+  "input": {
+   "price": 0,
+   "adults": 2,
+   "kids": "2",
+   "infants": "1",
+   "hdvOn": true,
+   "hdvHours": "x",
+   "days": 0,
+   "voucher": {
+    "code": "BIG",
+    "type": "fixed",
+    "value": 99999999
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 2,
+   "infants": 1,
+   "pax": 5,
+   "base": 0,
+   "hdv": 1500000,
+   "subtotal": 1500000,
+   "discount": 1500000,
+   "voucherCode": "BIG",
+   "final": 0,
+   "depositPct": 20,
+   "deposit": 0,
+   "remaining": 0
+  }
+ },
+ {
+  "input": {
+   "price": 0,
+   "adults": 2.7,
+   "kids": 1.2,
+   "infants": 0.9,
+   "hdvOn": false,
+   "hdvHours": 8,
+   "days": 1,
+   "voucher": null
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 1,
+   "infants": 0,
+   "pax": 3,
+   "base": 0,
+   "hdv": 0,
+   "subtotal": 0,
+   "discount": 0,
+   "voucherCode": "",
+   "final": 0,
+   "depositPct": 20,
+   "deposit": 0,
+   "remaining": 0
+  }
+ },
+ {
+  "input": {
+   "price": 0,
+   "adults": 2.7,
+   "kids": 1.2,
+   "infants": 0.9,
+   "hdvOn": true,
+   "hdvHours": 10,
+   "days": 2,
+   "voucher": {
+    "code": "W10",
+    "type": "percent",
+    "value": 10,
+    "maxDiscount": 0
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 1,
+   "infants": 0,
+   "pax": 3,
+   "base": 0,
+   "hdv": 3800000,
+   "subtotal": 3800000,
+   "discount": 380000,
+   "voucherCode": "W10",
+   "final": 3420000,
+   "depositPct": 20,
+   "deposit": 684000,
+   "remaining": 2736000
+  }
+ },
+ {
+  "input": {
+   "price": 0,
+   "adults": 2.7,
+   "kids": 1.2,
+   "infants": 0.9,
+   "hdvOn": true,
+   "hdvHours": 12,
+   "days": "4",
+   "voucher": {
+    "code": "G15",
+    "type": "percent",
+    "value": 15,
+    "maxDiscount": 200000
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 1,
+   "infants": 0,
+   "pax": 3,
+   "base": 0,
+   "hdv": 9200000,
+   "subtotal": 9200000,
+   "discount": 200000,
+   "voucherCode": "G15",
+   "final": 9000000,
+   "depositPct": 20,
+   "deposit": 1800000,
+   "remaining": 7200000
+  }
+ },
+ {
+  "input": {
+   "price": 0,
+   "adults": 2.7,
+   "kids": 1.2,
+   "infants": 0.9,
+   "hdvOn": true,
+   "hdvHours": 8,
+   "days": 3,
+   "voucher": {
+    "code": "BIG",
+    "type": "fixed",
+    "value": 99999999
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 1,
+   "infants": 0,
+   "pax": 3,
+   "base": 0,
+   "hdv": 4500000,
+   "subtotal": 4500000,
+   "discount": 4500000,
+   "voucherCode": "BIG",
+   "final": 0,
+   "depositPct": 20,
+   "deposit": 0,
+   "remaining": 0
+  }
+ },
+ {
+  "input": {
+   "price": 0,
+   "adults": 2.7,
+   "kids": 1.2,
+   "infants": 0.9,
+   "hdvOn": true,
+   "hdvHours": "x",
+   "days": 0,
+   "voucher": {
+    "code": "ODD",
+    "type": "percent",
+    "value": 33.3333
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 1,
+   "infants": 0,
+   "pax": 3,
+   "base": 0,
+   "hdv": 1500000,
+   "subtotal": 1500000,
+   "discount": 500000,
+   "voucherCode": "ODD",
+   "final": 1000000,
+   "depositPct": 20,
+   "deposit": 200000,
+   "remaining": 800000
+  }
+ },
+ {
+  "input": {
+   "price": 990000,
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "hdvOn": false,
+   "hdvHours": 8,
+   "days": 1,
+   "voucher": {
+    "code": "W10",
+    "type": "percent",
+    "value": 10,
+    "maxDiscount": 0
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "pax": 1,
+   "base": 990000,
+   "hdv": 0,
+   "subtotal": 990000,
+   "discount": 99000,
+   "voucherCode": "W10",
+   "final": 891000,
+   "depositPct": 20,
+   "deposit": 178200,
+   "remaining": 712800
+  }
+ },
+ {
+  "input": {
+   "price": 990000,
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "hdvOn": true,
+   "hdvHours": 10,
+   "days": 2,
+   "voucher": {
+    "code": "G15",
+    "type": "percent",
+    "value": 15,
+    "maxDiscount": 200000
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "pax": 1,
+   "base": 990000,
+   "hdv": 3800000,
+   "subtotal": 4790000,
+   "discount": 200000,
+   "voucherCode": "G15",
+   "final": 4590000,
+   "depositPct": 20,
+   "deposit": 918000,
+   "remaining": 3672000
+  }
+ },
+ {
+  "input": {
+   "price": 990000,
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "hdvOn": true,
+   "hdvHours": 12,
+   "days": "4",
+   "voucher": {
+    "code": "F",
+    "type": "fixed",
+    "value": 300000
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "pax": 1,
+   "base": 990000,
+   "hdv": 9200000,
+   "subtotal": 10190000,
+   "discount": 300000,
+   "voucherCode": "F",
+   "final": 9890000,
+   "depositPct": 20,
+   "deposit": 1978000,
+   "remaining": 7912000
+  }
+ },
+ {
+  "input": {
+   "price": 990000,
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "hdvOn": true,
+   "hdvHours": 8,
+   "days": 3,
+   "voucher": {
+    "code": "ODD",
+    "type": "percent",
+    "value": 33.3333
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "pax": 1,
+   "base": 990000,
+   "hdv": 4500000,
+   "subtotal": 5490000,
+   "discount": 1829998,
+   "voucherCode": "ODD",
+   "final": 3660002,
+   "depositPct": 20,
+   "deposit": 732000,
+   "remaining": 2928002
+  }
+ },
+ {
+  "input": {
+   "price": 990000,
+   "adults": 2,
+   "kids": 1,
+   "infants": 1,
+   "hdvOn": true,
+   "hdvHours": "x",
+   "days": 0,
+   "voucher": null
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 1,
+   "infants": 1,
+   "pax": 4,
+   "base": 2475000,
+   "hdv": 1500000,
+   "subtotal": 3975000,
+   "discount": 0,
+   "voucherCode": "",
+   "final": 3975000,
+   "depositPct": 20,
+   "deposit": 795000,
+   "remaining": 3180000
+  }
+ },
+ {
+  "input": {
+   "price": 990000,
+   "adults": 2,
+   "kids": 1,
+   "infants": 1,
+   "hdvOn": false,
+   "hdvHours": 8,
+   "days": 1,
+   "voucher": {
+    "code": "G15",
+    "type": "percent",
+    "value": 15,
+    "maxDiscount": 200000
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 1,
+   "infants": 1,
+   "pax": 4,
+   "base": 2475000,
+   "hdv": 0,
+   "subtotal": 2475000,
+   "discount": 200000,
+   "voucherCode": "G15",
+   "final": 2275000,
+   "depositPct": 20,
+   "deposit": 455000,
+   "remaining": 1820000
+  }
+ },
+ {
+  "input": {
+   "price": 990000,
+   "adults": 2,
+   "kids": 1,
+   "infants": 1,
+   "hdvOn": true,
+   "hdvHours": 10,
+   "days": 2,
+   "voucher": {
+    "code": "F",
+    "type": "fixed",
+    "value": 300000
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 1,
+   "infants": 1,
+   "pax": 4,
+   "base": 2475000,
+   "hdv": 3800000,
+   "subtotal": 6275000,
+   "discount": 300000,
+   "voucherCode": "F",
+   "final": 5975000,
+   "depositPct": 20,
+   "deposit": 1195000,
+   "remaining": 4780000
+  }
+ },
+ {
+  "input": {
+   "price": 990000,
+   "adults": 2,
+   "kids": 1,
+   "infants": 1,
+   "hdvOn": true,
+   "hdvHours": 12,
+   "days": "4",
+   "voucher": {
+    "code": "BIG",
+    "type": "fixed",
+    "value": 99999999
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 1,
+   "infants": 1,
+   "pax": 4,
+   "base": 2475000,
+   "hdv": 9200000,
+   "subtotal": 11675000,
+   "discount": 11675000,
+   "voucherCode": "BIG",
+   "final": 0,
+   "depositPct": 20,
+   "deposit": 0,
+   "remaining": 0
+  }
+ },
+ {
+  "input": {
+   "price": 990000,
+   "adults": 3,
+   "kids": 2,
+   "infants": 5,
+   "hdvOn": true,
+   "hdvHours": 8,
+   "days": 3,
+   "voucher": null
+  },
+  "expected": {
+   "adults": 3,
+   "kids": 4,
+   "infants": 3,
+   "pax": 10,
+   "base": 4950000,
+   "hdv": 4500000,
+   "subtotal": 9450000,
+   "discount": 0,
+   "voucherCode": "",
+   "final": 9450000,
+   "depositPct": 20,
+   "deposit": 1890000,
+   "remaining": 7560000
+  }
+ },
+ {
+  "input": {
+   "price": 990000,
+   "adults": 3,
+   "kids": 2,
+   "infants": 5,
+   "hdvOn": true,
+   "hdvHours": "x",
+   "days": 0,
+   "voucher": {
+    "code": "W10",
+    "type": "percent",
+    "value": 10,
+    "maxDiscount": 0
+   }
+  },
+  "expected": {
+   "adults": 3,
+   "kids": 4,
+   "infants": 3,
+   "pax": 10,
+   "base": 4950000,
+   "hdv": 1500000,
+   "subtotal": 6450000,
+   "discount": 645000,
+   "voucherCode": "W10",
+   "final": 5805000,
+   "depositPct": 20,
+   "deposit": 1161000,
+   "remaining": 4644000
+  }
+ },
+ {
+  "input": {
+   "price": 990000,
+   "adults": 3,
+   "kids": 2,
+   "infants": 5,
+   "hdvOn": false,
+   "hdvHours": 8,
+   "days": 1,
+   "voucher": {
+    "code": "F",
+    "type": "fixed",
+    "value": 300000
+   }
+  },
+  "expected": {
+   "adults": 3,
+   "kids": 4,
+   "infants": 3,
+   "pax": 10,
+   "base": 4950000,
+   "hdv": 0,
+   "subtotal": 4950000,
+   "discount": 300000,
+   "voucherCode": "F",
+   "final": 4650000,
+   "depositPct": 20,
+   "deposit": 930000,
+   "remaining": 3720000
+  }
+ },
+ {
+  "input": {
+   "price": 990000,
+   "adults": 3,
+   "kids": 2,
+   "infants": 5,
+   "hdvOn": true,
+   "hdvHours": 10,
+   "days": 2,
+   "voucher": {
+    "code": "BIG",
+    "type": "fixed",
+    "value": 99999999
+   }
+  },
+  "expected": {
+   "adults": 3,
+   "kids": 4,
+   "infants": 3,
+   "pax": 10,
+   "base": 4950000,
+   "hdv": 3800000,
+   "subtotal": 8750000,
+   "discount": 8750000,
+   "voucherCode": "BIG",
+   "final": 0,
+   "depositPct": 20,
+   "deposit": 0,
+   "remaining": 0
+  }
+ },
+ {
+  "input": {
+   "price": 990000,
+   "adults": 3,
+   "kids": 2,
+   "infants": 5,
+   "hdvOn": true,
+   "hdvHours": 12,
+   "days": "4",
+   "voucher": {
+    "code": "ODD",
+    "type": "percent",
+    "value": 33.3333
+   }
+  },
+  "expected": {
+   "adults": 3,
+   "kids": 4,
+   "infants": 3,
+   "pax": 10,
+   "base": 4950000,
+   "hdv": 9200000,
+   "subtotal": 14150000,
+   "discount": 4716662,
+   "voucherCode": "ODD",
+   "final": 9433338,
+   "depositPct": 20,
+   "deposit": 1886668,
+   "remaining": 7546670
+  }
+ },
+ {
+  "input": {
+   "price": 990000,
+   "adults": 1,
+   "kids": 3,
+   "infants": 2,
+   "hdvOn": true,
+   "hdvHours": 8,
+   "days": 3,
+   "voucher": {
+    "code": "W10",
+    "type": "percent",
+    "value": 10,
+    "maxDiscount": 0
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 4,
+   "infants": 1,
+   "pax": 6,
+   "base": 2970000,
+   "hdv": 4500000,
+   "subtotal": 7470000,
+   "discount": 747000,
+   "voucherCode": "W10",
+   "final": 6723000,
+   "depositPct": 20,
+   "deposit": 1344600,
+   "remaining": 5378400
+  }
+ },
+ {
+  "input": {
+   "price": 990000,
+   "adults": 1,
+   "kids": 3,
+   "infants": 2,
+   "hdvOn": true,
+   "hdvHours": "x",
+   "days": 0,
+   "voucher": {
+    "code": "G15",
+    "type": "percent",
+    "value": 15,
+    "maxDiscount": 200000
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 4,
+   "infants": 1,
+   "pax": 6,
+   "base": 2970000,
+   "hdv": 1500000,
+   "subtotal": 4470000,
+   "discount": 200000,
+   "voucherCode": "G15",
+   "final": 4270000,
+   "depositPct": 20,
+   "deposit": 854000,
+   "remaining": 3416000
+  }
+ },
+ {
+  "input": {
+   "price": 990000,
+   "adults": 1,
+   "kids": 3,
+   "infants": 2,
+   "hdvOn": false,
+   "hdvHours": 8,
+   "days": 1,
+   "voucher": {
+    "code": "BIG",
+    "type": "fixed",
+    "value": 99999999
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 4,
+   "infants": 1,
+   "pax": 6,
+   "base": 2970000,
+   "hdv": 0,
+   "subtotal": 2970000,
+   "discount": 2970000,
+   "voucherCode": "BIG",
+   "final": 0,
+   "depositPct": 20,
+   "deposit": 0,
+   "remaining": 0
+  }
+ },
+ {
+  "input": {
+   "price": 990000,
+   "adults": 1,
+   "kids": 3,
+   "infants": 2,
+   "hdvOn": true,
+   "hdvHours": 10,
+   "days": 2,
+   "voucher": {
+    "code": "ODD",
+    "type": "percent",
+    "value": 33.3333
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 4,
+   "infants": 1,
+   "pax": 6,
+   "base": 2970000,
+   "hdv": 3800000,
+   "subtotal": 6770000,
+   "discount": 2256664,
+   "voucherCode": "ODD",
+   "final": 4513336,
+   "depositPct": 20,
+   "deposit": 902667,
+   "remaining": 3610669
+  }
+ },
+ {
+  "input": {
+   "price": 990000,
+   "adults": 0,
+   "kids": 0,
+   "infants": 0,
+   "hdvOn": true,
+   "hdvHours": 12,
+   "days": "4",
+   "voucher": null
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "pax": 1,
+   "base": 990000,
+   "hdv": 9200000,
+   "subtotal": 10190000,
+   "discount": 0,
+   "voucherCode": "",
+   "final": 10190000,
+   "depositPct": 20,
+   "deposit": 2038000,
+   "remaining": 8152000
+  }
+ },
+ {
+  "input": {
+   "price": 990000,
+   "adults": 0,
+   "kids": 0,
+   "infants": 0,
+   "hdvOn": true,
+   "hdvHours": 8,
+   "days": 3,
+   "voucher": {
+    "code": "G15",
+    "type": "percent",
+    "value": 15,
+    "maxDiscount": 200000
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "pax": 1,
+   "base": 990000,
+   "hdv": 4500000,
+   "subtotal": 5490000,
+   "discount": 200000,
+   "voucherCode": "G15",
+   "final": 5290000,
+   "depositPct": 20,
+   "deposit": 1058000,
+   "remaining": 4232000
+  }
+ },
+ {
+  "input": {
+   "price": 990000,
+   "adults": 0,
+   "kids": 0,
+   "infants": 0,
+   "hdvOn": true,
+   "hdvHours": "x",
+   "days": 0,
+   "voucher": {
+    "code": "F",
+    "type": "fixed",
+    "value": 300000
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "pax": 1,
+   "base": 990000,
+   "hdv": 1500000,
+   "subtotal": 2490000,
+   "discount": 300000,
+   "voucherCode": "F",
+   "final": 2190000,
+   "depositPct": 20,
+   "deposit": 438000,
+   "remaining": 1752000
+  }
+ },
+ {
+  "input": {
+   "price": 990000,
+   "adults": 0,
+   "kids": 0,
+   "infants": 0,
+   "hdvOn": false,
+   "hdvHours": 8,
+   "days": 1,
+   "voucher": {
+    "code": "ODD",
+    "type": "percent",
+    "value": 33.3333
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "pax": 1,
+   "base": 990000,
+   "hdv": 0,
+   "subtotal": 990000,
+   "discount": 330000,
+   "voucherCode": "ODD",
+   "final": 660000,
+   "depositPct": 20,
+   "deposit": 132000,
+   "remaining": 528000
+  }
+ },
+ {
+  "input": {
+   "price": 990000,
+   "adults": 60,
+   "kids": 60,
+   "infants": 60,
+   "hdvOn": true,
+   "hdvHours": 10,
+   "days": 2,
+   "voucher": null
+  },
+  "expected": {
+   "adults": 50,
+   "kids": 50,
+   "infants": 50,
+   "pax": 150,
+   "base": 74250000,
+   "hdv": 3800000,
+   "subtotal": 78050000,
+   "discount": 0,
+   "voucherCode": "",
+   "final": 78050000,
+   "depositPct": 20,
+   "deposit": 15610000,
+   "remaining": 62440000
+  }
+ },
+ {
+  "input": {
+   "price": 990000,
+   "adults": 60,
+   "kids": 60,
+   "infants": 60,
+   "hdvOn": true,
+   "hdvHours": 12,
+   "days": "4",
+   "voucher": {
+    "code": "W10",
+    "type": "percent",
+    "value": 10,
+    "maxDiscount": 0
+   }
+  },
+  "expected": {
+   "adults": 50,
+   "kids": 50,
+   "infants": 50,
+   "pax": 150,
+   "base": 74250000,
+   "hdv": 9200000,
+   "subtotal": 83450000,
+   "discount": 8345000,
+   "voucherCode": "W10",
+   "final": 75105000,
+   "depositPct": 20,
+   "deposit": 15021000,
+   "remaining": 60084000
+  }
+ },
+ {
+  "input": {
+   "price": 990000,
+   "adults": 60,
+   "kids": 60,
+   "infants": 60,
+   "hdvOn": true,
+   "hdvHours": 8,
+   "days": 3,
+   "voucher": {
+    "code": "F",
+    "type": "fixed",
+    "value": 300000
+   }
+  },
+  "expected": {
+   "adults": 50,
+   "kids": 50,
+   "infants": 50,
+   "pax": 150,
+   "base": 74250000,
+   "hdv": 4500000,
+   "subtotal": 78750000,
+   "discount": 300000,
+   "voucherCode": "F",
+   "final": 78450000,
+   "depositPct": 20,
+   "deposit": 15690000,
+   "remaining": 62760000
+  }
+ },
+ {
+  "input": {
+   "price": 990000,
+   "adults": 60,
+   "kids": 60,
+   "infants": 60,
+   "hdvOn": true,
+   "hdvHours": "x",
+   "days": 0,
+   "voucher": {
+    "code": "BIG",
+    "type": "fixed",
+    "value": 99999999
+   }
+  },
+  "expected": {
+   "adults": 50,
+   "kids": 50,
+   "infants": 50,
+   "pax": 150,
+   "base": 74250000,
+   "hdv": 1500000,
+   "subtotal": 75750000,
+   "discount": 75750000,
+   "voucherCode": "BIG",
+   "final": 0,
+   "depositPct": 20,
+   "deposit": 0,
+   "remaining": 0
+  }
+ },
+ {
+  "input": {
+   "price": 990000,
+   "adults": 2,
+   "kids": "2",
+   "infants": "1",
+   "hdvOn": false,
+   "hdvHours": 8,
+   "days": 1,
+   "voucher": null
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 2,
+   "infants": 1,
+   "pax": 5,
+   "base": 2970000,
+   "hdv": 0,
+   "subtotal": 2970000,
+   "discount": 0,
+   "voucherCode": "",
+   "final": 2970000,
+   "depositPct": 20,
+   "deposit": 594000,
+   "remaining": 2376000
+  }
+ },
+ {
+  "input": {
+   "price": 990000,
+   "adults": 2,
+   "kids": "2",
+   "infants": "1",
+   "hdvOn": true,
+   "hdvHours": 10,
+   "days": 2,
+   "voucher": {
+    "code": "W10",
+    "type": "percent",
+    "value": 10,
+    "maxDiscount": 0
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 2,
+   "infants": 1,
+   "pax": 5,
+   "base": 2970000,
+   "hdv": 3800000,
+   "subtotal": 6770000,
+   "discount": 677000,
+   "voucherCode": "W10",
+   "final": 6093000,
+   "depositPct": 20,
+   "deposit": 1218600,
+   "remaining": 4874400
+  }
+ },
+ {
+  "input": {
+   "price": 990000,
+   "adults": 2,
+   "kids": "2",
+   "infants": "1",
+   "hdvOn": true,
+   "hdvHours": 12,
+   "days": "4",
+   "voucher": {
+    "code": "G15",
+    "type": "percent",
+    "value": 15,
+    "maxDiscount": 200000
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 2,
+   "infants": 1,
+   "pax": 5,
+   "base": 2970000,
+   "hdv": 9200000,
+   "subtotal": 12170000,
+   "discount": 200000,
+   "voucherCode": "G15",
+   "final": 11970000,
+   "depositPct": 20,
+   "deposit": 2394000,
+   "remaining": 9576000
+  }
+ },
+ {
+  "input": {
+   "price": 990000,
+   "adults": 2,
+   "kids": "2",
+   "infants": "1",
+   "hdvOn": true,
+   "hdvHours": 8,
+   "days": 3,
+   "voucher": {
+    "code": "BIG",
+    "type": "fixed",
+    "value": 99999999
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 2,
+   "infants": 1,
+   "pax": 5,
+   "base": 2970000,
+   "hdv": 4500000,
+   "subtotal": 7470000,
+   "discount": 7470000,
+   "voucherCode": "BIG",
+   "final": 0,
+   "depositPct": 20,
+   "deposit": 0,
+   "remaining": 0
+  }
+ },
+ {
+  "input": {
+   "price": 990000,
+   "adults": 2,
+   "kids": "2",
+   "infants": "1",
+   "hdvOn": true,
+   "hdvHours": "x",
+   "days": 0,
+   "voucher": {
+    "code": "ODD",
+    "type": "percent",
+    "value": 33.3333
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 2,
+   "infants": 1,
+   "pax": 5,
+   "base": 2970000,
+   "hdv": 1500000,
+   "subtotal": 4470000,
+   "discount": 1489999,
+   "voucherCode": "ODD",
+   "final": 2980001,
+   "depositPct": 20,
+   "deposit": 596000,
+   "remaining": 2384001
+  }
+ },
+ {
+  "input": {
+   "price": 990000,
+   "adults": 2.7,
+   "kids": 1.2,
+   "infants": 0.9,
+   "hdvOn": false,
+   "hdvHours": 8,
+   "days": 1,
+   "voucher": {
+    "code": "W10",
+    "type": "percent",
+    "value": 10,
+    "maxDiscount": 0
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 1,
+   "infants": 0,
+   "pax": 3,
+   "base": 2475000,
+   "hdv": 0,
+   "subtotal": 2475000,
+   "discount": 247500,
+   "voucherCode": "W10",
+   "final": 2227500,
+   "depositPct": 20,
+   "deposit": 445500,
+   "remaining": 1782000
+  }
+ },
+ {
+  "input": {
+   "price": 990000,
+   "adults": 2.7,
+   "kids": 1.2,
+   "infants": 0.9,
+   "hdvOn": true,
+   "hdvHours": 10,
+   "days": 2,
+   "voucher": {
+    "code": "G15",
+    "type": "percent",
+    "value": 15,
+    "maxDiscount": 200000
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 1,
+   "infants": 0,
+   "pax": 3,
+   "base": 2475000,
+   "hdv": 3800000,
+   "subtotal": 6275000,
+   "discount": 200000,
+   "voucherCode": "G15",
+   "final": 6075000,
+   "depositPct": 20,
+   "deposit": 1215000,
+   "remaining": 4860000
+  }
+ },
+ {
+  "input": {
+   "price": 990000,
+   "adults": 2.7,
+   "kids": 1.2,
+   "infants": 0.9,
+   "hdvOn": true,
+   "hdvHours": 12,
+   "days": "4",
+   "voucher": {
+    "code": "F",
+    "type": "fixed",
+    "value": 300000
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 1,
+   "infants": 0,
+   "pax": 3,
+   "base": 2475000,
+   "hdv": 9200000,
+   "subtotal": 11675000,
+   "discount": 300000,
+   "voucherCode": "F",
+   "final": 11375000,
+   "depositPct": 20,
+   "deposit": 2275000,
+   "remaining": 9100000
+  }
+ },
+ {
+  "input": {
+   "price": 990000,
+   "adults": 2.7,
+   "kids": 1.2,
+   "infants": 0.9,
+   "hdvOn": true,
+   "hdvHours": 8,
+   "days": 3,
+   "voucher": {
+    "code": "ODD",
+    "type": "percent",
+    "value": 33.3333
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 1,
+   "infants": 0,
+   "pax": 3,
+   "base": 2475000,
+   "hdv": 4500000,
+   "subtotal": 6975000,
+   "discount": 2324998,
+   "voucherCode": "ODD",
+   "final": 4650002,
+   "depositPct": 20,
+   "deposit": 930000,
+   "remaining": 3720002
+  }
+ },
+ {
+  "input": {
+   "price": 1990000,
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "hdvOn": true,
+   "hdvHours": "x",
+   "days": 0,
+   "voucher": null
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "pax": 1,
+   "base": 1990000,
+   "hdv": 1500000,
+   "subtotal": 3490000,
+   "discount": 0,
+   "voucherCode": "",
+   "final": 3490000,
+   "depositPct": 20,
+   "deposit": 698000,
+   "remaining": 2792000
+  }
+ },
+ {
+  "input": {
+   "price": 1990000,
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "hdvOn": false,
+   "hdvHours": 8,
+   "days": 1,
+   "voucher": {
+    "code": "G15",
+    "type": "percent",
+    "value": 15,
+    "maxDiscount": 200000
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "pax": 1,
+   "base": 1990000,
+   "hdv": 0,
+   "subtotal": 1990000,
+   "discount": 200000,
+   "voucherCode": "G15",
+   "final": 1790000,
+   "depositPct": 20,
+   "deposit": 358000,
+   "remaining": 1432000
+  }
+ },
+ {
+  "input": {
+   "price": 1990000,
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "hdvOn": true,
+   "hdvHours": 10,
+   "days": 2,
+   "voucher": {
+    "code": "F",
+    "type": "fixed",
+    "value": 300000
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "pax": 1,
+   "base": 1990000,
+   "hdv": 3800000,
+   "subtotal": 5790000,
+   "discount": 300000,
+   "voucherCode": "F",
+   "final": 5490000,
+   "depositPct": 20,
+   "deposit": 1098000,
+   "remaining": 4392000
+  }
+ },
+ {
+  "input": {
+   "price": 1990000,
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "hdvOn": true,
+   "hdvHours": 12,
+   "days": "4",
+   "voucher": {
+    "code": "BIG",
+    "type": "fixed",
+    "value": 99999999
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "pax": 1,
+   "base": 1990000,
+   "hdv": 9200000,
+   "subtotal": 11190000,
+   "discount": 11190000,
+   "voucherCode": "BIG",
+   "final": 0,
+   "depositPct": 20,
+   "deposit": 0,
+   "remaining": 0
+  }
+ },
+ {
+  "input": {
+   "price": 1990000,
+   "adults": 2,
+   "kids": 1,
+   "infants": 1,
+   "hdvOn": true,
+   "hdvHours": 8,
+   "days": 3,
+   "voucher": null
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 1,
+   "infants": 1,
+   "pax": 4,
+   "base": 4975000,
+   "hdv": 4500000,
+   "subtotal": 9475000,
+   "discount": 0,
+   "voucherCode": "",
+   "final": 9475000,
+   "depositPct": 20,
+   "deposit": 1895000,
+   "remaining": 7580000
+  }
+ },
+ {
+  "input": {
+   "price": 1990000,
+   "adults": 2,
+   "kids": 1,
+   "infants": 1,
+   "hdvOn": true,
+   "hdvHours": "x",
+   "days": 0,
+   "voucher": {
+    "code": "W10",
+    "type": "percent",
+    "value": 10,
+    "maxDiscount": 0
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 1,
+   "infants": 1,
+   "pax": 4,
+   "base": 4975000,
+   "hdv": 1500000,
+   "subtotal": 6475000,
+   "discount": 647500,
+   "voucherCode": "W10",
+   "final": 5827500,
+   "depositPct": 20,
+   "deposit": 1165500,
+   "remaining": 4662000
+  }
+ },
+ {
+  "input": {
+   "price": 1990000,
+   "adults": 2,
+   "kids": 1,
+   "infants": 1,
+   "hdvOn": false,
+   "hdvHours": 8,
+   "days": 1,
+   "voucher": {
+    "code": "F",
+    "type": "fixed",
+    "value": 300000
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 1,
+   "infants": 1,
+   "pax": 4,
+   "base": 4975000,
+   "hdv": 0,
+   "subtotal": 4975000,
+   "discount": 300000,
+   "voucherCode": "F",
+   "final": 4675000,
+   "depositPct": 20,
+   "deposit": 935000,
+   "remaining": 3740000
+  }
+ },
+ {
+  "input": {
+   "price": 1990000,
+   "adults": 2,
+   "kids": 1,
+   "infants": 1,
+   "hdvOn": true,
+   "hdvHours": 10,
+   "days": 2,
+   "voucher": {
+    "code": "BIG",
+    "type": "fixed",
+    "value": 99999999
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 1,
+   "infants": 1,
+   "pax": 4,
+   "base": 4975000,
+   "hdv": 3800000,
+   "subtotal": 8775000,
+   "discount": 8775000,
+   "voucherCode": "BIG",
+   "final": 0,
+   "depositPct": 20,
+   "deposit": 0,
+   "remaining": 0
+  }
+ },
+ {
+  "input": {
+   "price": 1990000,
+   "adults": 2,
+   "kids": 1,
+   "infants": 1,
+   "hdvOn": true,
+   "hdvHours": 12,
+   "days": "4",
+   "voucher": {
+    "code": "ODD",
+    "type": "percent",
+    "value": 33.3333
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 1,
+   "infants": 1,
+   "pax": 4,
+   "base": 4975000,
+   "hdv": 9200000,
+   "subtotal": 14175000,
+   "discount": 4724995,
+   "voucherCode": "ODD",
+   "final": 9450005,
+   "depositPct": 20,
+   "deposit": 1890001,
+   "remaining": 7560004
+  }
+ },
+ {
+  "input": {
+   "price": 1990000,
+   "adults": 3,
+   "kids": 2,
+   "infants": 5,
+   "hdvOn": true,
+   "hdvHours": 8,
+   "days": 3,
+   "voucher": {
+    "code": "W10",
+    "type": "percent",
+    "value": 10,
+    "maxDiscount": 0
+   }
+  },
+  "expected": {
+   "adults": 3,
+   "kids": 4,
+   "infants": 3,
+   "pax": 10,
+   "base": 9950000,
+   "hdv": 4500000,
+   "subtotal": 14450000,
+   "discount": 1445000,
+   "voucherCode": "W10",
+   "final": 13005000,
+   "depositPct": 20,
+   "deposit": 2601000,
+   "remaining": 10404000
+  }
+ },
+ {
+  "input": {
+   "price": 1990000,
+   "adults": 3,
+   "kids": 2,
+   "infants": 5,
+   "hdvOn": true,
+   "hdvHours": "x",
+   "days": 0,
+   "voucher": {
+    "code": "G15",
+    "type": "percent",
+    "value": 15,
+    "maxDiscount": 200000
+   }
+  },
+  "expected": {
+   "adults": 3,
+   "kids": 4,
+   "infants": 3,
+   "pax": 10,
+   "base": 9950000,
+   "hdv": 1500000,
+   "subtotal": 11450000,
+   "discount": 200000,
+   "voucherCode": "G15",
+   "final": 11250000,
+   "depositPct": 20,
+   "deposit": 2250000,
+   "remaining": 9000000
+  }
+ },
+ {
+  "input": {
+   "price": 1990000,
+   "adults": 3,
+   "kids": 2,
+   "infants": 5,
+   "hdvOn": false,
+   "hdvHours": 8,
+   "days": 1,
+   "voucher": {
+    "code": "BIG",
+    "type": "fixed",
+    "value": 99999999
+   }
+  },
+  "expected": {
+   "adults": 3,
+   "kids": 4,
+   "infants": 3,
+   "pax": 10,
+   "base": 9950000,
+   "hdv": 0,
+   "subtotal": 9950000,
+   "discount": 9950000,
+   "voucherCode": "BIG",
+   "final": 0,
+   "depositPct": 20,
+   "deposit": 0,
+   "remaining": 0
+  }
+ },
+ {
+  "input": {
+   "price": 1990000,
+   "adults": 3,
+   "kids": 2,
+   "infants": 5,
+   "hdvOn": true,
+   "hdvHours": 10,
+   "days": 2,
+   "voucher": {
+    "code": "ODD",
+    "type": "percent",
+    "value": 33.3333
+   }
+  },
+  "expected": {
+   "adults": 3,
+   "kids": 4,
+   "infants": 3,
+   "pax": 10,
+   "base": 9950000,
+   "hdv": 3800000,
+   "subtotal": 13750000,
+   "discount": 4583329,
+   "voucherCode": "ODD",
+   "final": 9166671,
+   "depositPct": 20,
+   "deposit": 1833334,
+   "remaining": 7333337
+  }
+ },
+ {
+  "input": {
+   "price": 1990000,
+   "adults": 1,
+   "kids": 3,
+   "infants": 2,
+   "hdvOn": true,
+   "hdvHours": 12,
+   "days": "4",
+   "voucher": null
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 4,
+   "infants": 1,
+   "pax": 6,
+   "base": 5970000,
+   "hdv": 9200000,
+   "subtotal": 15170000,
+   "discount": 0,
+   "voucherCode": "",
+   "final": 15170000,
+   "depositPct": 20,
+   "deposit": 3034000,
+   "remaining": 12136000
+  }
+ },
+ {
+  "input": {
+   "price": 1990000,
+   "adults": 1,
+   "kids": 3,
+   "infants": 2,
+   "hdvOn": true,
+   "hdvHours": 8,
+   "days": 3,
+   "voucher": {
+    "code": "G15",
+    "type": "percent",
+    "value": 15,
+    "maxDiscount": 200000
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 4,
+   "infants": 1,
+   "pax": 6,
+   "base": 5970000,
+   "hdv": 4500000,
+   "subtotal": 10470000,
+   "discount": 200000,
+   "voucherCode": "G15",
+   "final": 10270000,
+   "depositPct": 20,
+   "deposit": 2054000,
+   "remaining": 8216000
+  }
+ },
+ {
+  "input": {
+   "price": 1990000,
+   "adults": 1,
+   "kids": 3,
+   "infants": 2,
+   "hdvOn": true,
+   "hdvHours": "x",
+   "days": 0,
+   "voucher": {
+    "code": "F",
+    "type": "fixed",
+    "value": 300000
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 4,
+   "infants": 1,
+   "pax": 6,
+   "base": 5970000,
+   "hdv": 1500000,
+   "subtotal": 7470000,
+   "discount": 300000,
+   "voucherCode": "F",
+   "final": 7170000,
+   "depositPct": 20,
+   "deposit": 1434000,
+   "remaining": 5736000
+  }
+ },
+ {
+  "input": {
+   "price": 1990000,
+   "adults": 1,
+   "kids": 3,
+   "infants": 2,
+   "hdvOn": false,
+   "hdvHours": 8,
+   "days": 1,
+   "voucher": {
+    "code": "ODD",
+    "type": "percent",
+    "value": 33.3333
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 4,
+   "infants": 1,
+   "pax": 6,
+   "base": 5970000,
+   "hdv": 0,
+   "subtotal": 5970000,
+   "discount": 1989998,
+   "voucherCode": "ODD",
+   "final": 3980002,
+   "depositPct": 20,
+   "deposit": 796000,
+   "remaining": 3184002
+  }
+ },
+ {
+  "input": {
+   "price": 1990000,
+   "adults": 0,
+   "kids": 0,
+   "infants": 0,
+   "hdvOn": true,
+   "hdvHours": 10,
+   "days": 2,
+   "voucher": null
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "pax": 1,
+   "base": 1990000,
+   "hdv": 3800000,
+   "subtotal": 5790000,
+   "discount": 0,
+   "voucherCode": "",
+   "final": 5790000,
+   "depositPct": 20,
+   "deposit": 1158000,
+   "remaining": 4632000
+  }
+ },
+ {
+  "input": {
+   "price": 1990000,
+   "adults": 0,
+   "kids": 0,
+   "infants": 0,
+   "hdvOn": true,
+   "hdvHours": 12,
+   "days": "4",
+   "voucher": {
+    "code": "W10",
+    "type": "percent",
+    "value": 10,
+    "maxDiscount": 0
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "pax": 1,
+   "base": 1990000,
+   "hdv": 9200000,
+   "subtotal": 11190000,
+   "discount": 1119000,
+   "voucherCode": "W10",
+   "final": 10071000,
+   "depositPct": 20,
+   "deposit": 2014200,
+   "remaining": 8056800
+  }
+ },
+ {
+  "input": {
+   "price": 1990000,
+   "adults": 0,
+   "kids": 0,
+   "infants": 0,
+   "hdvOn": true,
+   "hdvHours": 8,
+   "days": 3,
+   "voucher": {
+    "code": "F",
+    "type": "fixed",
+    "value": 300000
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "pax": 1,
+   "base": 1990000,
+   "hdv": 4500000,
+   "subtotal": 6490000,
+   "discount": 300000,
+   "voucherCode": "F",
+   "final": 6190000,
+   "depositPct": 20,
+   "deposit": 1238000,
+   "remaining": 4952000
+  }
+ },
+ {
+  "input": {
+   "price": 1990000,
+   "adults": 0,
+   "kids": 0,
+   "infants": 0,
+   "hdvOn": true,
+   "hdvHours": "x",
+   "days": 0,
+   "voucher": {
+    "code": "BIG",
+    "type": "fixed",
+    "value": 99999999
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "pax": 1,
+   "base": 1990000,
+   "hdv": 1500000,
+   "subtotal": 3490000,
+   "discount": 3490000,
+   "voucherCode": "BIG",
+   "final": 0,
+   "depositPct": 20,
+   "deposit": 0,
+   "remaining": 0
+  }
+ },
+ {
+  "input": {
+   "price": 1990000,
+   "adults": 60,
+   "kids": 60,
+   "infants": 60,
+   "hdvOn": false,
+   "hdvHours": 8,
+   "days": 1,
+   "voucher": null
+  },
+  "expected": {
+   "adults": 50,
+   "kids": 50,
+   "infants": 50,
+   "pax": 150,
+   "base": 149250000,
+   "hdv": 0,
+   "subtotal": 149250000,
+   "discount": 0,
+   "voucherCode": "",
+   "final": 149250000,
+   "depositPct": 20,
+   "deposit": 29850000,
+   "remaining": 119400000
+  }
+ },
+ {
+  "input": {
+   "price": 1990000,
+   "adults": 60,
+   "kids": 60,
+   "infants": 60,
+   "hdvOn": true,
+   "hdvHours": 10,
+   "days": 2,
+   "voucher": {
+    "code": "W10",
+    "type": "percent",
+    "value": 10,
+    "maxDiscount": 0
+   }
+  },
+  "expected": {
+   "adults": 50,
+   "kids": 50,
+   "infants": 50,
+   "pax": 150,
+   "base": 149250000,
+   "hdv": 3800000,
+   "subtotal": 153050000,
+   "discount": 15305000,
+   "voucherCode": "W10",
+   "final": 137745000,
+   "depositPct": 20,
+   "deposit": 27549000,
+   "remaining": 110196000
+  }
+ },
+ {
+  "input": {
+   "price": 1990000,
+   "adults": 60,
+   "kids": 60,
+   "infants": 60,
+   "hdvOn": true,
+   "hdvHours": 12,
+   "days": "4",
+   "voucher": {
+    "code": "G15",
+    "type": "percent",
+    "value": 15,
+    "maxDiscount": 200000
+   }
+  },
+  "expected": {
+   "adults": 50,
+   "kids": 50,
+   "infants": 50,
+   "pax": 150,
+   "base": 149250000,
+   "hdv": 9200000,
+   "subtotal": 158450000,
+   "discount": 200000,
+   "voucherCode": "G15",
+   "final": 158250000,
+   "depositPct": 20,
+   "deposit": 31650000,
+   "remaining": 126600000
+  }
+ },
+ {
+  "input": {
+   "price": 1990000,
+   "adults": 60,
+   "kids": 60,
+   "infants": 60,
+   "hdvOn": true,
+   "hdvHours": 8,
+   "days": 3,
+   "voucher": {
+    "code": "BIG",
+    "type": "fixed",
+    "value": 99999999
+   }
+  },
+  "expected": {
+   "adults": 50,
+   "kids": 50,
+   "infants": 50,
+   "pax": 150,
+   "base": 149250000,
+   "hdv": 4500000,
+   "subtotal": 153750000,
+   "discount": 99999999,
+   "voucherCode": "BIG",
+   "final": 53750001,
+   "depositPct": 20,
+   "deposit": 10750000,
+   "remaining": 43000001
+  }
+ },
+ {
+  "input": {
+   "price": 1990000,
+   "adults": 60,
+   "kids": 60,
+   "infants": 60,
+   "hdvOn": true,
+   "hdvHours": "x",
+   "days": 0,
+   "voucher": {
+    "code": "ODD",
+    "type": "percent",
+    "value": 33.3333
+   }
+  },
+  "expected": {
+   "adults": 50,
+   "kids": 50,
+   "infants": 50,
+   "pax": 150,
+   "base": 149250000,
+   "hdv": 1500000,
+   "subtotal": 150750000,
+   "discount": 50249950,
+   "voucherCode": "ODD",
+   "final": 100500050,
+   "depositPct": 20,
+   "deposit": 20100010,
+   "remaining": 80400040
+  }
+ },
+ {
+  "input": {
+   "price": 1990000,
+   "adults": 2,
+   "kids": "2",
+   "infants": "1",
+   "hdvOn": false,
+   "hdvHours": 8,
+   "days": 1,
+   "voucher": {
+    "code": "W10",
+    "type": "percent",
+    "value": 10,
+    "maxDiscount": 0
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 2,
+   "infants": 1,
+   "pax": 5,
+   "base": 5970000,
+   "hdv": 0,
+   "subtotal": 5970000,
+   "discount": 597000,
+   "voucherCode": "W10",
+   "final": 5373000,
+   "depositPct": 20,
+   "deposit": 1074600,
+   "remaining": 4298400
+  }
+ },
+ {
+  "input": {
+   "price": 1990000,
+   "adults": 2,
+   "kids": "2",
+   "infants": "1",
+   "hdvOn": true,
+   "hdvHours": 10,
+   "days": 2,
+   "voucher": {
+    "code": "G15",
+    "type": "percent",
+    "value": 15,
+    "maxDiscount": 200000
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 2,
+   "infants": 1,
+   "pax": 5,
+   "base": 5970000,
+   "hdv": 3800000,
+   "subtotal": 9770000,
+   "discount": 200000,
+   "voucherCode": "G15",
+   "final": 9570000,
+   "depositPct": 20,
+   "deposit": 1914000,
+   "remaining": 7656000
+  }
+ },
+ {
+  "input": {
+   "price": 1990000,
+   "adults": 2,
+   "kids": "2",
+   "infants": "1",
+   "hdvOn": true,
+   "hdvHours": 12,
+   "days": "4",
+   "voucher": {
+    "code": "F",
+    "type": "fixed",
+    "value": 300000
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 2,
+   "infants": 1,
+   "pax": 5,
+   "base": 5970000,
+   "hdv": 9200000,
+   "subtotal": 15170000,
+   "discount": 300000,
+   "voucherCode": "F",
+   "final": 14870000,
+   "depositPct": 20,
+   "deposit": 2974000,
+   "remaining": 11896000
+  }
+ },
+ {
+  "input": {
+   "price": 1990000,
+   "adults": 2,
+   "kids": "2",
+   "infants": "1",
+   "hdvOn": true,
+   "hdvHours": 8,
+   "days": 3,
+   "voucher": {
+    "code": "ODD",
+    "type": "percent",
+    "value": 33.3333
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 2,
+   "infants": 1,
+   "pax": 5,
+   "base": 5970000,
+   "hdv": 4500000,
+   "subtotal": 10470000,
+   "discount": 3489997,
+   "voucherCode": "ODD",
+   "final": 6980003,
+   "depositPct": 20,
+   "deposit": 1396001,
+   "remaining": 5584002
+  }
+ },
+ {
+  "input": {
+   "price": 1990000,
+   "adults": 2.7,
+   "kids": 1.2,
+   "infants": 0.9,
+   "hdvOn": true,
+   "hdvHours": "x",
+   "days": 0,
+   "voucher": null
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 1,
+   "infants": 0,
+   "pax": 3,
+   "base": 4975000,
+   "hdv": 1500000,
+   "subtotal": 6475000,
+   "discount": 0,
+   "voucherCode": "",
+   "final": 6475000,
+   "depositPct": 20,
+   "deposit": 1295000,
+   "remaining": 5180000
+  }
+ },
+ {
+  "input": {
+   "price": 1990000,
+   "adults": 2.7,
+   "kids": 1.2,
+   "infants": 0.9,
+   "hdvOn": false,
+   "hdvHours": 8,
+   "days": 1,
+   "voucher": {
+    "code": "G15",
+    "type": "percent",
+    "value": 15,
+    "maxDiscount": 200000
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 1,
+   "infants": 0,
+   "pax": 3,
+   "base": 4975000,
+   "hdv": 0,
+   "subtotal": 4975000,
+   "discount": 200000,
+   "voucherCode": "G15",
+   "final": 4775000,
+   "depositPct": 20,
+   "deposit": 955000,
+   "remaining": 3820000
+  }
+ },
+ {
+  "input": {
+   "price": 1990000,
+   "adults": 2.7,
+   "kids": 1.2,
+   "infants": 0.9,
+   "hdvOn": true,
+   "hdvHours": 10,
+   "days": 2,
+   "voucher": {
+    "code": "F",
+    "type": "fixed",
+    "value": 300000
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 1,
+   "infants": 0,
+   "pax": 3,
+   "base": 4975000,
+   "hdv": 3800000,
+   "subtotal": 8775000,
+   "discount": 300000,
+   "voucherCode": "F",
+   "final": 8475000,
+   "depositPct": 20,
+   "deposit": 1695000,
+   "remaining": 6780000
+  }
+ },
+ {
+  "input": {
+   "price": 1990000,
+   "adults": 2.7,
+   "kids": 1.2,
+   "infants": 0.9,
+   "hdvOn": true,
+   "hdvHours": 12,
+   "days": "4",
+   "voucher": {
+    "code": "BIG",
+    "type": "fixed",
+    "value": 99999999
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 1,
+   "infants": 0,
+   "pax": 3,
+   "base": 4975000,
+   "hdv": 9200000,
+   "subtotal": 14175000,
+   "discount": 14175000,
+   "voucherCode": "BIG",
+   "final": 0,
+   "depositPct": 20,
+   "deposit": 0,
+   "remaining": 0
+  }
+ },
+ {
+  "input": {
+   "price": 2500000,
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "hdvOn": true,
+   "hdvHours": 8,
+   "days": 3,
+   "voucher": null
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "pax": 1,
+   "base": 2500000,
+   "hdv": 4500000,
+   "subtotal": 7000000,
+   "discount": 0,
+   "voucherCode": "",
+   "final": 7000000,
+   "depositPct": 20,
+   "deposit": 1400000,
+   "remaining": 5600000
+  }
+ },
+ {
+  "input": {
+   "price": 2500000,
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "hdvOn": true,
+   "hdvHours": "x",
+   "days": 0,
+   "voucher": {
+    "code": "W10",
+    "type": "percent",
+    "value": 10,
+    "maxDiscount": 0
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "pax": 1,
+   "base": 2500000,
+   "hdv": 1500000,
+   "subtotal": 4000000,
+   "discount": 400000,
+   "voucherCode": "W10",
+   "final": 3600000,
+   "depositPct": 20,
+   "deposit": 720000,
+   "remaining": 2880000
+  }
+ },
+ {
+  "input": {
+   "price": 2500000,
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "hdvOn": false,
+   "hdvHours": 8,
+   "days": 1,
+   "voucher": {
+    "code": "F",
+    "type": "fixed",
+    "value": 300000
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "pax": 1,
+   "base": 2500000,
+   "hdv": 0,
+   "subtotal": 2500000,
+   "discount": 300000,
+   "voucherCode": "F",
+   "final": 2200000,
+   "depositPct": 20,
+   "deposit": 440000,
+   "remaining": 1760000
+  }
+ },
+ {
+  "input": {
+   "price": 2500000,
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "hdvOn": true,
+   "hdvHours": 10,
+   "days": 2,
+   "voucher": {
+    "code": "BIG",
+    "type": "fixed",
+    "value": 99999999
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "pax": 1,
+   "base": 2500000,
+   "hdv": 3800000,
+   "subtotal": 6300000,
+   "discount": 6300000,
+   "voucherCode": "BIG",
+   "final": 0,
+   "depositPct": 20,
+   "deposit": 0,
+   "remaining": 0
+  }
+ },
+ {
+  "input": {
+   "price": 2500000,
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "hdvOn": true,
+   "hdvHours": 12,
+   "days": "4",
+   "voucher": {
+    "code": "ODD",
+    "type": "percent",
+    "value": 33.3333
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "pax": 1,
+   "base": 2500000,
+   "hdv": 9200000,
+   "subtotal": 11700000,
+   "discount": 3899996,
+   "voucherCode": "ODD",
+   "final": 7800004,
+   "depositPct": 20,
+   "deposit": 1560001,
+   "remaining": 6240003
+  }
+ },
+ {
+  "input": {
+   "price": 2500000,
+   "adults": 2,
+   "kids": 1,
+   "infants": 1,
+   "hdvOn": true,
+   "hdvHours": 8,
+   "days": 3,
+   "voucher": {
+    "code": "W10",
+    "type": "percent",
+    "value": 10,
+    "maxDiscount": 0
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 1,
+   "infants": 1,
+   "pax": 4,
+   "base": 6250000,
+   "hdv": 4500000,
+   "subtotal": 10750000,
+   "discount": 1075000,
+   "voucherCode": "W10",
+   "final": 9675000,
+   "depositPct": 20,
+   "deposit": 1935000,
+   "remaining": 7740000
+  }
+ },
+ {
+  "input": {
+   "price": 2500000,
+   "adults": 2,
+   "kids": 1,
+   "infants": 1,
+   "hdvOn": true,
+   "hdvHours": "x",
+   "days": 0,
+   "voucher": {
+    "code": "G15",
+    "type": "percent",
+    "value": 15,
+    "maxDiscount": 200000
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 1,
+   "infants": 1,
+   "pax": 4,
+   "base": 6250000,
+   "hdv": 1500000,
+   "subtotal": 7750000,
+   "discount": 200000,
+   "voucherCode": "G15",
+   "final": 7550000,
+   "depositPct": 20,
+   "deposit": 1510000,
+   "remaining": 6040000
+  }
+ },
+ {
+  "input": {
+   "price": 2500000,
+   "adults": 2,
+   "kids": 1,
+   "infants": 1,
+   "hdvOn": false,
+   "hdvHours": 8,
+   "days": 1,
+   "voucher": {
+    "code": "BIG",
+    "type": "fixed",
+    "value": 99999999
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 1,
+   "infants": 1,
+   "pax": 4,
+   "base": 6250000,
+   "hdv": 0,
+   "subtotal": 6250000,
+   "discount": 6250000,
+   "voucherCode": "BIG",
+   "final": 0,
+   "depositPct": 20,
+   "deposit": 0,
+   "remaining": 0
+  }
+ },
+ {
+  "input": {
+   "price": 2500000,
+   "adults": 2,
+   "kids": 1,
+   "infants": 1,
+   "hdvOn": true,
+   "hdvHours": 10,
+   "days": 2,
+   "voucher": {
+    "code": "ODD",
+    "type": "percent",
+    "value": 33.3333
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 1,
+   "infants": 1,
+   "pax": 4,
+   "base": 6250000,
+   "hdv": 3800000,
+   "subtotal": 10050000,
+   "discount": 3349997,
+   "voucherCode": "ODD",
+   "final": 6700003,
+   "depositPct": 20,
+   "deposit": 1340001,
+   "remaining": 5360002
+  }
+ },
+ {
+  "input": {
+   "price": 2500000,
+   "adults": 3,
+   "kids": 2,
+   "infants": 5,
+   "hdvOn": true,
+   "hdvHours": 12,
+   "days": "4",
+   "voucher": null
+  },
+  "expected": {
+   "adults": 3,
+   "kids": 4,
+   "infants": 3,
+   "pax": 10,
+   "base": 12500000,
+   "hdv": 9200000,
+   "subtotal": 21700000,
+   "discount": 0,
+   "voucherCode": "",
+   "final": 21700000,
+   "depositPct": 20,
+   "deposit": 4340000,
+   "remaining": 17360000
+  }
+ },
+ {
+  "input": {
+   "price": 2500000,
+   "adults": 3,
+   "kids": 2,
+   "infants": 5,
+   "hdvOn": true,
+   "hdvHours": 8,
+   "days": 3,
+   "voucher": {
+    "code": "G15",
+    "type": "percent",
+    "value": 15,
+    "maxDiscount": 200000
+   }
+  },
+  "expected": {
+   "adults": 3,
+   "kids": 4,
+   "infants": 3,
+   "pax": 10,
+   "base": 12500000,
+   "hdv": 4500000,
+   "subtotal": 17000000,
+   "discount": 200000,
+   "voucherCode": "G15",
+   "final": 16800000,
+   "depositPct": 20,
+   "deposit": 3360000,
+   "remaining": 13440000
+  }
+ },
+ {
+  "input": {
+   "price": 2500000,
+   "adults": 3,
+   "kids": 2,
+   "infants": 5,
+   "hdvOn": true,
+   "hdvHours": "x",
+   "days": 0,
+   "voucher": {
+    "code": "F",
+    "type": "fixed",
+    "value": 300000
+   }
+  },
+  "expected": {
+   "adults": 3,
+   "kids": 4,
+   "infants": 3,
+   "pax": 10,
+   "base": 12500000,
+   "hdv": 1500000,
+   "subtotal": 14000000,
+   "discount": 300000,
+   "voucherCode": "F",
+   "final": 13700000,
+   "depositPct": 20,
+   "deposit": 2740000,
+   "remaining": 10960000
+  }
+ },
+ {
+  "input": {
+   "price": 2500000,
+   "adults": 3,
+   "kids": 2,
+   "infants": 5,
+   "hdvOn": false,
+   "hdvHours": 8,
+   "days": 1,
+   "voucher": {
+    "code": "ODD",
+    "type": "percent",
+    "value": 33.3333
+   }
+  },
+  "expected": {
+   "adults": 3,
+   "kids": 4,
+   "infants": 3,
+   "pax": 10,
+   "base": 12500000,
+   "hdv": 0,
+   "subtotal": 12500000,
+   "discount": 4166663,
+   "voucherCode": "ODD",
+   "final": 8333337,
+   "depositPct": 20,
+   "deposit": 1666667,
+   "remaining": 6666670
+  }
+ },
+ {
+  "input": {
+   "price": 2500000,
+   "adults": 1,
+   "kids": 3,
+   "infants": 2,
+   "hdvOn": true,
+   "hdvHours": 10,
+   "days": 2,
+   "voucher": null
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 4,
+   "infants": 1,
+   "pax": 6,
+   "base": 7500000,
+   "hdv": 3800000,
+   "subtotal": 11300000,
+   "discount": 0,
+   "voucherCode": "",
+   "final": 11300000,
+   "depositPct": 20,
+   "deposit": 2260000,
+   "remaining": 9040000
+  }
+ },
+ {
+  "input": {
+   "price": 2500000,
+   "adults": 1,
+   "kids": 3,
+   "infants": 2,
+   "hdvOn": true,
+   "hdvHours": 12,
+   "days": "4",
+   "voucher": {
+    "code": "W10",
+    "type": "percent",
+    "value": 10,
+    "maxDiscount": 0
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 4,
+   "infants": 1,
+   "pax": 6,
+   "base": 7500000,
+   "hdv": 9200000,
+   "subtotal": 16700000,
+   "discount": 1670000,
+   "voucherCode": "W10",
+   "final": 15030000,
+   "depositPct": 20,
+   "deposit": 3006000,
+   "remaining": 12024000
+  }
+ },
+ {
+  "input": {
+   "price": 2500000,
+   "adults": 1,
+   "kids": 3,
+   "infants": 2,
+   "hdvOn": true,
+   "hdvHours": 8,
+   "days": 3,
+   "voucher": {
+    "code": "F",
+    "type": "fixed",
+    "value": 300000
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 4,
+   "infants": 1,
+   "pax": 6,
+   "base": 7500000,
+   "hdv": 4500000,
+   "subtotal": 12000000,
+   "discount": 300000,
+   "voucherCode": "F",
+   "final": 11700000,
+   "depositPct": 20,
+   "deposit": 2340000,
+   "remaining": 9360000
+  }
+ },
+ {
+  "input": {
+   "price": 2500000,
+   "adults": 1,
+   "kids": 3,
+   "infants": 2,
+   "hdvOn": true,
+   "hdvHours": "x",
+   "days": 0,
+   "voucher": {
+    "code": "BIG",
+    "type": "fixed",
+    "value": 99999999
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 4,
+   "infants": 1,
+   "pax": 6,
+   "base": 7500000,
+   "hdv": 1500000,
+   "subtotal": 9000000,
+   "discount": 9000000,
+   "voucherCode": "BIG",
+   "final": 0,
+   "depositPct": 20,
+   "deposit": 0,
+   "remaining": 0
+  }
+ },
+ {
+  "input": {
+   "price": 2500000,
+   "adults": 0,
+   "kids": 0,
+   "infants": 0,
+   "hdvOn": false,
+   "hdvHours": 8,
+   "days": 1,
+   "voucher": null
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "pax": 1,
+   "base": 2500000,
+   "hdv": 0,
+   "subtotal": 2500000,
+   "discount": 0,
+   "voucherCode": "",
+   "final": 2500000,
+   "depositPct": 20,
+   "deposit": 500000,
+   "remaining": 2000000
+  }
+ },
+ {
+  "input": {
+   "price": 2500000,
+   "adults": 0,
+   "kids": 0,
+   "infants": 0,
+   "hdvOn": true,
+   "hdvHours": 10,
+   "days": 2,
+   "voucher": {
+    "code": "W10",
+    "type": "percent",
+    "value": 10,
+    "maxDiscount": 0
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "pax": 1,
+   "base": 2500000,
+   "hdv": 3800000,
+   "subtotal": 6300000,
+   "discount": 630000,
+   "voucherCode": "W10",
+   "final": 5670000,
+   "depositPct": 20,
+   "deposit": 1134000,
+   "remaining": 4536000
+  }
+ },
+ {
+  "input": {
+   "price": 2500000,
+   "adults": 0,
+   "kids": 0,
+   "infants": 0,
+   "hdvOn": true,
+   "hdvHours": 12,
+   "days": "4",
+   "voucher": {
+    "code": "G15",
+    "type": "percent",
+    "value": 15,
+    "maxDiscount": 200000
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "pax": 1,
+   "base": 2500000,
+   "hdv": 9200000,
+   "subtotal": 11700000,
+   "discount": 200000,
+   "voucherCode": "G15",
+   "final": 11500000,
+   "depositPct": 20,
+   "deposit": 2300000,
+   "remaining": 9200000
+  }
+ },
+ {
+  "input": {
+   "price": 2500000,
+   "adults": 0,
+   "kids": 0,
+   "infants": 0,
+   "hdvOn": true,
+   "hdvHours": 8,
+   "days": 3,
+   "voucher": {
+    "code": "BIG",
+    "type": "fixed",
+    "value": 99999999
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "pax": 1,
+   "base": 2500000,
+   "hdv": 4500000,
+   "subtotal": 7000000,
+   "discount": 7000000,
+   "voucherCode": "BIG",
+   "final": 0,
+   "depositPct": 20,
+   "deposit": 0,
+   "remaining": 0
+  }
+ },
+ {
+  "input": {
+   "price": 2500000,
+   "adults": 0,
+   "kids": 0,
+   "infants": 0,
+   "hdvOn": true,
+   "hdvHours": "x",
+   "days": 0,
+   "voucher": {
+    "code": "ODD",
+    "type": "percent",
+    "value": 33.3333
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "pax": 1,
+   "base": 2500000,
+   "hdv": 1500000,
+   "subtotal": 4000000,
+   "discount": 1333332,
+   "voucherCode": "ODD",
+   "final": 2666668,
+   "depositPct": 20,
+   "deposit": 533334,
+   "remaining": 2133334
+  }
+ },
+ {
+  "input": {
+   "price": 2500000,
+   "adults": 60,
+   "kids": 60,
+   "infants": 60,
+   "hdvOn": false,
+   "hdvHours": 8,
+   "days": 1,
+   "voucher": {
+    "code": "W10",
+    "type": "percent",
+    "value": 10,
+    "maxDiscount": 0
+   }
+  },
+  "expected": {
+   "adults": 50,
+   "kids": 50,
+   "infants": 50,
+   "pax": 150,
+   "base": 187500000,
+   "hdv": 0,
+   "subtotal": 187500000,
+   "discount": 18750000,
+   "voucherCode": "W10",
+   "final": 168750000,
+   "depositPct": 20,
+   "deposit": 33750000,
+   "remaining": 135000000
+  }
+ },
+ {
+  "input": {
+   "price": 2500000,
+   "adults": 60,
+   "kids": 60,
+   "infants": 60,
+   "hdvOn": true,
+   "hdvHours": 10,
+   "days": 2,
+   "voucher": {
+    "code": "G15",
+    "type": "percent",
+    "value": 15,
+    "maxDiscount": 200000
+   }
+  },
+  "expected": {
+   "adults": 50,
+   "kids": 50,
+   "infants": 50,
+   "pax": 150,
+   "base": 187500000,
+   "hdv": 3800000,
+   "subtotal": 191300000,
+   "discount": 200000,
+   "voucherCode": "G15",
+   "final": 191100000,
+   "depositPct": 20,
+   "deposit": 38220000,
+   "remaining": 152880000
+  }
+ },
+ {
+  "input": {
+   "price": 2500000,
+   "adults": 60,
+   "kids": 60,
+   "infants": 60,
+   "hdvOn": true,
+   "hdvHours": 12,
+   "days": "4",
+   "voucher": {
+    "code": "F",
+    "type": "fixed",
+    "value": 300000
+   }
+  },
+  "expected": {
+   "adults": 50,
+   "kids": 50,
+   "infants": 50,
+   "pax": 150,
+   "base": 187500000,
+   "hdv": 9200000,
+   "subtotal": 196700000,
+   "discount": 300000,
+   "voucherCode": "F",
+   "final": 196400000,
+   "depositPct": 20,
+   "deposit": 39280000,
+   "remaining": 157120000
+  }
+ },
+ {
+  "input": {
+   "price": 2500000,
+   "adults": 60,
+   "kids": 60,
+   "infants": 60,
+   "hdvOn": true,
+   "hdvHours": 8,
+   "days": 3,
+   "voucher": {
+    "code": "ODD",
+    "type": "percent",
+    "value": 33.3333
+   }
+  },
+  "expected": {
+   "adults": 50,
+   "kids": 50,
+   "infants": 50,
+   "pax": 150,
+   "base": 187500000,
+   "hdv": 4500000,
+   "subtotal": 192000000,
+   "discount": 63999936,
+   "voucherCode": "ODD",
+   "final": 128000064,
+   "depositPct": 20,
+   "deposit": 25600013,
+   "remaining": 102400051
+  }
+ },
+ {
+  "input": {
+   "price": 2500000,
+   "adults": 2,
+   "kids": "2",
+   "infants": "1",
+   "hdvOn": true,
+   "hdvHours": "x",
+   "days": 0,
+   "voucher": null
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 2,
+   "infants": 1,
+   "pax": 5,
+   "base": 7500000,
+   "hdv": 1500000,
+   "subtotal": 9000000,
+   "discount": 0,
+   "voucherCode": "",
+   "final": 9000000,
+   "depositPct": 20,
+   "deposit": 1800000,
+   "remaining": 7200000
+  }
+ },
+ {
+  "input": {
+   "price": 2500000,
+   "adults": 2,
+   "kids": "2",
+   "infants": "1",
+   "hdvOn": false,
+   "hdvHours": 8,
+   "days": 1,
+   "voucher": {
+    "code": "G15",
+    "type": "percent",
+    "value": 15,
+    "maxDiscount": 200000
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 2,
+   "infants": 1,
+   "pax": 5,
+   "base": 7500000,
+   "hdv": 0,
+   "subtotal": 7500000,
+   "discount": 200000,
+   "voucherCode": "G15",
+   "final": 7300000,
+   "depositPct": 20,
+   "deposit": 1460000,
+   "remaining": 5840000
+  }
+ },
+ {
+  "input": {
+   "price": 2500000,
+   "adults": 2,
+   "kids": "2",
+   "infants": "1",
+   "hdvOn": true,
+   "hdvHours": 10,
+   "days": 2,
+   "voucher": {
+    "code": "F",
+    "type": "fixed",
+    "value": 300000
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 2,
+   "infants": 1,
+   "pax": 5,
+   "base": 7500000,
+   "hdv": 3800000,
+   "subtotal": 11300000,
+   "discount": 300000,
+   "voucherCode": "F",
+   "final": 11000000,
+   "depositPct": 20,
+   "deposit": 2200000,
+   "remaining": 8800000
+  }
+ },
+ {
+  "input": {
+   "price": 2500000,
+   "adults": 2,
+   "kids": "2",
+   "infants": "1",
+   "hdvOn": true,
+   "hdvHours": 12,
+   "days": "4",
+   "voucher": {
+    "code": "BIG",
+    "type": "fixed",
+    "value": 99999999
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 2,
+   "infants": 1,
+   "pax": 5,
+   "base": 7500000,
+   "hdv": 9200000,
+   "subtotal": 16700000,
+   "discount": 16700000,
+   "voucherCode": "BIG",
+   "final": 0,
+   "depositPct": 20,
+   "deposit": 0,
+   "remaining": 0
+  }
+ },
+ {
+  "input": {
+   "price": 2500000,
+   "adults": 2.7,
+   "kids": 1.2,
+   "infants": 0.9,
+   "hdvOn": true,
+   "hdvHours": 8,
+   "days": 3,
+   "voucher": null
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 1,
+   "infants": 0,
+   "pax": 3,
+   "base": 6250000,
+   "hdv": 4500000,
+   "subtotal": 10750000,
+   "discount": 0,
+   "voucherCode": "",
+   "final": 10750000,
+   "depositPct": 20,
+   "deposit": 2150000,
+   "remaining": 8600000
+  }
+ },
+ {
+  "input": {
+   "price": 2500000,
+   "adults": 2.7,
+   "kids": 1.2,
+   "infants": 0.9,
+   "hdvOn": true,
+   "hdvHours": "x",
+   "days": 0,
+   "voucher": {
+    "code": "W10",
+    "type": "percent",
+    "value": 10,
+    "maxDiscount": 0
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 1,
+   "infants": 0,
+   "pax": 3,
+   "base": 6250000,
+   "hdv": 1500000,
+   "subtotal": 7750000,
+   "discount": 775000,
+   "voucherCode": "W10",
+   "final": 6975000,
+   "depositPct": 20,
+   "deposit": 1395000,
+   "remaining": 5580000
+  }
+ },
+ {
+  "input": {
+   "price": 2500000,
+   "adults": 2.7,
+   "kids": 1.2,
+   "infants": 0.9,
+   "hdvOn": false,
+   "hdvHours": 8,
+   "days": 1,
+   "voucher": {
+    "code": "F",
+    "type": "fixed",
+    "value": 300000
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 1,
+   "infants": 0,
+   "pax": 3,
+   "base": 6250000,
+   "hdv": 0,
+   "subtotal": 6250000,
+   "discount": 300000,
+   "voucherCode": "F",
+   "final": 5950000,
+   "depositPct": 20,
+   "deposit": 1190000,
+   "remaining": 4760000
+  }
+ },
+ {
+  "input": {
+   "price": 2500000,
+   "adults": 2.7,
+   "kids": 1.2,
+   "infants": 0.9,
+   "hdvOn": true,
+   "hdvHours": 10,
+   "days": 2,
+   "voucher": {
+    "code": "BIG",
+    "type": "fixed",
+    "value": 99999999
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 1,
+   "infants": 0,
+   "pax": 3,
+   "base": 6250000,
+   "hdv": 3800000,
+   "subtotal": 10050000,
+   "discount": 10050000,
+   "voucherCode": "BIG",
+   "final": 0,
+   "depositPct": 20,
+   "deposit": 0,
+   "remaining": 0
+  }
+ },
+ {
+  "input": {
+   "price": 2500000,
+   "adults": 2.7,
+   "kids": 1.2,
+   "infants": 0.9,
+   "hdvOn": true,
+   "hdvHours": 12,
+   "days": "4",
+   "voucher": {
+    "code": "ODD",
+    "type": "percent",
+    "value": 33.3333
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 1,
+   "infants": 0,
+   "pax": 3,
+   "base": 6250000,
+   "hdv": 9200000,
+   "subtotal": 15450000,
+   "discount": 5149995,
+   "voucherCode": "ODD",
+   "final": 10300005,
+   "depositPct": 20,
+   "deposit": 2060001,
+   "remaining": 8240004
+  }
+ },
+ {
+  "input": {
+   "price": 9800000,
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "hdvOn": true,
+   "hdvHours": 8,
+   "days": 3,
+   "voucher": {
+    "code": "W10",
+    "type": "percent",
+    "value": 10,
+    "maxDiscount": 0
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "pax": 1,
+   "base": 9800000,
+   "hdv": 4500000,
+   "subtotal": 14300000,
+   "discount": 1430000,
+   "voucherCode": "W10",
+   "final": 12870000,
+   "depositPct": 20,
+   "deposit": 2574000,
+   "remaining": 10296000
+  }
+ },
+ {
+  "input": {
+   "price": 9800000,
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "hdvOn": true,
+   "hdvHours": "x",
+   "days": 0,
+   "voucher": {
+    "code": "G15",
+    "type": "percent",
+    "value": 15,
+    "maxDiscount": 200000
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "pax": 1,
+   "base": 9800000,
+   "hdv": 1500000,
+   "subtotal": 11300000,
+   "discount": 200000,
+   "voucherCode": "G15",
+   "final": 11100000,
+   "depositPct": 20,
+   "deposit": 2220000,
+   "remaining": 8880000
+  }
+ },
+ {
+  "input": {
+   "price": 9800000,
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "hdvOn": false,
+   "hdvHours": 8,
+   "days": 1,
+   "voucher": {
+    "code": "BIG",
+    "type": "fixed",
+    "value": 99999999
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "pax": 1,
+   "base": 9800000,
+   "hdv": 0,
+   "subtotal": 9800000,
+   "discount": 9800000,
+   "voucherCode": "BIG",
+   "final": 0,
+   "depositPct": 20,
+   "deposit": 0,
+   "remaining": 0
+  }
+ },
+ {
+  "input": {
+   "price": 9800000,
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "hdvOn": true,
+   "hdvHours": 10,
+   "days": 2,
+   "voucher": {
+    "code": "ODD",
+    "type": "percent",
+    "value": 33.3333
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "pax": 1,
+   "base": 9800000,
+   "hdv": 3800000,
+   "subtotal": 13600000,
+   "discount": 4533329,
+   "voucherCode": "ODD",
+   "final": 9066671,
+   "depositPct": 20,
+   "deposit": 1813334,
+   "remaining": 7253337
+  }
+ },
+ {
+  "input": {
+   "price": 9800000,
+   "adults": 2,
+   "kids": 1,
+   "infants": 1,
+   "hdvOn": true,
+   "hdvHours": 12,
+   "days": "4",
+   "voucher": null
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 1,
+   "infants": 1,
+   "pax": 4,
+   "base": 24500000,
+   "hdv": 9200000,
+   "subtotal": 33700000,
+   "discount": 0,
+   "voucherCode": "",
+   "final": 33700000,
+   "depositPct": 20,
+   "deposit": 6740000,
+   "remaining": 26960000
+  }
+ },
+ {
+  "input": {
+   "price": 9800000,
+   "adults": 2,
+   "kids": 1,
+   "infants": 1,
+   "hdvOn": true,
+   "hdvHours": 8,
+   "days": 3,
+   "voucher": {
+    "code": "G15",
+    "type": "percent",
+    "value": 15,
+    "maxDiscount": 200000
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 1,
+   "infants": 1,
+   "pax": 4,
+   "base": 24500000,
+   "hdv": 4500000,
+   "subtotal": 29000000,
+   "discount": 200000,
+   "voucherCode": "G15",
+   "final": 28800000,
+   "depositPct": 20,
+   "deposit": 5760000,
+   "remaining": 23040000
+  }
+ },
+ {
+  "input": {
+   "price": 9800000,
+   "adults": 2,
+   "kids": 1,
+   "infants": 1,
+   "hdvOn": true,
+   "hdvHours": "x",
+   "days": 0,
+   "voucher": {
+    "code": "F",
+    "type": "fixed",
+    "value": 300000
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 1,
+   "infants": 1,
+   "pax": 4,
+   "base": 24500000,
+   "hdv": 1500000,
+   "subtotal": 26000000,
+   "discount": 300000,
+   "voucherCode": "F",
+   "final": 25700000,
+   "depositPct": 20,
+   "deposit": 5140000,
+   "remaining": 20560000
+  }
+ },
+ {
+  "input": {
+   "price": 9800000,
+   "adults": 2,
+   "kids": 1,
+   "infants": 1,
+   "hdvOn": false,
+   "hdvHours": 8,
+   "days": 1,
+   "voucher": {
+    "code": "ODD",
+    "type": "percent",
+    "value": 33.3333
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 1,
+   "infants": 1,
+   "pax": 4,
+   "base": 24500000,
+   "hdv": 0,
+   "subtotal": 24500000,
+   "discount": 8166659,
+   "voucherCode": "ODD",
+   "final": 16333341,
+   "depositPct": 20,
+   "deposit": 3266668,
+   "remaining": 13066673
+  }
+ },
+ {
+  "input": {
+   "price": 9800000,
+   "adults": 3,
+   "kids": 2,
+   "infants": 5,
+   "hdvOn": true,
+   "hdvHours": 10,
+   "days": 2,
+   "voucher": null
+  },
+  "expected": {
+   "adults": 3,
+   "kids": 4,
+   "infants": 3,
+   "pax": 10,
+   "base": 49000000,
+   "hdv": 3800000,
+   "subtotal": 52800000,
+   "discount": 0,
+   "voucherCode": "",
+   "final": 52800000,
+   "depositPct": 20,
+   "deposit": 10560000,
+   "remaining": 42240000
+  }
+ },
+ {
+  "input": {
+   "price": 9800000,
+   "adults": 3,
+   "kids": 2,
+   "infants": 5,
+   "hdvOn": true,
+   "hdvHours": 12,
+   "days": "4",
+   "voucher": {
+    "code": "W10",
+    "type": "percent",
+    "value": 10,
+    "maxDiscount": 0
+   }
+  },
+  "expected": {
+   "adults": 3,
+   "kids": 4,
+   "infants": 3,
+   "pax": 10,
+   "base": 49000000,
+   "hdv": 9200000,
+   "subtotal": 58200000,
+   "discount": 5820000,
+   "voucherCode": "W10",
+   "final": 52380000,
+   "depositPct": 20,
+   "deposit": 10476000,
+   "remaining": 41904000
+  }
+ },
+ {
+  "input": {
+   "price": 9800000,
+   "adults": 3,
+   "kids": 2,
+   "infants": 5,
+   "hdvOn": true,
+   "hdvHours": 8,
+   "days": 3,
+   "voucher": {
+    "code": "F",
+    "type": "fixed",
+    "value": 300000
+   }
+  },
+  "expected": {
+   "adults": 3,
+   "kids": 4,
+   "infants": 3,
+   "pax": 10,
+   "base": 49000000,
+   "hdv": 4500000,
+   "subtotal": 53500000,
+   "discount": 300000,
+   "voucherCode": "F",
+   "final": 53200000,
+   "depositPct": 20,
+   "deposit": 10640000,
+   "remaining": 42560000
+  }
+ },
+ {
+  "input": {
+   "price": 9800000,
+   "adults": 3,
+   "kids": 2,
+   "infants": 5,
+   "hdvOn": true,
+   "hdvHours": "x",
+   "days": 0,
+   "voucher": {
+    "code": "BIG",
+    "type": "fixed",
+    "value": 99999999
+   }
+  },
+  "expected": {
+   "adults": 3,
+   "kids": 4,
+   "infants": 3,
+   "pax": 10,
+   "base": 49000000,
+   "hdv": 1500000,
+   "subtotal": 50500000,
+   "discount": 50500000,
+   "voucherCode": "BIG",
+   "final": 0,
+   "depositPct": 20,
+   "deposit": 0,
+   "remaining": 0
+  }
+ },
+ {
+  "input": {
+   "price": 9800000,
+   "adults": 1,
+   "kids": 3,
+   "infants": 2,
+   "hdvOn": false,
+   "hdvHours": 8,
+   "days": 1,
+   "voucher": null
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 4,
+   "infants": 1,
+   "pax": 6,
+   "base": 29400000,
+   "hdv": 0,
+   "subtotal": 29400000,
+   "discount": 0,
+   "voucherCode": "",
+   "final": 29400000,
+   "depositPct": 20,
+   "deposit": 5880000,
+   "remaining": 23520000
+  }
+ },
+ {
+  "input": {
+   "price": 9800000,
+   "adults": 1,
+   "kids": 3,
+   "infants": 2,
+   "hdvOn": true,
+   "hdvHours": 10,
+   "days": 2,
+   "voucher": {
+    "code": "W10",
+    "type": "percent",
+    "value": 10,
+    "maxDiscount": 0
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 4,
+   "infants": 1,
+   "pax": 6,
+   "base": 29400000,
+   "hdv": 3800000,
+   "subtotal": 33200000,
+   "discount": 3320000,
+   "voucherCode": "W10",
+   "final": 29880000,
+   "depositPct": 20,
+   "deposit": 5976000,
+   "remaining": 23904000
+  }
+ },
+ {
+  "input": {
+   "price": 9800000,
+   "adults": 1,
+   "kids": 3,
+   "infants": 2,
+   "hdvOn": true,
+   "hdvHours": 12,
+   "days": "4",
+   "voucher": {
+    "code": "G15",
+    "type": "percent",
+    "value": 15,
+    "maxDiscount": 200000
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 4,
+   "infants": 1,
+   "pax": 6,
+   "base": 29400000,
+   "hdv": 9200000,
+   "subtotal": 38600000,
+   "discount": 200000,
+   "voucherCode": "G15",
+   "final": 38400000,
+   "depositPct": 20,
+   "deposit": 7680000,
+   "remaining": 30720000
+  }
+ },
+ {
+  "input": {
+   "price": 9800000,
+   "adults": 1,
+   "kids": 3,
+   "infants": 2,
+   "hdvOn": true,
+   "hdvHours": 8,
+   "days": 3,
+   "voucher": {
+    "code": "BIG",
+    "type": "fixed",
+    "value": 99999999
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 4,
+   "infants": 1,
+   "pax": 6,
+   "base": 29400000,
+   "hdv": 4500000,
+   "subtotal": 33900000,
+   "discount": 33900000,
+   "voucherCode": "BIG",
+   "final": 0,
+   "depositPct": 20,
+   "deposit": 0,
+   "remaining": 0
+  }
+ },
+ {
+  "input": {
+   "price": 9800000,
+   "adults": 1,
+   "kids": 3,
+   "infants": 2,
+   "hdvOn": true,
+   "hdvHours": "x",
+   "days": 0,
+   "voucher": {
+    "code": "ODD",
+    "type": "percent",
+    "value": 33.3333
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 4,
+   "infants": 1,
+   "pax": 6,
+   "base": 29400000,
+   "hdv": 1500000,
+   "subtotal": 30900000,
+   "discount": 10299990,
+   "voucherCode": "ODD",
+   "final": 20600010,
+   "depositPct": 20,
+   "deposit": 4120002,
+   "remaining": 16480008
+  }
+ },
+ {
+  "input": {
+   "price": 9800000,
+   "adults": 0,
+   "kids": 0,
+   "infants": 0,
+   "hdvOn": false,
+   "hdvHours": 8,
+   "days": 1,
+   "voucher": {
+    "code": "W10",
+    "type": "percent",
+    "value": 10,
+    "maxDiscount": 0
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "pax": 1,
+   "base": 9800000,
+   "hdv": 0,
+   "subtotal": 9800000,
+   "discount": 980000,
+   "voucherCode": "W10",
+   "final": 8820000,
+   "depositPct": 20,
+   "deposit": 1764000,
+   "remaining": 7056000
+  }
+ },
+ {
+  "input": {
+   "price": 9800000,
+   "adults": 0,
+   "kids": 0,
+   "infants": 0,
+   "hdvOn": true,
+   "hdvHours": 10,
+   "days": 2,
+   "voucher": {
+    "code": "G15",
+    "type": "percent",
+    "value": 15,
+    "maxDiscount": 200000
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "pax": 1,
+   "base": 9800000,
+   "hdv": 3800000,
+   "subtotal": 13600000,
+   "discount": 200000,
+   "voucherCode": "G15",
+   "final": 13400000,
+   "depositPct": 20,
+   "deposit": 2680000,
+   "remaining": 10720000
+  }
+ },
+ {
+  "input": {
+   "price": 9800000,
+   "adults": 0,
+   "kids": 0,
+   "infants": 0,
+   "hdvOn": true,
+   "hdvHours": 12,
+   "days": "4",
+   "voucher": {
+    "code": "F",
+    "type": "fixed",
+    "value": 300000
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "pax": 1,
+   "base": 9800000,
+   "hdv": 9200000,
+   "subtotal": 19000000,
+   "discount": 300000,
+   "voucherCode": "F",
+   "final": 18700000,
+   "depositPct": 20,
+   "deposit": 3740000,
+   "remaining": 14960000
+  }
+ },
+ {
+  "input": {
+   "price": 9800000,
+   "adults": 0,
+   "kids": 0,
+   "infants": 0,
+   "hdvOn": true,
+   "hdvHours": 8,
+   "days": 3,
+   "voucher": {
+    "code": "ODD",
+    "type": "percent",
+    "value": 33.3333
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "pax": 1,
+   "base": 9800000,
+   "hdv": 4500000,
+   "subtotal": 14300000,
+   "discount": 4766662,
+   "voucherCode": "ODD",
+   "final": 9533338,
+   "depositPct": 20,
+   "deposit": 1906668,
+   "remaining": 7626670
+  }
+ },
+ {
+  "input": {
+   "price": 9800000,
+   "adults": 60,
+   "kids": 60,
+   "infants": 60,
+   "hdvOn": true,
+   "hdvHours": "x",
+   "days": 0,
+   "voucher": null
+  },
+  "expected": {
+   "adults": 50,
+   "kids": 50,
+   "infants": 50,
+   "pax": 150,
+   "base": 735000000,
+   "hdv": 1500000,
+   "subtotal": 736500000,
+   "discount": 0,
+   "voucherCode": "",
+   "final": 736500000,
+   "depositPct": 20,
+   "deposit": 147300000,
+   "remaining": 589200000
+  }
+ },
+ {
+  "input": {
+   "price": 9800000,
+   "adults": 60,
+   "kids": 60,
+   "infants": 60,
+   "hdvOn": false,
+   "hdvHours": 8,
+   "days": 1,
+   "voucher": {
+    "code": "G15",
+    "type": "percent",
+    "value": 15,
+    "maxDiscount": 200000
+   }
+  },
+  "expected": {
+   "adults": 50,
+   "kids": 50,
+   "infants": 50,
+   "pax": 150,
+   "base": 735000000,
+   "hdv": 0,
+   "subtotal": 735000000,
+   "discount": 200000,
+   "voucherCode": "G15",
+   "final": 734800000,
+   "depositPct": 20,
+   "deposit": 146960000,
+   "remaining": 587840000
+  }
+ },
+ {
+  "input": {
+   "price": 9800000,
+   "adults": 60,
+   "kids": 60,
+   "infants": 60,
+   "hdvOn": true,
+   "hdvHours": 10,
+   "days": 2,
+   "voucher": {
+    "code": "F",
+    "type": "fixed",
+    "value": 300000
+   }
+  },
+  "expected": {
+   "adults": 50,
+   "kids": 50,
+   "infants": 50,
+   "pax": 150,
+   "base": 735000000,
+   "hdv": 3800000,
+   "subtotal": 738800000,
+   "discount": 300000,
+   "voucherCode": "F",
+   "final": 738500000,
+   "depositPct": 20,
+   "deposit": 147700000,
+   "remaining": 590800000
+  }
+ },
+ {
+  "input": {
+   "price": 9800000,
+   "adults": 60,
+   "kids": 60,
+   "infants": 60,
+   "hdvOn": true,
+   "hdvHours": 12,
+   "days": "4",
+   "voucher": {
+    "code": "BIG",
+    "type": "fixed",
+    "value": 99999999
+   }
+  },
+  "expected": {
+   "adults": 50,
+   "kids": 50,
+   "infants": 50,
+   "pax": 150,
+   "base": 735000000,
+   "hdv": 9200000,
+   "subtotal": 744200000,
+   "discount": 99999999,
+   "voucherCode": "BIG",
+   "final": 644200001,
+   "depositPct": 20,
+   "deposit": 128840000,
+   "remaining": 515360001
+  }
+ },
+ {
+  "input": {
+   "price": 9800000,
+   "adults": 2,
+   "kids": "2",
+   "infants": "1",
+   "hdvOn": true,
+   "hdvHours": 8,
+   "days": 3,
+   "voucher": null
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 2,
+   "infants": 1,
+   "pax": 5,
+   "base": 29400000,
+   "hdv": 4500000,
+   "subtotal": 33900000,
+   "discount": 0,
+   "voucherCode": "",
+   "final": 33900000,
+   "depositPct": 20,
+   "deposit": 6780000,
+   "remaining": 27120000
+  }
+ },
+ {
+  "input": {
+   "price": 9800000,
+   "adults": 2,
+   "kids": "2",
+   "infants": "1",
+   "hdvOn": true,
+   "hdvHours": "x",
+   "days": 0,
+   "voucher": {
+    "code": "W10",
+    "type": "percent",
+    "value": 10,
+    "maxDiscount": 0
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 2,
+   "infants": 1,
+   "pax": 5,
+   "base": 29400000,
+   "hdv": 1500000,
+   "subtotal": 30900000,
+   "discount": 3090000,
+   "voucherCode": "W10",
+   "final": 27810000,
+   "depositPct": 20,
+   "deposit": 5562000,
+   "remaining": 22248000
+  }
+ },
+ {
+  "input": {
+   "price": 9800000,
+   "adults": 2,
+   "kids": "2",
+   "infants": "1",
+   "hdvOn": false,
+   "hdvHours": 8,
+   "days": 1,
+   "voucher": {
+    "code": "F",
+    "type": "fixed",
+    "value": 300000
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 2,
+   "infants": 1,
+   "pax": 5,
+   "base": 29400000,
+   "hdv": 0,
+   "subtotal": 29400000,
+   "discount": 300000,
+   "voucherCode": "F",
+   "final": 29100000,
+   "depositPct": 20,
+   "deposit": 5820000,
+   "remaining": 23280000
+  }
+ },
+ {
+  "input": {
+   "price": 9800000,
+   "adults": 2,
+   "kids": "2",
+   "infants": "1",
+   "hdvOn": true,
+   "hdvHours": 10,
+   "days": 2,
+   "voucher": {
+    "code": "BIG",
+    "type": "fixed",
+    "value": 99999999
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 2,
+   "infants": 1,
+   "pax": 5,
+   "base": 29400000,
+   "hdv": 3800000,
+   "subtotal": 33200000,
+   "discount": 33200000,
+   "voucherCode": "BIG",
+   "final": 0,
+   "depositPct": 20,
+   "deposit": 0,
+   "remaining": 0
+  }
+ },
+ {
+  "input": {
+   "price": 9800000,
+   "adults": 2,
+   "kids": "2",
+   "infants": "1",
+   "hdvOn": true,
+   "hdvHours": 12,
+   "days": "4",
+   "voucher": {
+    "code": "ODD",
+    "type": "percent",
+    "value": 33.3333
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 2,
+   "infants": 1,
+   "pax": 5,
+   "base": 29400000,
+   "hdv": 9200000,
+   "subtotal": 38600000,
+   "discount": 12866654,
+   "voucherCode": "ODD",
+   "final": 25733346,
+   "depositPct": 20,
+   "deposit": 5146669,
+   "remaining": 20586677
+  }
+ },
+ {
+  "input": {
+   "price": 9800000,
+   "adults": 2.7,
+   "kids": 1.2,
+   "infants": 0.9,
+   "hdvOn": true,
+   "hdvHours": 8,
+   "days": 3,
+   "voucher": {
+    "code": "W10",
+    "type": "percent",
+    "value": 10,
+    "maxDiscount": 0
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 1,
+   "infants": 0,
+   "pax": 3,
+   "base": 24500000,
+   "hdv": 4500000,
+   "subtotal": 29000000,
+   "discount": 2900000,
+   "voucherCode": "W10",
+   "final": 26100000,
+   "depositPct": 20,
+   "deposit": 5220000,
+   "remaining": 20880000
+  }
+ },
+ {
+  "input": {
+   "price": 9800000,
+   "adults": 2.7,
+   "kids": 1.2,
+   "infants": 0.9,
+   "hdvOn": true,
+   "hdvHours": "x",
+   "days": 0,
+   "voucher": {
+    "code": "G15",
+    "type": "percent",
+    "value": 15,
+    "maxDiscount": 200000
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 1,
+   "infants": 0,
+   "pax": 3,
+   "base": 24500000,
+   "hdv": 1500000,
+   "subtotal": 26000000,
+   "discount": 200000,
+   "voucherCode": "G15",
+   "final": 25800000,
+   "depositPct": 20,
+   "deposit": 5160000,
+   "remaining": 20640000
+  }
+ },
+ {
+  "input": {
+   "price": 9800000,
+   "adults": 2.7,
+   "kids": 1.2,
+   "infants": 0.9,
+   "hdvOn": false,
+   "hdvHours": 8,
+   "days": 1,
+   "voucher": {
+    "code": "BIG",
+    "type": "fixed",
+    "value": 99999999
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 1,
+   "infants": 0,
+   "pax": 3,
+   "base": 24500000,
+   "hdv": 0,
+   "subtotal": 24500000,
+   "discount": 24500000,
+   "voucherCode": "BIG",
+   "final": 0,
+   "depositPct": 20,
+   "deposit": 0,
+   "remaining": 0
+  }
+ },
+ {
+  "input": {
+   "price": 9800000,
+   "adults": 2.7,
+   "kids": 1.2,
+   "infants": 0.9,
+   "hdvOn": true,
+   "hdvHours": 10,
+   "days": 2,
+   "voucher": {
+    "code": "ODD",
+    "type": "percent",
+    "value": 33.3333
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 1,
+   "infants": 0,
+   "pax": 3,
+   "base": 24500000,
+   "hdv": 3800000,
+   "subtotal": 28300000,
+   "discount": 9433324,
+   "voucherCode": "ODD",
+   "final": 18866676,
+   "depositPct": 20,
+   "deposit": 3773335,
+   "remaining": 15093341
+  }
+ },
+ {
+  "input": {
+   "price": 12345678,
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "hdvOn": true,
+   "hdvHours": 12,
+   "days": "4",
+   "voucher": null
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "pax": 1,
+   "base": 12345678,
+   "hdv": 9200000,
+   "subtotal": 21545678,
+   "discount": 0,
+   "voucherCode": "",
+   "final": 21545678,
+   "depositPct": 20,
+   "deposit": 4309136,
+   "remaining": 17236542
+  }
+ },
+ {
+  "input": {
+   "price": 12345678,
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "hdvOn": true,
+   "hdvHours": 8,
+   "days": 3,
+   "voucher": {
+    "code": "G15",
+    "type": "percent",
+    "value": 15,
+    "maxDiscount": 200000
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "pax": 1,
+   "base": 12345678,
+   "hdv": 4500000,
+   "subtotal": 16845678,
+   "discount": 200000,
+   "voucherCode": "G15",
+   "final": 16645678,
+   "depositPct": 20,
+   "deposit": 3329136,
+   "remaining": 13316542
+  }
+ },
+ {
+  "input": {
+   "price": 12345678,
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "hdvOn": true,
+   "hdvHours": "x",
+   "days": 0,
+   "voucher": {
+    "code": "F",
+    "type": "fixed",
+    "value": 300000
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "pax": 1,
+   "base": 12345678,
+   "hdv": 1500000,
+   "subtotal": 13845678,
+   "discount": 300000,
+   "voucherCode": "F",
+   "final": 13545678,
+   "depositPct": 20,
+   "deposit": 2709136,
+   "remaining": 10836542
+  }
+ },
+ {
+  "input": {
+   "price": 12345678,
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "hdvOn": false,
+   "hdvHours": 8,
+   "days": 1,
+   "voucher": {
+    "code": "ODD",
+    "type": "percent",
+    "value": 33.3333
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "pax": 1,
+   "base": 12345678,
+   "hdv": 0,
+   "subtotal": 12345678,
+   "discount": 4115222,
+   "voucherCode": "ODD",
+   "final": 8230456,
+   "depositPct": 20,
+   "deposit": 1646091,
+   "remaining": 6584365
+  }
+ },
+ {
+  "input": {
+   "price": 12345678,
+   "adults": 2,
+   "kids": 1,
+   "infants": 1,
+   "hdvOn": true,
+   "hdvHours": 10,
+   "days": 2,
+   "voucher": null
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 1,
+   "infants": 1,
+   "pax": 4,
+   "base": 30864195,
+   "hdv": 3800000,
+   "subtotal": 34664195,
+   "discount": 0,
+   "voucherCode": "",
+   "final": 34664195,
+   "depositPct": 20,
+   "deposit": 6932839,
+   "remaining": 27731356
+  }
+ },
+ {
+  "input": {
+   "price": 12345678,
+   "adults": 2,
+   "kids": 1,
+   "infants": 1,
+   "hdvOn": true,
+   "hdvHours": 12,
+   "days": "4",
+   "voucher": {
+    "code": "W10",
+    "type": "percent",
+    "value": 10,
+    "maxDiscount": 0
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 1,
+   "infants": 1,
+   "pax": 4,
+   "base": 30864195,
+   "hdv": 9200000,
+   "subtotal": 40064195,
+   "discount": 4006420,
+   "voucherCode": "W10",
+   "final": 36057775,
+   "depositPct": 20,
+   "deposit": 7211555,
+   "remaining": 28846220
+  }
+ },
+ {
+  "input": {
+   "price": 12345678,
+   "adults": 2,
+   "kids": 1,
+   "infants": 1,
+   "hdvOn": true,
+   "hdvHours": 8,
+   "days": 3,
+   "voucher": {
+    "code": "F",
+    "type": "fixed",
+    "value": 300000
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 1,
+   "infants": 1,
+   "pax": 4,
+   "base": 30864195,
+   "hdv": 4500000,
+   "subtotal": 35364195,
+   "discount": 300000,
+   "voucherCode": "F",
+   "final": 35064195,
+   "depositPct": 20,
+   "deposit": 7012839,
+   "remaining": 28051356
+  }
+ },
+ {
+  "input": {
+   "price": 12345678,
+   "adults": 2,
+   "kids": 1,
+   "infants": 1,
+   "hdvOn": true,
+   "hdvHours": "x",
+   "days": 0,
+   "voucher": {
+    "code": "BIG",
+    "type": "fixed",
+    "value": 99999999
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 1,
+   "infants": 1,
+   "pax": 4,
+   "base": 30864195,
+   "hdv": 1500000,
+   "subtotal": 32364195,
+   "discount": 32364195,
+   "voucherCode": "BIG",
+   "final": 0,
+   "depositPct": 20,
+   "deposit": 0,
+   "remaining": 0
+  }
+ },
+ {
+  "input": {
+   "price": 12345678,
+   "adults": 3,
+   "kids": 2,
+   "infants": 5,
+   "hdvOn": false,
+   "hdvHours": 8,
+   "days": 1,
+   "voucher": null
+  },
+  "expected": {
+   "adults": 3,
+   "kids": 4,
+   "infants": 3,
+   "pax": 10,
+   "base": 61728390,
+   "hdv": 0,
+   "subtotal": 61728390,
+   "discount": 0,
+   "voucherCode": "",
+   "final": 61728390,
+   "depositPct": 20,
+   "deposit": 12345678,
+   "remaining": 49382712
+  }
+ },
+ {
+  "input": {
+   "price": 12345678,
+   "adults": 3,
+   "kids": 2,
+   "infants": 5,
+   "hdvOn": true,
+   "hdvHours": 10,
+   "days": 2,
+   "voucher": {
+    "code": "W10",
+    "type": "percent",
+    "value": 10,
+    "maxDiscount": 0
+   }
+  },
+  "expected": {
+   "adults": 3,
+   "kids": 4,
+   "infants": 3,
+   "pax": 10,
+   "base": 61728390,
+   "hdv": 3800000,
+   "subtotal": 65528390,
+   "discount": 6552839,
+   "voucherCode": "W10",
+   "final": 58975551,
+   "depositPct": 20,
+   "deposit": 11795110,
+   "remaining": 47180441
+  }
+ },
+ {
+  "input": {
+   "price": 12345678,
+   "adults": 3,
+   "kids": 2,
+   "infants": 5,
+   "hdvOn": true,
+   "hdvHours": 12,
+   "days": "4",
+   "voucher": {
+    "code": "G15",
+    "type": "percent",
+    "value": 15,
+    "maxDiscount": 200000
+   }
+  },
+  "expected": {
+   "adults": 3,
+   "kids": 4,
+   "infants": 3,
+   "pax": 10,
+   "base": 61728390,
+   "hdv": 9200000,
+   "subtotal": 70928390,
+   "discount": 200000,
+   "voucherCode": "G15",
+   "final": 70728390,
+   "depositPct": 20,
+   "deposit": 14145678,
+   "remaining": 56582712
+  }
+ },
+ {
+  "input": {
+   "price": 12345678,
+   "adults": 3,
+   "kids": 2,
+   "infants": 5,
+   "hdvOn": true,
+   "hdvHours": 8,
+   "days": 3,
+   "voucher": {
+    "code": "BIG",
+    "type": "fixed",
+    "value": 99999999
+   }
+  },
+  "expected": {
+   "adults": 3,
+   "kids": 4,
+   "infants": 3,
+   "pax": 10,
+   "base": 61728390,
+   "hdv": 4500000,
+   "subtotal": 66228390,
+   "discount": 66228390,
+   "voucherCode": "BIG",
+   "final": 0,
+   "depositPct": 20,
+   "deposit": 0,
+   "remaining": 0
+  }
+ },
+ {
+  "input": {
+   "price": 12345678,
+   "adults": 3,
+   "kids": 2,
+   "infants": 5,
+   "hdvOn": true,
+   "hdvHours": "x",
+   "days": 0,
+   "voucher": {
+    "code": "ODD",
+    "type": "percent",
+    "value": 33.3333
+   }
+  },
+  "expected": {
+   "adults": 3,
+   "kids": 4,
+   "infants": 3,
+   "pax": 10,
+   "base": 61728390,
+   "hdv": 1500000,
+   "subtotal": 63228390,
+   "discount": 21076109,
+   "voucherCode": "ODD",
+   "final": 42152281,
+   "depositPct": 20,
+   "deposit": 8430456,
+   "remaining": 33721825
+  }
+ },
+ {
+  "input": {
+   "price": 12345678,
+   "adults": 1,
+   "kids": 3,
+   "infants": 2,
+   "hdvOn": false,
+   "hdvHours": 8,
+   "days": 1,
+   "voucher": {
+    "code": "W10",
+    "type": "percent",
+    "value": 10,
+    "maxDiscount": 0
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 4,
+   "infants": 1,
+   "pax": 6,
+   "base": 37037034,
+   "hdv": 0,
+   "subtotal": 37037034,
+   "discount": 3703703,
+   "voucherCode": "W10",
+   "final": 33333331,
+   "depositPct": 20,
+   "deposit": 6666666,
+   "remaining": 26666665
+  }
+ },
+ {
+  "input": {
+   "price": 12345678,
+   "adults": 1,
+   "kids": 3,
+   "infants": 2,
+   "hdvOn": true,
+   "hdvHours": 10,
+   "days": 2,
+   "voucher": {
+    "code": "G15",
+    "type": "percent",
+    "value": 15,
+    "maxDiscount": 200000
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 4,
+   "infants": 1,
+   "pax": 6,
+   "base": 37037034,
+   "hdv": 3800000,
+   "subtotal": 40837034,
+   "discount": 200000,
+   "voucherCode": "G15",
+   "final": 40637034,
+   "depositPct": 20,
+   "deposit": 8127407,
+   "remaining": 32509627
+  }
+ },
+ {
+  "input": {
+   "price": 12345678,
+   "adults": 1,
+   "kids": 3,
+   "infants": 2,
+   "hdvOn": true,
+   "hdvHours": 12,
+   "days": "4",
+   "voucher": {
+    "code": "F",
+    "type": "fixed",
+    "value": 300000
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 4,
+   "infants": 1,
+   "pax": 6,
+   "base": 37037034,
+   "hdv": 9200000,
+   "subtotal": 46237034,
+   "discount": 300000,
+   "voucherCode": "F",
+   "final": 45937034,
+   "depositPct": 20,
+   "deposit": 9187407,
+   "remaining": 36749627
+  }
+ },
+ {
+  "input": {
+   "price": 12345678,
+   "adults": 1,
+   "kids": 3,
+   "infants": 2,
+   "hdvOn": true,
+   "hdvHours": 8,
+   "days": 3,
+   "voucher": {
+    "code": "ODD",
+    "type": "percent",
+    "value": 33.3333
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 4,
+   "infants": 1,
+   "pax": 6,
+   "base": 37037034,
+   "hdv": 4500000,
+   "subtotal": 41537034,
+   "discount": 13845664,
+   "voucherCode": "ODD",
+   "final": 27691370,
+   "depositPct": 20,
+   "deposit": 5538274,
+   "remaining": 22153096
+  }
+ },
+ {
+  "input": {
+   "price": 12345678,
+   "adults": 0,
+   "kids": 0,
+   "infants": 0,
+   "hdvOn": true,
+   "hdvHours": "x",
+   "days": 0,
+   "voucher": null
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "pax": 1,
+   "base": 12345678,
+   "hdv": 1500000,
+   "subtotal": 13845678,
+   "discount": 0,
+   "voucherCode": "",
+   "final": 13845678,
+   "depositPct": 20,
+   "deposit": 2769136,
+   "remaining": 11076542
+  }
+ },
+ {
+  "input": {
+   "price": 12345678,
+   "adults": 0,
+   "kids": 0,
+   "infants": 0,
+   "hdvOn": false,
+   "hdvHours": 8,
+   "days": 1,
+   "voucher": {
+    "code": "G15",
+    "type": "percent",
+    "value": 15,
+    "maxDiscount": 200000
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "pax": 1,
+   "base": 12345678,
+   "hdv": 0,
+   "subtotal": 12345678,
+   "discount": 200000,
+   "voucherCode": "G15",
+   "final": 12145678,
+   "depositPct": 20,
+   "deposit": 2429136,
+   "remaining": 9716542
+  }
+ },
+ {
+  "input": {
+   "price": 12345678,
+   "adults": 0,
+   "kids": 0,
+   "infants": 0,
+   "hdvOn": true,
+   "hdvHours": 10,
+   "days": 2,
+   "voucher": {
+    "code": "F",
+    "type": "fixed",
+    "value": 300000
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "pax": 1,
+   "base": 12345678,
+   "hdv": 3800000,
+   "subtotal": 16145678,
+   "discount": 300000,
+   "voucherCode": "F",
+   "final": 15845678,
+   "depositPct": 20,
+   "deposit": 3169136,
+   "remaining": 12676542
+  }
+ },
+ {
+  "input": {
+   "price": 12345678,
+   "adults": 0,
+   "kids": 0,
+   "infants": 0,
+   "hdvOn": true,
+   "hdvHours": 12,
+   "days": "4",
+   "voucher": {
+    "code": "BIG",
+    "type": "fixed",
+    "value": 99999999
+   }
+  },
+  "expected": {
+   "adults": 1,
+   "kids": 0,
+   "infants": 0,
+   "pax": 1,
+   "base": 12345678,
+   "hdv": 9200000,
+   "subtotal": 21545678,
+   "discount": 21545678,
+   "voucherCode": "BIG",
+   "final": 0,
+   "depositPct": 20,
+   "deposit": 0,
+   "remaining": 0
+  }
+ },
+ {
+  "input": {
+   "price": 12345678,
+   "adults": 60,
+   "kids": 60,
+   "infants": 60,
+   "hdvOn": true,
+   "hdvHours": 8,
+   "days": 3,
+   "voucher": null
+  },
+  "expected": {
+   "adults": 50,
+   "kids": 50,
+   "infants": 50,
+   "pax": 150,
+   "base": 925925850,
+   "hdv": 4500000,
+   "subtotal": 930425850,
+   "discount": 0,
+   "voucherCode": "",
+   "final": 930425850,
+   "depositPct": 20,
+   "deposit": 186085170,
+   "remaining": 744340680
+  }
+ },
+ {
+  "input": {
+   "price": 12345678,
+   "adults": 60,
+   "kids": 60,
+   "infants": 60,
+   "hdvOn": true,
+   "hdvHours": "x",
+   "days": 0,
+   "voucher": {
+    "code": "W10",
+    "type": "percent",
+    "value": 10,
+    "maxDiscount": 0
+   }
+  },
+  "expected": {
+   "adults": 50,
+   "kids": 50,
+   "infants": 50,
+   "pax": 150,
+   "base": 925925850,
+   "hdv": 1500000,
+   "subtotal": 927425850,
+   "discount": 92742585,
+   "voucherCode": "W10",
+   "final": 834683265,
+   "depositPct": 20,
+   "deposit": 166936653,
+   "remaining": 667746612
+  }
+ },
+ {
+  "input": {
+   "price": 12345678,
+   "adults": 60,
+   "kids": 60,
+   "infants": 60,
+   "hdvOn": false,
+   "hdvHours": 8,
+   "days": 1,
+   "voucher": {
+    "code": "F",
+    "type": "fixed",
+    "value": 300000
+   }
+  },
+  "expected": {
+   "adults": 50,
+   "kids": 50,
+   "infants": 50,
+   "pax": 150,
+   "base": 925925850,
+   "hdv": 0,
+   "subtotal": 925925850,
+   "discount": 300000,
+   "voucherCode": "F",
+   "final": 925625850,
+   "depositPct": 20,
+   "deposit": 185125170,
+   "remaining": 740500680
+  }
+ },
+ {
+  "input": {
+   "price": 12345678,
+   "adults": 60,
+   "kids": 60,
+   "infants": 60,
+   "hdvOn": true,
+   "hdvHours": 10,
+   "days": 2,
+   "voucher": {
+    "code": "BIG",
+    "type": "fixed",
+    "value": 99999999
+   }
+  },
+  "expected": {
+   "adults": 50,
+   "kids": 50,
+   "infants": 50,
+   "pax": 150,
+   "base": 925925850,
+   "hdv": 3800000,
+   "subtotal": 929725850,
+   "discount": 99999999,
+   "voucherCode": "BIG",
+   "final": 829725851,
+   "depositPct": 20,
+   "deposit": 165945170,
+   "remaining": 663780681
+  }
+ },
+ {
+  "input": {
+   "price": 12345678,
+   "adults": 60,
+   "kids": 60,
+   "infants": 60,
+   "hdvOn": true,
+   "hdvHours": 12,
+   "days": "4",
+   "voucher": {
+    "code": "ODD",
+    "type": "percent",
+    "value": 33.3333
+   }
+  },
+  "expected": {
+   "adults": 50,
+   "kids": 50,
+   "infants": 50,
+   "pax": 150,
+   "base": 925925850,
+   "hdv": 9200000,
+   "subtotal": 935125850,
+   "discount": 311708305,
+   "voucherCode": "ODD",
+   "final": 623417545,
+   "depositPct": 20,
+   "deposit": 124683509,
+   "remaining": 498734036
+  }
+ },
+ {
+  "input": {
+   "price": 12345678,
+   "adults": 2,
+   "kids": "2",
+   "infants": "1",
+   "hdvOn": true,
+   "hdvHours": 8,
+   "days": 3,
+   "voucher": {
+    "code": "W10",
+    "type": "percent",
+    "value": 10,
+    "maxDiscount": 0
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 2,
+   "infants": 1,
+   "pax": 5,
+   "base": 37037034,
+   "hdv": 4500000,
+   "subtotal": 41537034,
+   "discount": 4153703,
+   "voucherCode": "W10",
+   "final": 37383331,
+   "depositPct": 20,
+   "deposit": 7476666,
+   "remaining": 29906665
+  }
+ },
+ {
+  "input": {
+   "price": 12345678,
+   "adults": 2,
+   "kids": "2",
+   "infants": "1",
+   "hdvOn": true,
+   "hdvHours": "x",
+   "days": 0,
+   "voucher": {
+    "code": "G15",
+    "type": "percent",
+    "value": 15,
+    "maxDiscount": 200000
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 2,
+   "infants": 1,
+   "pax": 5,
+   "base": 37037034,
+   "hdv": 1500000,
+   "subtotal": 38537034,
+   "discount": 200000,
+   "voucherCode": "G15",
+   "final": 38337034,
+   "depositPct": 20,
+   "deposit": 7667407,
+   "remaining": 30669627
+  }
+ },
+ {
+  "input": {
+   "price": 12345678,
+   "adults": 2,
+   "kids": "2",
+   "infants": "1",
+   "hdvOn": false,
+   "hdvHours": 8,
+   "days": 1,
+   "voucher": {
+    "code": "BIG",
+    "type": "fixed",
+    "value": 99999999
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 2,
+   "infants": 1,
+   "pax": 5,
+   "base": 37037034,
+   "hdv": 0,
+   "subtotal": 37037034,
+   "discount": 37037034,
+   "voucherCode": "BIG",
+   "final": 0,
+   "depositPct": 20,
+   "deposit": 0,
+   "remaining": 0
+  }
+ },
+ {
+  "input": {
+   "price": 12345678,
+   "adults": 2,
+   "kids": "2",
+   "infants": "1",
+   "hdvOn": true,
+   "hdvHours": 10,
+   "days": 2,
+   "voucher": {
+    "code": "ODD",
+    "type": "percent",
+    "value": 33.3333
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 2,
+   "infants": 1,
+   "pax": 5,
+   "base": 37037034,
+   "hdv": 3800000,
+   "subtotal": 40837034,
+   "discount": 13612331,
+   "voucherCode": "ODD",
+   "final": 27224703,
+   "depositPct": 20,
+   "deposit": 5444941,
+   "remaining": 21779762
+  }
+ },
+ {
+  "input": {
+   "price": 12345678,
+   "adults": 2.7,
+   "kids": 1.2,
+   "infants": 0.9,
+   "hdvOn": true,
+   "hdvHours": 12,
+   "days": "4",
+   "voucher": null
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 1,
+   "infants": 0,
+   "pax": 3,
+   "base": 30864195,
+   "hdv": 9200000,
+   "subtotal": 40064195,
+   "discount": 0,
+   "voucherCode": "",
+   "final": 40064195,
+   "depositPct": 20,
+   "deposit": 8012839,
+   "remaining": 32051356
+  }
+ },
+ {
+  "input": {
+   "price": 12345678,
+   "adults": 2.7,
+   "kids": 1.2,
+   "infants": 0.9,
+   "hdvOn": true,
+   "hdvHours": 8,
+   "days": 3,
+   "voucher": {
+    "code": "G15",
+    "type": "percent",
+    "value": 15,
+    "maxDiscount": 200000
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 1,
+   "infants": 0,
+   "pax": 3,
+   "base": 30864195,
+   "hdv": 4500000,
+   "subtotal": 35364195,
+   "discount": 200000,
+   "voucherCode": "G15",
+   "final": 35164195,
+   "depositPct": 20,
+   "deposit": 7032839,
+   "remaining": 28131356
+  }
+ },
+ {
+  "input": {
+   "price": 12345678,
+   "adults": 2.7,
+   "kids": 1.2,
+   "infants": 0.9,
+   "hdvOn": true,
+   "hdvHours": "x",
+   "days": 0,
+   "voucher": {
+    "code": "F",
+    "type": "fixed",
+    "value": 300000
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 1,
+   "infants": 0,
+   "pax": 3,
+   "base": 30864195,
+   "hdv": 1500000,
+   "subtotal": 32364195,
+   "discount": 300000,
+   "voucherCode": "F",
+   "final": 32064195,
+   "depositPct": 20,
+   "deposit": 6412839,
+   "remaining": 25651356
+  }
+ },
+ {
+  "input": {
+   "price": 12345678,
+   "adults": 2.7,
+   "kids": 1.2,
+   "infants": 0.9,
+   "hdvOn": false,
+   "hdvHours": 8,
+   "days": 1,
+   "voucher": {
+    "code": "ODD",
+    "type": "percent",
+    "value": 33.3333
+   }
+  },
+  "expected": {
+   "adults": 2,
+   "kids": 1,
+   "infants": 0,
+   "pax": 3,
+   "base": 30864195,
+   "hdv": 0,
+   "subtotal": 30864195,
+   "discount": 10288055,
+   "voucherCode": "ODD",
+   "final": 20576140,
+   "depositPct": 20,
+   "deposit": 4115228,
+   "remaining": 16460912
+  }
+ }
+]

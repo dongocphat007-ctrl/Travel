@@ -1,0 +1,104 @@
+/* contact-fab.css – nút liên hệ nhanh nổi (nằm trên nút chatbot AI góc phải dưới) */
+#contact-fab {
+  position: fixed;
+  right: 28px;
+  bottom: 92px;
+  z-index: 8700;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.cf-btn {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  transition:
+    transform 0.18s,
+    box-shadow 0.18s;
+}
+.cf-btn:hover,
+.cf-btn:focus-visible {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.32);
+  outline: none;
+}
+.cf-zalo {
+  background: #0068ff;
+}
+.cf-zalo-txt {
+  color: #fff;
+  font:
+    800 12px/1 "Inter",
+    sans-serif;
+  letter-spacing: -0.2px;
+}
+.cf-mess {
+  background: linear-gradient(135deg, #00b2ff, #006aff 60%, #a033ff);
+}
+.cf-tel {
+  background: #16a34a;
+  animation: cfRing 2.4s infinite;
+}
+@keyframes cfRing {
+  0% {
+    box-shadow:
+      0 0 0 0 rgba(22, 163, 74, 0.55),
+      0 4px 14px rgba(0, 0, 0, 0.25);
+  }
+  70%,
+  100% {
+    box-shadow:
+      0 0 0 14px rgba(22, 163, 74, 0),
+      0 4px 14px rgba(0, 0, 0, 0.25);
+  }
+}
+.cf-tip {
+  position: absolute;
+  right: 58px;
+  top: 50%;
+  transform: translateY(-50%);
+  white-space: nowrap;
+  background: #1e1b4b;
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 5px 10px;
+  border-radius: 8px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+}
+.cf-btn:hover .cf-tip,
+.cf-btn:focus-visible .cf-tip {
+  opacity: 1;
+}
+@media (max-width: 480px) {
+  #contact-fab {
+    right: 20px;
+    bottom: 84px;
+    gap: 10px;
+  }
+  .cf-btn {
+    width: 44px;
+    height: 44px;
+  }
+  .cf-tip {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cf-tel {
+    animation: none;
+  }
+}
+@media print {
+  #contact-fab {
+    display: none;
+  }
+}

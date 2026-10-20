@@ -1,0 +1,16 @@
+/* Trang Tìm Tour: tóm tắt, bộ lọc, thẻ kết quả thật, nút hỏi chatbot. Nạp trước design.css (token màu lấy từ :root). */
+#page-tour-finder .tf-summary { margin: 4px 0 12px; font-size: .95rem; line-height: 1.55; color: var(--ink-2, var(--text-muted)); }
+#page-tour-finder .tf-filters { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; margin-bottom: 10px; }
+#page-tour-finder .tf-filters label { display: flex; flex-direction: column; gap: 3px; font-size: .72rem; font-weight: 600; color: var(--text-muted); }
+#page-tour-finder .tf-filters select { font: inherit; font-size: .82rem; padding: 7px 8px; border: 1px solid var(--border); border-radius: var(--r, 6px); background: var(--bg-card, #fff); color: var(--text); min-height: 36px; }
+#page-tour-finder .tf-meta { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; font-size: .8rem; color: var(--text-muted); }
+#page-tour-finder .tf-ask-btn { font: inherit; font-size: .8rem; font-weight: 600; padding: 7px 12px; min-height: 36px; background: transparent; color: var(--accent); border: 1px solid var(--accent); border-radius: var(--r, 6px); cursor: pointer; }
+#page-tour-finder .tf-ask-btn:hover { background: var(--accent); color: #fff; }
+#page-tour-finder .tm-tour-card.is-active { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft, rgba(79,70,229,.2)); }
+#page-tour-finder .tf-n { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; margin-right: 6px; border-radius: 50%; background: var(--ink, #1e293b); color: #fff; font-size: .72rem; font-weight: 700; }
+#page-tour-finder .tm-card-price small { font-weight: 500; color: var(--text-muted); font-size: .7rem; }
+#page-tour-finder .tf-card-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+#page-tour-finder .tf-btn-detail { font: inherit; font-size: .8rem; font-weight: 600; padding: 6px 14px; min-height: 36px; background: transparent; color: var(--text); border: 1px solid var(--border); border-radius: var(--r, 6px); cursor: pointer; }
+#page-tour-finder .tf-btn-detail:hover { border-color: var(--accent); color: var(--accent); }
+#page-tour-finder .tf-empty { padding: 20px 14px; border: 1px dashed var(--border); border-radius: var(--r, 8px); color: var(--text-muted); font-size: .9rem; line-height: 1.5; }
+@media (max-width: 600px) { #page-tour-finder .tf-ask-btn, #page-tour-finder .tf-btn-detail, #page-tour-finder .tm-btn-map { min-height: 44px; } }

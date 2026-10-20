@@ -1,0 +1,91 @@
+/* Giai đoạn 11 – Yêu thích / So sánh. Tiền tố .fv- để không đụng CSS có sẵn.
+   [MERGE] Đã đưa về identity "Sổ tay lữ hành trên giấy" (Source A): giấy + mực xanh + tem đỏ, bo 2px, không bóng/gradient/pill.
+   Dùng token của css/design.css (--paper, --paper-2, --ink, --ink-2, --muted, --rule, --accent, --r). */
+
+/* ── Nút trên card tour (card của A: .tour-card, flex ngang; nút nằm góc trên-phải, không che chữ) ── */
+.fv-host { position: relative; }
+.fv-actions { position: absolute; top: 8px; right: 8px; display: flex; flex-direction: row-reverse; gap: 6px; align-items: flex-start; pointer-events: none; z-index: 5; }
+.fv-actions > * { pointer-events: auto; }
+.fv-actions__l { display: flex; gap: 6px; }
+/* Trên card tour của A (vé): dải thao tác nằm dưới cùng như mép vé, KHÔNG phủ lên giá/tiêu đề.
+   Card là grid (desktop) hoặc flex-wrap (≤600px) nên dải chiếm trọn một hàng riêng. */
+.tour-card.fv-host { flex-wrap: wrap; }
+.tour-card > .fv-actions { position: static; order: 9; grid-column: 1 / -1; flex: 1 0 100%; width: 100%; box-sizing: border-box; flex-direction: row; justify-content: space-between; align-items: center; gap: 8px; padding: 6px 10px; border-top: 1px dotted var(--rule); pointer-events: auto; }
+.tour-card > .fv-actions .fv-cmp { margin-left: auto; }
+.fv-heart, .fv-share, .fv-cmp {
+  min-width: 44px; min-height: 44px; border: 1px solid var(--rule); border-radius: var(--r);
+  background: var(--paper); color: var(--ink-2); cursor: pointer; line-height: 1; box-shadow: none; font-family: var(--font-text);
+}
+.fv-heart, .fv-share { width: 44px; height: 44px; font-size: 20px; padding: 0; }
+.fv-cmp { padding: 0 10px; font-size: 12px; font-weight: 600; }
+.fv-heart:hover, .fv-share:hover, .fv-cmp:hover { border-color: var(--ink); color: var(--ink); }
+.fv-heart.is-on { color: var(--accent); border-color: var(--accent); }
+.fv-cmp.is-on { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+.fv-heart:focus-visible, .fv-share:focus-visible, .fv-cmp:focus-visible, .fv-btn:focus-visible, .fv-tray button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ── Chip "Yêu thích n" (cố định góc dưới-trái) và khay So sánh ── */
+.fv-pill { position: fixed; left: 14px; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); z-index: 150; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 14px; background: var(--paper); color: var(--ink); border: 1px solid var(--ink); border-radius: var(--r); font-size: 14px; font-weight: 600; text-decoration: none; box-shadow: none; }
+.fv-pill b { color: var(--accent); }
+.fv-tray { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(14px + env(safe-area-inset-bottom, 0px)); z-index: 151; display: flex; gap: 10px; align-items: center; background: var(--ink); color: var(--paper); border-radius: var(--r); padding: 10px 14px; font-size: 14px; box-shadow: none; }
+.fv-tray[hidden] { display: none; }
+.fv-tray button { min-height: 44px; border: 0; border-radius: var(--r); padding: 0 14px; font-size: 14px; font-weight: 600; cursor: pointer; background: var(--accent); color: #fff; }
+.fv-tray .fv-tray__ghost { background: transparent; color: var(--paper); text-decoration: underline; }
+
+.fv-toast { position: fixed; left: 50%; top: 18px; transform: translate(-50%, -20px); opacity: 0; pointer-events: none; z-index: 1100; background: var(--ink); color: var(--paper); padding: 10px 16px; border-radius: var(--r); font-size: 14px; max-width: 90vw; transition: opacity .2s, transform .2s; }
+.fv-toast.is-show { opacity: 1; transform: translate(-50%, 0); }
+
+/* ── Trang "Yêu thích" ── */
+.fv-page { position: fixed; inset: 0; z-index: 900; overflow-y: auto; background: var(--ground, #e4e1da); color: var(--ink); font-family: var(--font-text); padding: calc(16px + env(safe-area-inset-top, 0px)) 16px calc(90px + env(safe-area-inset-bottom, 0px)); }
+.fv-page__head { max-width: 1100px; margin: 0 auto 16px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.fv-page__head h2 { margin: 0; font: 500 clamp(1.5rem, 1.1rem + 1.6vw, 2.25rem)/1.1 var(--font-display); color: var(--ink); }
+.fv-page__count { color: var(--muted); font-weight: 400; font-family: var(--font-text); }
+.fv-page__body { max-width: 1100px; margin: 0 auto; }
+.fv-btn { display: inline-flex; align-items: center; min-height: 44px; background: var(--ink); color: var(--paper); border: 0; border-radius: var(--r); padding: 0 16px; font-size: 14px; font-weight: 600; text-decoration: none; cursor: pointer; }
+.fv-btn--ghost { background: transparent; color: var(--ink); border: 1px solid var(--ink); box-shadow: none; }
+.fv-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
+.fv-card { background: var(--paper); border: 1px solid var(--rule); border-top: 3px dotted var(--rule); border-radius: var(--r); overflow: hidden; box-shadow: none; display: flex; flex-direction: column; }
+.fv-card__img { display: block; aspect-ratio: 4 / 3; background: var(--paper-2); }
+.fv-card__img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.fv-card__body { padding: 12px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+.fv-card__name { font: 500 1.125rem/1.25 var(--font-display); color: var(--ink); text-decoration: none; }
+.fv-card__meta { color: var(--muted); font-size: 13px; }
+.fv-card__actions { margin-top: auto; display: flex; gap: 8px; align-items: center; }
+.fv-card .fv-heart, .fv-card .fv-cmp, .fv-card .fv-share { box-shadow: none; background: var(--paper); }
+.fv-card .fv-cmp.is-on { background: var(--ink); }
+.fv-card--gone { opacity: .8; }
+.fv-empty, .fv-loading { text-align: center; color: var(--ink-2); padding: 48px 12px; }
+@media (max-width: 480px) { .fv-tray { width: calc(100% - 24px); justify-content: space-between; } .fv-pill { bottom: calc(70px + env(safe-area-inset-bottom, 0px)); } }
+
+/* ── 11.5 bảng so sánh ── */
+.fv-table-wrap { overflow-x: auto; background: var(--paper); border: 1px solid var(--rule); border-radius: var(--r); box-shadow: none; }
+.fv-table { border-collapse: collapse; width: 100%; min-width: 560px; table-layout: fixed; }
+.fv-table th, .fv-table td { padding: 12px; border-bottom: 1px dotted var(--rule); text-align: left; vertical-align: top; font-size: 14px; color: var(--ink); }
+.fv-table tbody th { width: 120px; color: var(--muted); font-weight: 600; background: var(--paper-2); }
+.fv-table thead td { width: 120px; }
+.fv-table td.is-best { color: var(--ink); font-weight: 700; }
+.fv-table td.is-best::after { content: " ✓"; color: var(--accent); }
+.fv-cmp-col { font-weight: normal; display: table-cell; }
+.fv-cmp-col__img { display: block; aspect-ratio: 4 / 3; background: var(--paper-2); border-radius: var(--r); overflow: hidden; margin-bottom: 8px; }
+.fv-cmp-col__img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.fv-cmp-col .fv-card__actions { margin-top: 8px; }
+.fv-cmp-col .fv-cmp, .fv-cmp-col .fv-share { box-shadow: none; }
+.fv-cmp-col .fv-share { background: var(--paper); }
+.fv-na { color: var(--muted); }
+
+/* ── 11.6 hộp thoại chia sẻ ── */
+.fv-modal { position: fixed; inset: 0; z-index: 1050; background: rgba(13, 33, 55, .55); display: flex; align-items: center; justify-content: center; padding: 16px; }
+.fv-modal__box { background: var(--paper); color: var(--ink); border: 1px solid var(--rule); border-top: 4px dotted var(--rule); border-radius: var(--r); padding: 18px; width: min(460px, 100%); display: flex; flex-direction: column; gap: 12px; box-shadow: none; }
+.fv-modal__box h2 { margin: 0; font: 500 1.375rem/1.15 var(--font-display); }
+.fv-modal__row { display: flex; gap: 8px; }
+.fv-modal__input { flex: 1; min-width: 0; min-height: 44px; padding: 8px 10px; border: 1px solid var(--rule); border-radius: var(--r); background: #fff; color: var(--ink); font-size: 16px; font-family: var(--font-text); }
+.fv-modal__box > .fv-btn { align-self: flex-end; }
+@media (max-width: 480px) { .fv-modal__row { flex-direction: column; } }
+
+.fv-sr { position: absolute !important; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0; }
+.fv-table-wrap:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Sửa sau audit UI/UX: nút "Yêu thích" chỉ hiện khi có mục; nằm DƯỚI modal (z-index modal ≥ 200) và Leaflet;
+   ẩn trên trang chi tiết tour để không che CTA "Đặt tour ngay". */
+.fv-pill[hidden] { display: none; }
+body:has(#page-tour.active) .fv-pill,
+body:has(#page-tour.active) .fv-tray { display: none; }

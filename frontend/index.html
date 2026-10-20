@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Travel – Tour du lịch Việt Nam và quốc tế</title>
+  <meta name="description" content="629 hành trình có sẵn từ Bắc vào Nam và ra thế giới: lịch trình rõ ràng, giá minh bạch, hướng dẫn viên địa phương.">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#0d2137">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="vi_VN">
+  <meta property="og:site_name" content="Travel">
+  <meta property="og:title" content="Travel – Tour du lịch Việt Nam và quốc tế">
+  <meta property="og:description" content="Đặt tour, so sánh tour, lưu tour yêu thích và chia sẻ cho bạn bè.">
+  <meta property="og:image" content="img/og-cover.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Travel – Khám phá Việt Nam">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="img/og-cover.png">
+  <link rel="sitemap" type="application/xml" href="/sitemap.xml">
+  <link rel="icon" href="img/favicon/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="img/favicon/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="img/favicon/favicon-64.png">
+  <link rel="apple-touch-icon" href="img/favicon/apple-touch-icon.png">
+  <!-- Phông tự lưu trong fonts/ (Newsreader + Be Vietnam Pro, đủ dấu tiếng Việt) -->
+  <link rel="preload" href="fonts/be-vietnam-pro-vietnamese-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/fonts.css">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+  <!-- Google Identity Services -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/tour-page.css">
+  <link rel="stylesheet" href="css/contact-fab.css">
+  <link rel="stylesheet" href="css/tour-filters.css">
+  <link rel="stylesheet" href="css/mobile-fixes.css">
+  <link rel="stylesheet" href="css/p0.css">
+  <link rel="stylesheet" href="css/guides.css">
+  <link rel="stylesheet" href="css/favorites.css">
+  <link rel="stylesheet" href="css/a11y.css">
+  <link rel="stylesheet" href="css/p13.css">
+  <link rel="stylesheet" href="css/tour-finder.css">
+  <!-- Lớp thiết kế: luôn nạp CUỐI để ghi đè các file css ở trên -->
+  <link rel="stylesheet" href="css/design.css">
+  <!-- axios (bản lưu sẵn trong lib/ để chạy được cả khi không có mạng) – dùng cho trang Hướng dẫn viên -->
+  <script type="importmap">
+    { "imports": { "axios": "./lib/axios.min.js" } }
+  </script>
+  <!-- Nạp các mảnh HTML trong thư mục html/ -->
+  <!-- Đổi tên dự án: chuyển dữ liệu localStorage cũ (tripcraft_*, travel_vn_*) sang tiền tố travel_* — phải chạy TRƯỚC mọi script khác -->
+  <script src="js/brand-migrate.js"></script>
+  <!-- Giai đoạn 13 (B): ảnh lỗi → ảnh thay thế, lazy-load, debounce ô tìm kiếm, apiFetch/cache/renderInBatches — nạp SỚM, trước include.js -->
+  <script src="js/p13-utils.js"></script>
+  <script src="js/include.js"></script>
+</head>
+<body>
+<a class="skip-link" href="#main">Bỏ qua điều hướng</a>
+<noscript><p style="padding:16px;text-align:center">Trang cần bật JavaScript để hoạt động.</p></noscript>
+
+<script>includeHtml('html/navbar.html')</script>
+
+<main class="main" id="main">
+
+  <script>includeHtml('html/page-home.html')</script>
+  <script>includeHtml('html/page-create-trip.html')</script>
+  <script>includeHtml('html/page-trip-detail.html')</script>
+  <script>includeHtml('html/page-add-loc.html')</script>
+  <script>includeHtml('html/page-dashboard.html')</script>
+  <script>includeHtml('html/page-about.html')</script>
+  <script>includeHtml('html/page-world-map.html')</script>
+  <script>includeHtml('html/page-tour-finder.html')</script>
+  <script>includeHtml('html/page-tour.html')</script>
+  <script>includeHtml('html/page-guides.html')</script>
+  <script>includeHtml('html/page-hotel-search.html')</script>
+  <script>includeHtml('html/page-food.html')</script>
+  <script>includeHtml('html/page-policy.html')</script>
+  <script>includeHtml('html/page-profile.html')</script>
+  <script>includeHtml('html/page-admin.html')</script>
+
+</main>
+
+<script>includeHtml('html/modal-login.html')</script>
+<script>includeHtml('html/modal-logout.html')</script>
+<script>includeHtml('html/modal-confirm.html')</script>
+<script>includeHtml('html/toast.html')</script>
+<script>includeHtml('html/footer.html')</script>
+<script>includeHtml('html/google-signin.html')</script>
+
+<!-- TOUR MẪU DATA + HOME LOGIC -->
+<script src="js/home.js"></script>
+
+<!-- THƯ VIỆN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+
+<!-- JS MODULES -->
+<script src="js/utils.js"></script>
+<script src="js/storage.js"></script>
+<!-- Giá dùng chung với server + cầu nối API (phải nạp trước auth.js) -->
+<script src="shared/pricing.js"></script>
+<script src="shared/guide-availability.js"></script>
+<script src="shared/review-schema.js"></script>
+<script src="js/data-api.js"></script>
+
+<script src="js/otp.js"></script>
+<script src="js/business-info.js"></script>
+<script src="js/constants.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/trips.js"></script>
+<script src="js/qrcode-lib.js"></script>
+<script src="js/payment.js"></script>
+<script src="js/policy.js"></script>
+<script src="js/validator.js"></script>
+<script src="js/render.js"></script>
+<script src="js/lazy-libs.js"></script>
+<script src="js/export-module.js"></script>
+<script src="js/booking-pdf.js"></script>
+<script src="js/gemini.js"></script>
+<script src="js/import-module.js"></script>
+<script src="js/rag.js"></script>
+<script src="js/tour-search.js"></script>
+<script src="js/chat-log.js"></script>
+<script src="js/admin-chat.js"></script>
+<script src="js/chatbot.js"></script>
+<!-- 11.1–11.8 (B): Yêu thích (♡) + So sánh (tối đa 3 tour) + Chia sẻ ?tour=ID; trang #/favorites, #/compare -->
+<script src="js/favorites.js"></script>
+<script src="js/map-basemap.js"></script>
+<script src="js/tour-map.js"></script>
+<script src="js/world-map.js"></script>
+<script src="js/world-tours.js"></script>
+<script src="js/hotel-flight-search.js"></script>
+<script src="js/food-module.js"></script>
+<script src="js/tour-images.js"></script>
+<script src="js/tab-layout.js"></script>
+<script src="js/order-stats.js"></script>
+<script src="js/admin.js"></script>
+<script src="js/admin-p0.js"></script>
+<script src="js/main.js"></script>
+<script src="js/tour-finder.js"></script>
+<script src="js/tour-page.js"></script>
+<script src="js/contact-fab.js"></script>
+
+<script src="js/home-patch.js"></script>
+
+<!-- P0: voucher, banner động, tour nổi bật -->
+<script src="js/voucher-ui.js"></script>
+<script src="js/guide-picker.js"></script>
+<script src="js/weather.js"></script>
+<script src="js/tour-location-map.js"></script>
+<script src="js/banner.js"></script>
+<script src="js/featured.js"></script>
+<!-- Hero trang chủ: bản đồ Tuyến Bắc–Nam (dùng bộ lọc của home.js) -->
+<script src="js/route-map.js"></script>
+
+<!-- Hướng dẫn viên: danh sách accordion (#/guides) -->
+<script type="module" src="js/guides.js"></script>
+
+<!-- Thông báo theo tài khoản + xác thực hồ sơ (tên, email, giới tính, ngày sinh) -->
+<script src="js/account-extras.js"></script>
+
+<!-- 12.1–12.4 (B): alt ảnh, label input, aria-label nút icon, điều hướng bàn phím. Console: TravelA11y.audit() -->
+<script src="js/a11y.js"></script>
+<!-- 12.7 / 12.9 (B): title, description, Open Graph, canonical theo route -->
+<script src="js/seo.js"></script>
+<!-- Keo nối A+B: khớp cấu hình các module B với markup/router của A -->
+<script src="js/merge-glue.js"></script>
+</body>
+</html>

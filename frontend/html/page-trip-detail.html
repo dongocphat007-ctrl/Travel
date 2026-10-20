@@ -1,0 +1,26 @@
+  <!-- PAGE: TRIP DETAIL -->
+  <section class="page" id="page-trip-detail">
+    <button class="back-btn" id="back-to-home">← Tất cả chuyến đi</button>
+    <div class="trip-hero" id="detail-hero"></div>
+    <div class="tabs">
+      <button class="tab-btn active" id="tab-it">🗓️ Lịch trình</button>
+      <button class="tab-btn" id="tab-bud">💰 Ngân sách</button>
+    </div>
+    <div id="tc-itinerary">
+      <div class="filter-bar">
+        <label>Lọc loại:</label>
+        <select class="filter-sel" id="loc-filter-cat" style="padding:7px 11px;font-size:13px">
+          <option value="">Tất cả</option>
+          <option value="landmark">🏛️ Địa danh</option>
+          <option value="food">🍜 Ăn uống</option>
+          <option value="hotel">🏨 Chỗ ở</option>
+          <option value="transport">🚌 Di chuyển</option>
+          <option value="activity">🎯 Hoạt động</option>
+          <option value="other">📌 Khác</option>
+        </select>
+        <span id="loc-filter-count" style="font-size:13px;color:var(--muted)"></span>
+      </div>
+      <div id="days-container"></div>
+    </div>
+    <div id="tc-budget" style="display:none"></div>
+  </section>

@@ -1,0 +1,23 @@
+  <!-- PAGE: HƯỚNG DẪN VIÊN (danh sách dạng accordion, route #/guides) -->
+  <section class="page" id="page-guides">
+    <div class="guides-page">
+      <h1 class="guides-title">Hướng dẫn viên</h1>
+      <p class="guides-sub" id="guideSummary">Bấm vào một người để xem chi tiết.</p>
+
+      <!-- Loading -->
+      <div id="guideLoading" class="guide-state hidden">
+        <div class="guide-spinner"></div>
+        <p>Đang tải hướng dẫn viên...</p>
+      </div>
+
+      <!-- Error -->
+      <div id="guideError" class="guide-state hidden">
+        <h2>Không tải được danh sách</h2>
+        <p>Kiểm tra mạng rồi thử lại.</p>
+        <button type="button" id="guideRetryBtn" class="detail-btn">Thử lại</button>
+      </div>
+
+      <!-- Guide list -->
+      <div id="guideList" class="guide-list"></div>
+    </div>
+  </section>

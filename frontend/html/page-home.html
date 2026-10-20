@@ -1,0 +1,109 @@
+  <!-- PAGE: HOME -->
+  <section class="page active" id="page-home">
+
+    <!-- HERO: lời khẳng định + bản đồ "Tuyến Bắc–Nam" (mỗi chấm là một tỉnh, to nhỏ theo số tour; bấm để lọc) – js/route-map.js -->
+    <section class="hm-hero" aria-labelledby="hm-title">
+      <div class="hm-hero-text">
+        <div>
+          <h1 class="hm-title" id="hm-title">Đi từ Bắc vào Nam.</h1>
+          <p class="hm-lead">Hơn 600 hành trình dựng sẵn. Giá ghi rõ cho từng người, hướng dẫn viên là người địa phương.</p>
+          <div class="hm-actions">
+            <button type="button" class="btn btn-primary" id="hm-cta">Xem các hành trình</button>
+            <button type="button" class="hm-link" id="hm-create">Tự tạo tour</button>
+          </div>
+        </div>
+        <div class="hm-regions" id="hmRegions" role="group" aria-label="Lọc tour theo vùng"></div>
+      </div>
+      <figure class="hm-route">
+        <div id="routeMap" class="rm-wrap"></div>
+        <figcaption class="rm-cap">Mỗi chấm là một tỉnh. Chấm càng lớn, tỉnh càng nhiều tour. Bấm vào chấm để lọc danh sách.</figcaption>
+      </figure>
+    </section>
+
+    <!-- Hidden elements (tương thích mã cũ) -->
+    <input type="text"   id="search-q"     style="display:none">
+    <select id="filter-status" style="display:none"><option value=""></option></select>
+    <select id="sort-by"       style="display:none"><option value="newest"></option></select>
+    <p id="trips-count" style="display:none"></p>
+    <button id="btn-new-trip"  style="display:none"></button>
+    <div id="trips-grid"       style="display:none"></div>
+
+    <!-- ĐƯỢC YÊU THÍCH NHẤT: carousel 5 banner ảnh (Top 07–11, thứ tự theo xếp hạng – js/banner.js) + bảng xếp hạng (js/featured.js) -->
+    <section class="hm-top" id="sec-top" aria-labelledby="hm-top-title">
+      <div class="hm-sec-head">
+        <h2 id="hm-top-title">Được yêu thích nhất</h2>
+        <p>Xếp theo lượt dùng tour. Đơn mới làm tour tự lên hạng, đơn đã hủy không tính.</p>
+      </div>
+      <section class="bn-wrap" id="bannerCarousel" aria-roledescription="carousel" aria-label="Tour được yêu thích nhất">
+        <div class="bn-track">
+          <article class="bn-slide bn-img" data-tour="hot07" role="group" aria-roledescription="slide">
+            <a class="bn-cover" href="#/tour/hot07" aria-label="Xem tour: Ninh Bình – Tuyệt tác sơn thủy giữa lòng di sản"><img src="img/banners/top-07-ninh-binh.png" alt="Ninh Bình – Tuyệt tác sơn thủy giữa lòng di sản" width="1024" height="338"></a>
+          </article>
+          <article class="bn-slide bn-img" data-tour="hot08" role="group" aria-roledescription="slide">
+            <a class="bn-cover" href="#/tour/hot08" aria-label="Xem tour: Cố đô Huế – Dấu ấn vàng son"><img src="img/banners/top-08-hue.png" alt="Cố đô Huế – Dấu ấn vàng son" width="1024" height="338" loading="lazy"></a>
+          </article>
+          <article class="bn-slide bn-img" data-tour="hot09" role="group" aria-roledescription="slide">
+            <a class="bn-cover" href="#/tour/hot09" aria-label="Xem tour: Đà Nẵng – Thành phố của những kỳ quan"><img src="img/banners/top-09-da-nang.png" alt="Đà Nẵng – Thành phố của những kỳ quan" width="1024" height="338" loading="lazy"></a>
+          </article>
+          <article class="bn-slide bn-img" data-tour="hot10" role="group" aria-roledescription="slide">
+            <a class="bn-cover" href="#/tour/hot10" aria-label="Xem tour: Sapa – Nơi gặp gỡ đất trời"><img src="img/banners/top-10-sapa.png" alt="Sapa – Nơi gặp gỡ đất trời" width="1024" height="338" loading="lazy"></a>
+          </article>
+          <article class="bn-slide bn-img" data-tour="hot11" role="group" aria-roledescription="slide">
+            <a class="bn-cover" href="#/tour/hot11" aria-label="Xem tour: Quảng Bình – Chinh phục kỳ quan hang động"><img src="img/banners/top-11-quang-binh.png" alt="Quảng Bình – Chinh phục kỳ quan hang động" width="1024" height="338" loading="lazy"></a>
+          </article>
+        </div>
+      </section>
+
+      <!-- TOUR NỔI BẬT: đếm từ đơn đặt thật (js/featured.js) -->
+      <div class="ft-wrap" id="featuredWrap" hidden>
+        <div class="ft-list" id="featuredList"></div>
+      </div>
+    </section>
+
+    <!-- TẤT CẢ HÀNH TRÌNH -->
+    <section id="sec-tours" class="hm-tours" aria-labelledby="hm-tours-title">
+      <div class="hm-sec-head">
+        <h2 id="hm-tours-title">Tất cả hành trình</h2>
+        <p>Chọn một tuyến, xem lịch trình và giá, rồi đặt chỗ.</p>
+      </div>
+
+      <div class="search-filter">
+        <div class="search-wrap">
+          <label class="sr-only" for="tourSearch">Tìm theo tên tour hoặc điểm đến</label>
+          <input type="text" id="tourSearch" placeholder="Tìm tên tour hoặc điểm đến" autocomplete="off" name="tour-search-x7k" readonly onfocus="this.removeAttribute('readonly')">
+        </div>
+        <div class="sort-group" role="group" aria-label="Nhóm tour">
+          <button class="src-btn active" data-src="all">Tất cả nhóm</button>
+          <button class="src-btn" data-src="sample">Tour mẫu (<span id="cnt-sample">524</span>)</button>
+          <button class="src-btn" data-src="intl">Tour quốc tế (<span id="cnt-intl">100</span>)</button>
+        </div>
+        <div class="sort-group" role="group" aria-label="Sắp xếp theo giá">
+          <button class="sort-btn" data-sort="asc">Giá thấp → cao</button>
+          <button class="sort-btn" data-sort="desc">Giá cao → thấp</button>
+        </div>
+        <div class="sort-group" role="group" aria-label="Hướng dẫn viên">
+          <button class="guide-btn active" data-guide="all">Tất cả</button>
+          <button class="guide-btn" data-guide="guided">Có hướng dẫn viên</button>
+          <button class="guide-btn" data-guide="self">Tự túc</button>
+        </div>
+      </div>
+      <div class="adv-filter" id="advFilter" aria-label="Bộ lọc nâng cao"></div>
+      <div id="regionFilter" style="display:none"></div>
+      <p id="tourCount" class="tour-count" aria-live="polite"></p>
+      <div class="tours-list" id="toursContainer"></div>
+    </section>
+
+    <!-- UNESCO -->
+    <section id="sec-bai-viet" class="hm-unesco" aria-labelledby="hm-unesco-title">
+      <div class="uc-layout">
+        <div class="hm-sec-head">
+          <h2 id="hm-unesco-title">Tám di sản thế giới</h2>
+          <p>Việt Nam có tám địa danh được UNESCO công nhận. Năm ghi bên trái là năm được công nhận.</p>
+        </div>
+        <div class="unesco-grid" id="unescoGrid" role="list"></div>
+      </div>
+    </section>
+
+    <!-- Tab Layout (Chuyến đi của tôi) -->
+    <div id="mainTabContainer" class="my-trips"></div>
+  </section>

@@ -1,0 +1,73 @@
+  <!-- PAGE: PROFILE -->
+  <section class="page" id="page-profile">
+    <div class="profile-wrap">
+      <div class="profile-hero">
+        <div class="profile-avatar-wrap">
+          <div class="profile-avatar" id="pf-avatar"></div>
+          <button type="button" class="pf-avatar-btn" id="pf-avatar-btn" title="Đổi ảnh đại diện" aria-label="Đổi ảnh đại diện">📷</button>
+          <input type="file" id="pf-avatar-input" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
+          <button type="button" class="pf-avatar-remove" id="pf-avatar-remove" style="display:none">Xóa ảnh</button>
+          <div class="form-err" id="err-pf-avatar"></div>
+        </div>
+        <div class="profile-info">
+          <div class="profile-name-row">
+            <span class="profile-name" id="pf-name-display"></span>
+            <button class="pf-edit-inline-btn" id="pf-edit-btn">✏️ Sửa tên</button>
+          </div>
+          <div class="profile-detail-row">
+            <span class="profile-detail-icon">📧</span>
+            <span id="pf-email"></span>
+          </div>
+          <div class="profile-detail-row" id="pf-provider-row">
+            <span class="profile-detail-icon">🔐</span>
+            <span id="pf-provider"></span>
+          </div>
+          <div class="profile-detail-row" id="pf-joined-row">
+            <span class="profile-detail-icon">📅</span>
+            <span id="pf-joined"></span>
+          </div>
+          <div class="profile-detail-row" id="pf-gender-row">
+            <span class="profile-detail-icon">👤</span>
+            <span id="pf-gender"></span>
+          </div>
+          <div class="profile-detail-row" id="pf-birthday-row">
+            <span class="profile-detail-icon">🎂</span>
+            <span id="pf-birthday"></span>
+          </div>
+          <div class="profile-detail-row" id="pf-verify-row">
+            <span class="profile-detail-icon">🛡️</span>
+            <span id="pf-verify"></span>
+            <button type="button" class="pf-edit-inline-btn" id="pf-verify-btn" style="display:none">Xác thực ngay</button>
+          </div>
+        </div>
+      </div>
+      <div class="profile-edit-form" id="pf-edit-form" style="display:none">
+        <div class="form-group">
+          <label class="form-label" for="pf-name-input">Tên hiển thị mới</label>
+          <input type="text" id="pf-name-input" class="form-input" placeholder="Nhập tên của bạn">
+          <div class="form-err" id="err-pf-name"></div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:12px">
+          <button class="btn btn-accent" id="pf-save-btn">💾 Lưu thay đổi</button>
+          <button class="btn btn-ghost" id="pf-cancel-btn">Hủy</button>
+        </div>
+      </div>
+      <div class="profile-stats" id="pf-stats"></div>
+      <div class="profile-trips-section" id="pf-bookings-section" style="display:none">
+        <div class="profile-section-header">
+          <h3 class="profile-section-title">🎫 Tour mẫu đã đăng ký</h3>
+        </div>
+        <div class="pf-bk-list" id="pf-bookings"></div>
+      </div>
+      <div class="profile-trips-section">
+        <div class="profile-section-header">
+          <h3 class="profile-section-title">Chuyến đi của tôi</h3>
+          <button class="btn btn-accent btn-sm" onclick="requireAuth(openNewTripForm)">＋ Tạo mới</button>
+        </div>
+        <div class="profile-trips-grid" id="pf-trips-grid"></div>
+      </div>
+      <div style="margin-top:36px;text-align:center">
+        <button class="btn-danger-outline" id="pf-logout-btn">🚪 Đăng xuất</button>
+      </div>
+    </div>
+  </section>

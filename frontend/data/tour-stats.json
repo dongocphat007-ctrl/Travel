@@ -1,0 +1,72 @@
+{
+ "_note": "DỮ LIỆU MẪU cho demo (lượt dùng/đánh giá khởi điểm). Đơn đặt thật được cộng thêm vào khi xếp hạng. Xóa file này nếu muốn chỉ dùng số liệu thật.",
+ "sample": true,
+ "tours": [
+  {
+   "tourId": "105",
+   "used": 2486,
+   "reviews": 1214,
+   "rating": 4.9
+  },
+  {
+   "tourId": "101",
+   "used": 2203,
+   "reviews": 1067,
+   "rating": 4.8
+  },
+  {
+   "tourId": "108",
+   "used": 1941,
+   "reviews": 903,
+   "rating": 4.8
+  },
+  {
+   "tourId": "107",
+   "used": 1722,
+   "reviews": 788,
+   "rating": 4.8
+  },
+  {
+   "tourId": "110",
+   "used": 1508,
+   "reviews": 652,
+   "rating": 4.7
+  },
+  {
+   "tourId": "102",
+   "used": 1296,
+   "reviews": 541,
+   "rating": 4.7
+  },
+  {
+   "tourId": "hot07",
+   "used": 1084,
+   "reviews": 436,
+   "rating": 4.8
+  },
+  {
+   "tourId": "hot08",
+   "used": 927,
+   "reviews": 352,
+   "rating": 4.7
+  },
+  {
+   "tourId": "hot09",
+   "used": 803,
+   "reviews": 289,
+   "rating": 4.8
+  },
+  {
+   "tourId": "hot10",
+   "used": 688,
+   "reviews": 231,
+   "rating": 4.7
+  },
+  {
+   "tourId": "hot11",
+   "used": 574,
+   "reviews": 176,
+   "rating": 4.7
+  }
+ ]
+}

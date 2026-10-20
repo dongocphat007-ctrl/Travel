@@ -1,0 +1,152 @@
+/* mobile-fixes.css – chỉnh giao diện điện thoại (nạp SAU cùng để ghi đè theme.css) */
+
+/* Không cho trang tràn ngang; ảnh/bảng/iframe không vượt khung */
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+img,
+video,
+iframe,
+canvas,
+svg {
+  max-width: 100%;
+}
+
+@media (max-width: 600px) {
+  /* Banner "Đăng nhập ngay": nút không bị bẻ thành 3 dòng */
+  .guest-banner {
+    gap: 10px;
+    padding: 10px 14px;
+    font-size: 0.85rem;
+  }
+  #banner-login-btn {
+    white-space: nowrap;
+    flex-shrink: 0;
+    padding: 9px 16px;
+  }
+
+  /* Thẻ tour: HIỆN giá + nút "Xem chi tiết" (trước đây bị display:none) → xuống hàng dưới */
+  .tour-card {
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+  .tour-card .tc-body {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+  .tour-card .tc-right {
+    display: flex !important;
+    flex: 1 1 100%;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    text-align: left;
+    padding-top: 10px;
+    border-top: 1px dashed var(--border);
+  }
+  .tour-card .tc-price {
+    font-size: 1.05rem;
+    display: inline;
+  }
+  .tour-card .tc-sub {
+    display: inline;
+    margin-left: 4px;
+  }
+  .tour-card .btn-detail {
+    margin-top: 0;
+    padding: 8px 14px;
+    white-space: nowrap;
+  }
+  .tour-card .tc-name {
+    overflow-wrap: anywhere;
+  }
+
+  /* Bộ lọc tự xuống hàng để nhãn không bị cắt ở mép màn hình */
+  .search-filter .sort-group {
+    flex-wrap: wrap;
+    overflow: visible;
+    gap: 6px;
+    padding-bottom: 4px;
+    width: 100%;
+  }
+  .search-filter .sort-group > span {
+    display: none;
+  }
+  .sort-btn,
+  .guide-btn,
+  .src-btn {
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    flex: 0 0 auto;
+  }
+  .adv-filter {
+    gap: 8px;
+  }
+  .af-field select,
+  .af-field input {
+    min-height: 42px;
+    font-size: 16px;
+  } /* 16px: iOS không tự phóng to khi chạm ô nhập */
+
+  /* Nút nổi (Zalo / Messenger / Gọi / Chatbot): nhỏ hơn, sát mép, không che nội dung */
+  #contact-fab {
+    right: 12px;
+    bottom: 76px;
+    gap: 8px;
+  }
+  .cf-btn {
+    width: 40px;
+    height: 40px;
+  }
+  .main {
+    padding-bottom: 150px;
+  }
+
+  /* Vùng chạm tối thiểu ~44px cho nút chính */
+  .btn,
+  .nav-btn,
+  .pg-btn {
+    min-height: 40px;
+  }
+  .pagination {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  /* Bảng (Admin, thống kê, đơn hàng) cuộn ngang trong khung */
+  .adm-table-wrap,
+  .exp-table-wrap,
+  .pol-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .adm-table {
+    min-width: 560px;
+  }
+
+  /* Popup / modal: vừa màn hình, cuộn bên trong */
+  .modal,
+  .login-card {
+    max-width: calc(100vw - 20px);
+    max-height: 92vh;
+    overflow-y: auto;
+  }
+  .modal input,
+  .modal select,
+  .modal textarea {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 380px) {
+  .tv-hero-content h1 {
+    font-size: 1.9rem;
+  }
+  .tour-card .tc-right {
+    flex-wrap: wrap;
+  }
+}

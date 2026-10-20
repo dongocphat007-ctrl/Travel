@@ -1,0 +1,81 @@
+  <!-- PAGE: HOTEL & FLIGHT -->
+  <section class="page" id="page-hotel-search">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Chuyến bay & Khách sạn</h1>
+        <p class="page-sub">Giá niêm yết do Travel cung cấp — đặt chỗ rồi thanh toán chuyển khoản như đặt tour</p>
+      </div>
+    </div>
+    <div class="hfs-tabs">
+      <button class="hfs-tab active" id="hfs-tab-flight" onclick="switchHFSTab('flight')">Chuyến bay</button>
+      <button class="hfs-tab" id="hfs-tab-hotel" onclick="switchHFSTab('hotel')">Khách sạn</button>
+    </div>
+    <div id="hfs-form-flight" class="hfs-form-wrap card card-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Điểm khởi hành</label>
+          <input type="text" id="hfs-fl-from" class="form-input" placeholder="VD: Hà Nội (HAN)">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Điểm đến</label>
+          <input type="text" id="hfs-fl-to" class="form-input" placeholder="VD: Tokyo (NRT)">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Ngày đi</label>
+          <input type="date" id="hfs-fl-depart" class="form-input">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Số hành khách</label>
+          <select id="hfs-fl-pax" class="form-select">
+            <option value="1">1 người</option><option value="2">2 người</option>
+            <option value="3">3 người</option><option value="4">4 người</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Hạng ghế</label>
+          <select id="hfs-fl-class" class="form-select">
+            <option value="economy">Phổ thông</option><option value="premium">Phổ thông ĐB</option>
+            <option value="business">Thương gia</option><option value="first">Hạng nhất</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn btn-accent" id="hfs-fl-btn">Tìm chuyến bay</button>
+    </div>
+    <div id="hfs-form-hotel" class="hfs-form-wrap card card-body" style="display:none">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Điểm đến / thành phố</label>
+          <input type="text" id="hfs-ht-dest" class="form-input" placeholder="VD: Hội An, Bangkok">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Hạng sao</label>
+          <select id="hfs-ht-stars" class="form-select">
+            <option value="any">Tất cả</option><option value="3">3 sao trở lên</option>
+            <option value="4">4 sao trở lên</option><option value="5">5 sao</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Nhận phòng</label>
+          <input type="date" id="hfs-ht-checkin" class="form-input">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Trả phòng</label>
+          <input type="date" id="hfs-ht-checkout" class="form-input">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Số khách</label>
+          <select id="hfs-ht-guests" class="form-select">
+            <option value="1">1 khách</option><option value="2">2 khách</option>
+            <option value="3">3 khách</option><option value="4">4 khách</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn btn-accent" id="hfs-ht-btn">Tìm khách sạn</button>
+    </div>
+    <div id="hfs-loading" style="display:none;text-align:center;padding:40px;color:var(--muted)">⏳ Đang tìm kiếm...</div>
+    <div id="hfs-results" class="hfs-results"></div>
+  </section>

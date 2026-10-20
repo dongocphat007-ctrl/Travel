@@ -1,0 +1,108 @@
+  <!-- PAGE: CREATE/EDIT TRIP -->
+  <section class="page" id="page-create-trip">
+    <button class="back-btn" id="back-from-form">← Quay lại</button>
+    <div class="page-header">
+      <div>
+        <h1 class="page-title" id="form-trip-title">Tạo chuyến đi mới</h1>
+        <p class="page-sub">Điền thông tin để bắt đầu lên kế hoạch</p>
+      </div>
+    </div>
+    <div class="card"><div class="card-body">
+      <form id="form-trip" novalidate>
+        <div class="form-group">
+          <label class="form-label">Biểu tượng chuyến đi</label>
+          <div class="emoji-grid" id="emoji-grid"></div>
+          <input type="hidden" id="f-emoji" value="✈️">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Ảnh bìa chuyến đi <span style="font-weight:400;color:var(--muted)">(tùy chọn)</span></label>
+          <div class="cover-upload-area" id="cover-upload-area">
+            <div class="cup-preview" id="cup-preview" style="display:none">
+              <img loading="lazy" decoding="async" id="cup-img" src="" alt="Ảnh bìa" class="cup-img">
+              <div class="cup-overlay">
+                <button type="button" class="cup-change-btn" id="cup-change-btn">Đổi ảnh</button>
+                <button type="button" class="cup-remove-btn" id="cup-remove-btn">✕ Xóa ảnh</button>
+              </div>
+            </div>
+            <div class="cup-empty" id="cup-empty">
+              
+              <div class="cup-label">Kéo & thả ảnh vào đây<br><span>hoặc</span></div>
+              <label class="cup-file-label" for="f-cover-file">Chọn ảnh từ máy tính</label>
+            </div>
+            <input type="file" id="f-cover-file" accept="image/*" style="display:none">
+            <input type="hidden" id="f-cover-image">
+          </div>
+          <p class="form-hint">Hỗ trợ JPG, PNG, GIF, WebP — tối đa 5MB</p>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="f-name">Tên chuyến đi <span class="req">*</span></label>
+            <input type="text" id="f-name" class="form-input" placeholder="VD: Đà Nẵng mùa hè 2026">
+            <div class="form-err" id="e-name"></div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="f-dest">Điểm đến <span class="req">*</span></label>
+            <input type="text" id="f-dest" class="form-input" placeholder="VD: Đà Nẵng, Hội An">
+            <div class="form-err" id="e-dest"></div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="f-start">Ngày khởi hành <span class="req">*</span></label>
+            <input type="date" id="f-start" class="form-input">
+            <div class="form-hint" id="f-start-hint"></div>
+            <div class="form-err" id="e-start"></div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="f-end">Ngày kết thúc <span class="req">*</span></label>
+            <input type="date" id="f-end" class="form-input">
+            <div class="form-err" id="e-end"></div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="f-budget">Ngân sách dự kiến (VNĐ) <span class="req">*</span></label>
+            <div class="num-input-wrap">
+              <input type="text" id="f-budget" class="form-input" placeholder="VD: 5.000.000" inputmode="numeric" autocomplete="off">
+              <span class="num-suffix">₫</span>
+            </div>
+            <div class="form-hint">Chỉ nhập số — tự động thêm dấu chấm phân cách</div>
+            <div class="form-err" id="e-budget"></div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="f-members">Số người tham gia</label>
+            <input type="text" id="f-members" class="form-input" placeholder="1" inputmode="numeric" value="1">
+            <p class="form-hint">Mặc định 1 người</p>
+          </div>
+        </div>
+        <div class="form-group" id="guide-hire-box" style="border:1px solid var(--border,#e2e8f0);border-radius:12px;padding:14px 16px">
+          <label style="display:flex;align-items:center;gap:8px;font-weight:700;cursor:pointer">
+            <input type="checkbox" id="f-guide"> Thuê hướng dẫn viên (HDV nội địa)
+          </label>
+          <p class="form-hint" style="margin:6px 0 0">1.500.000 ₫/ngày (8 tiếng). Làm thêm giờ phụ thu 200.000 ₫/tiếng.</p>
+          <div id="guide-opts" style="display:none;margin-top:10px">
+            <label class="form-label" for="f-guide-hours">Số tiếng HDV làm việc mỗi ngày</label>
+            <select id="f-guide-hours" class="form-input">
+              <option value="8">8 tiếng (giá chuẩn)</option>
+              <option value="9">9 tiếng (+1 tiếng)</option>
+              <option value="10">10 tiếng (+2 tiếng)</option>
+              <option value="11">11 tiếng (+3 tiếng)</option>
+              <option value="12">12 tiếng (+4 tiếng)</option>
+            </select>
+            <div class="form-hint" id="f-guide-cost" style="margin-top:8px;font-weight:600"></div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="f-desc">Ghi chú / Mô tả</label>
+          <textarea id="f-desc" class="form-textarea" placeholder="Ghi chú về chuyến đi..."></textarea>
+        </div>
+        <input type="hidden" id="f-edit-id">
+        <div class="form-actions">
+          <button type="button" class="btn btn-outline" id="cancel-trip-form">Hủy</button>
+          <button type="button" class="btn btn-outline" id="btn-import-trip" onclick="ImportModule.openImportDialog()">📂 Nhập từ file</button>
+          <button type="button" class="btn btn-outline" id="btn-export-trip" onclick="ExportModule.openExportDialog()">📤 Xuất file</button>
+          <button type="submit" class="btn btn-accent" id="f-submit-btn">Tạo chuyến đi</button>
+        </div>
+      </form>
+    </div></div>
+  </section>

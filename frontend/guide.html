@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Hướng dẫn viên | Travel</title>
+    <link rel="icon" href="img/favicon/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="img/favicon/favicon-32.png" />
+    <link rel="stylesheet" href="css/reset.css" />
+    <link rel="stylesheet" href="css/fonts.css" />
+    <link rel="stylesheet" href="css/guide-detail.css" />
+
+    <!-- axios (bản lưu sẵn trong lib/ để chạy được cả khi không có mạng) -->
+    <script type="importmap">
+      { "imports": { "axios": "./lib/axios.min.js" } }
+    </script>
+  </head>
+  <body>
+    <header class="header">
+      <div class="container">
+        <a href="index.html" class="logo">Travel</a>
+        <a href="index.html#/guides" class="back">← Danh sách hướng dẫn viên</a>
+      </div>
+    </header>
+
+    <main>
+      <div class="container">
+        <div id="guideLoading" class="loading">
+          <div class="spinner"></div>
+          <p>Đang tải hồ sơ...</p>
+        </div>
+        <div id="guideError" class="error hidden"></div>
+        <div id="guideDetail" class="hidden"></div>
+      </div>
+    </main>
+
+    <script type="module" src="./js/guide-detail.js"></script>
+  </body>
+</html>

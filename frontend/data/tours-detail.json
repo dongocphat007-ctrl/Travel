@@ -1,0 +1,1993 @@
+{
+  "tours": [
+    {
+      "id": 101,
+      "name": "Hà Nội – Hạ Long 3N2Đ",
+      "price": 2500000,
+      "region": "Miền Bắc",
+      "cat": "Thiên nhiên",
+      "emoji": "🏝️",
+      "desc": "Khám phá vịnh Hạ Long kỳ vĩ được UNESCO công nhận",
+      "rc": "north",
+      "guide": "guided",
+      "duration": "3 ngày 2 đêm",
+      "groupSize": "10–25 người",
+      "difficulty": "Nhẹ nhàng",
+      "tags": [
+        "UNESCO",
+        "Du thuyền",
+        "Biển"
+      ],
+      "highlight": "Vịnh Hạ Long · Hang Sửng Sốt · Đảo Ti Tốp · Chèo kayak",
+      "imageQuery": "Vịnh Hạ Long",
+      "itinerary": [
+        {
+          "day": 1,
+          "title": "Hà Nội – Hạ Long",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Xe đón tại Hà Nội, khởi hành đi Quảng Ninh"
+            },
+            {
+              "time": "Trưa",
+              "desc": "Lên du thuyền, ăn trưa hải sản trên vịnh"
+            },
+            {
+              "time": "Chiều",
+              "desc": "Tham quan hang Sửng Sốt, chèo kayak"
+            },
+            {
+              "time": "Tối",
+              "desc": "Ăn tối và nghỉ đêm trên du thuyền"
+            }
+          ]
+        },
+        {
+          "day": 2,
+          "title": "Khám phá vịnh",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Tập Thái Cực Quyền trên boong, thăm làng chài"
+            },
+            {
+              "time": "Trưa",
+              "desc": "Ăn trưa, tắm biển đảo Ti Tốp"
+            },
+            {
+              "time": "Chiều",
+              "desc": "Leo đỉnh Ti Tốp ngắm toàn cảnh vịnh"
+            },
+            {
+              "time": "Tối",
+              "desc": "Tự do dạo phố đêm Bãi Cháy"
+            }
+          ]
+        },
+        {
+          "day": 3,
+          "title": "Hạ Long – Hà Nội",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Ăn sáng, trả phòng, tham quan thêm điểm cuối"
+            },
+            {
+              "time": "Trưa",
+              "desc": "Ăn trưa"
+            },
+            {
+              "time": "Chiều",
+              "desc": "Xe đưa về Hà Nội, kết thúc chương trình"
+            }
+          ]
+        }
+      ],
+      "includes": [
+        "Xe du lịch đưa đón theo chương trình",
+        "Khách sạn tiêu chuẩn (2 đêm, 2 khách/phòng)",
+        "Các bữa ăn theo chương trình (2 bữa sáng, các bữa chính theo lịch trình)",
+        "Vé tham quan các điểm trong chương trình",
+        "Hướng dẫn viên suốt tuyến",
+        "Bảo hiểm du lịch nội địa",
+        "Nước suối mỗi ngày"
+      ],
+      "excludes": [
+        "Chi phí cá nhân, mua sắm",
+        "Phụ thu phòng đơn",
+        "Đồ uống ngoài chương trình",
+        "VAT (nếu cần xuất hoá đơn)",
+        "Tiền tip cho HDV và tài xế (tuỳ tâm)",
+        "Vé máy bay/tàu/xe đến nơi tập trung (nếu khởi hành từ tỉnh khác)"
+      ],
+      "pickup": "Điểm hẹn trung tâm Hà Nội (HDV và xe đón đoàn). Giờ và địa điểm cụ thể được gửi qua SĐT/Zalo trước ngày đi 1 ngày; đón tận nơi trong nội thành vui lòng liên hệ để báo phụ thu.",
+      "cancelNote": "Hủy tour tính theo số ngày từ lúc báo hủy đến ngày khởi hành. Có thể đổi sang ngày khác miễn phí nếu báo sớm và còn chỗ.",
+      "departures": {
+        "mode": "weekly",
+        "weekdays": [
+          4,
+          6
+        ],
+        "everyWeeks": 1,
+        "time": "06:00"
+      }
+    },
+    {
+      "id": 102,
+      "name": "Đà Nẵng – Hội An 4N3Đ",
+      "price": 3800000,
+      "region": "Miền Trung",
+      "cat": "Văn hóa",
+      "emoji": "🏮",
+      "desc": "Phố cổ Hội An huyền ảo và bãi biển Mỹ Khê sôi động",
+      "rc": "central",
+      "guide": "self",
+      "duration": "4 ngày 3 đêm",
+      "groupSize": "Linh hoạt",
+      "difficulty": "Nhẹ nhàng",
+      "tags": [
+        "Phố cổ",
+        "Biển",
+        "Ẩm thực"
+      ],
+      "highlight": "Bà Nà Hills · Cầu Vàng · Phố cổ Hội An · Biển Mỹ Khê",
+      "imageQuery": "Hội An",
+      "guideFee": 1500000,
+      "itinerary": [
+        {
+          "day": 1,
+          "title": "Đến Đà Nẵng",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Đáp sân bay, nhận phòng"
+            },
+            {
+              "time": "Chiều",
+              "desc": "Tắm biển Mỹ Khê, ngắm hoàng hôn"
+            },
+            {
+              "time": "Tối",
+              "desc": "Ăn mì Quảng, bánh tráng cuốn thịt heo, dạo cầu Rồng"
+            }
+          ]
+        },
+        {
+          "day": 2,
+          "title": "Bà Nà Hills",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Cáp treo lên Bà Nà Hills, check-in Cầu Vàng"
+            },
+            {
+              "time": "Trưa",
+              "desc": "Ăn trưa tại khu du lịch"
+            },
+            {
+              "time": "Chiều",
+              "desc": "Làng Pháp, vườn hoa, về lại thành phố"
+            }
+          ]
+        },
+        {
+          "day": 3,
+          "title": "Hội An",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Di chuyển đến Hội An, tham quan Chùa Cầu, nhà cổ"
+            },
+            {
+              "time": "Chiều",
+              "desc": "Thuê xe đạp qua làng rau Trà Quế"
+            },
+            {
+              "time": "Tối",
+              "desc": "Thả hoa đăng sông Hoài, ăn cao lầu"
+            }
+          ]
+        },
+        {
+          "day": 4,
+          "title": "Ngũ Hành Sơn",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Thăm Ngũ Hành Sơn, mua quà"
+            },
+            {
+              "time": "Trưa",
+              "desc": "Ăn trưa và ra sân bay"
+            }
+          ]
+        }
+      ],
+      "includes": [
+        "Lịch trình chi tiết theo từng ngày",
+        "Gợi ý ăn uống & điểm tham quan",
+        "Ước tính chi phí từng điểm",
+        "Linh hoạt sắp xếp theo ý thích"
+      ],
+      "excludes": [
+        "Vé máy bay / xe khách",
+        "Khách sạn (tự đặt)",
+        "Vé tham quan và chi phí ăn uống",
+        "Hướng dẫn viên (có thể thuê thêm khi đặt tour)",
+        "Bảo hiểm du lịch"
+      ],
+      "pickup": "Không có xe đón – bạn tự di chuyển đến Đà Nẵng – Hội An 4N3Đ. Điểm bắt đầu và gợi ý nơi lưu trú xem ở Ngày 1 của lịch trình.",
+      "cancelNote": "Tour tự túc: Travel không giữ dịch vụ thay bạn. Khoản đã đặt trực tiếp với khách sạn/vé tham quan theo chính sách của từng đơn vị.",
+      "departures": {
+        "mode": "flexible",
+        "note": "Tự chọn ngày đi – khởi hành mọi ngày"
+      }
+    },
+    {
+      "id": 103,
+      "name": "Sapa – Fansipan 3N2Đ",
+      "price": 2800000,
+      "region": "Miền Bắc",
+      "cat": "Khám phá",
+      "emoji": "⛰️",
+      "desc": "Chinh phục đỉnh Fansipan – nóc nhà Đông Dương",
+      "rc": "north",
+      "guide": "guided",
+      "duration": "3 ngày 2 đêm",
+      "groupSize": "8–20 người",
+      "difficulty": "Trung bình",
+      "tags": [
+        "Núi",
+        "Săn mây",
+        "Dân tộc"
+      ],
+      "highlight": "Đỉnh Fansipan · Bản Cát Cát · Thác Bạc · Ruộng bậc thang",
+      "imageQuery": "Sa Pa",
+      "itinerary": [
+        {
+          "day": 1,
+          "title": "Hà Nội – Sapa",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Xe khởi hành từ Hà Nội đi Sapa"
+            },
+            {
+              "time": "Trưa",
+              "desc": "Ăn trưa dọc đường"
+            },
+            {
+              "time": "Chiều",
+              "desc": "Nhận phòng, tham quan bản Cát Cát"
+            },
+            {
+              "time": "Tối",
+              "desc": "Ăn thắng cố, lẩu cá hồi"
+            }
+          ]
+        },
+        {
+          "day": 2,
+          "title": "Chinh phục Fansipan",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Cáp treo lên đỉnh Fansipan 3.143 m"
+            },
+            {
+              "time": "Trưa",
+              "desc": "Ăn trưa trên núi"
+            },
+            {
+              "time": "Chiều",
+              "desc": "Dạo thị trấn, mua đồ thổ cẩm"
+            },
+            {
+              "time": "Tối",
+              "desc": "Tự do khám phá chợ đêm"
+            }
+          ]
+        },
+        {
+          "day": 3,
+          "title": "Thác Bạc – về Hà Nội",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Tham quan Thác Bạc, ruộng bậc thang"
+            },
+            {
+              "time": "Trưa",
+              "desc": "Ăn trưa"
+            },
+            {
+              "time": "Chiều",
+              "desc": "Xe về Hà Nội, kết thúc chương trình"
+            }
+          ]
+        }
+      ],
+      "includes": [
+        "Xe du lịch đưa đón theo chương trình",
+        "Khách sạn tiêu chuẩn (2 đêm, 2 khách/phòng)",
+        "Các bữa ăn theo chương trình (2 bữa sáng, các bữa chính theo lịch trình)",
+        "Vé tham quan các điểm trong chương trình",
+        "Hướng dẫn viên suốt tuyến",
+        "Bảo hiểm du lịch nội địa",
+        "Nước suối mỗi ngày"
+      ],
+      "excludes": [
+        "Chi phí cá nhân, mua sắm",
+        "Phụ thu phòng đơn",
+        "Đồ uống ngoài chương trình",
+        "VAT (nếu cần xuất hoá đơn)",
+        "Tiền tip cho HDV và tài xế (tuỳ tâm)",
+        "Vé máy bay/tàu/xe đến nơi tập trung (nếu khởi hành từ tỉnh khác)"
+      ],
+      "pickup": "Điểm hẹn trung tâm Hà Nội (HDV và xe đón đoàn). Giờ và địa điểm cụ thể được gửi qua SĐT/Zalo trước ngày đi 1 ngày; đón tận nơi trong nội thành vui lòng liên hệ để báo phụ thu.",
+      "cancelNote": "Hủy tour tính theo số ngày từ lúc báo hủy đến ngày khởi hành. Có thể đổi sang ngày khác miễn phí nếu báo sớm và còn chỗ.",
+      "departures": {
+        "mode": "weekly",
+        "weekdays": [
+          4
+        ],
+        "everyWeeks": 1,
+        "time": "06:00"
+      }
+    },
+    {
+      "id": 104,
+      "name": "Cần Thơ – Miền Tây 2N1Đ",
+      "price": 1500000,
+      "region": "Miền Nam",
+      "cat": "Văn hóa",
+      "emoji": "🛶",
+      "desc": "Chợ nổi Cái Răng và miền Tây sông nước trù phú",
+      "rc": "south",
+      "guide": "self",
+      "duration": "2 ngày 1 đêm",
+      "groupSize": "Linh hoạt",
+      "difficulty": "Rất nhẹ",
+      "tags": [
+        "Sông nước",
+        "Chợ nổi",
+        "Ẩm thực"
+      ],
+      "highlight": "Chợ nổi Cái Răng · Vườn trái cây · Bến Ninh Kiều",
+      "imageQuery": "Chợ nổi Cái Răng",
+      "guideFee": 800000,
+      "itinerary": [
+        {
+          "day": 1,
+          "title": "TP.HCM – Cần Thơ",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Xe đi Cần Thơ, dừng chân ăn sáng"
+            },
+            {
+              "time": "Chiều",
+              "desc": "Nhận phòng, dạo bến Ninh Kiều"
+            },
+            {
+              "time": "Tối",
+              "desc": "Ăn lẩu mắm, bánh xèo"
+            }
+          ]
+        },
+        {
+          "day": 2,
+          "title": "Chợ nổi Cái Răng",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Thuyền đi chợ nổi lúc 5h30, ăn hủ tiếu trên ghe"
+            },
+            {
+              "time": "Trưa",
+              "desc": "Tham quan vườn trái cây, nhà cổ Bình Thủy"
+            },
+            {
+              "time": "Chiều",
+              "desc": "Xe về lại TP.HCM"
+            }
+          ]
+        }
+      ],
+      "includes": [
+        "Lịch trình chi tiết theo từng ngày",
+        "Gợi ý ăn uống & điểm tham quan",
+        "Ước tính chi phí từng điểm",
+        "Linh hoạt sắp xếp theo ý thích"
+      ],
+      "excludes": [
+        "Vé máy bay / xe khách",
+        "Khách sạn (tự đặt)",
+        "Vé tham quan và chi phí ăn uống",
+        "Hướng dẫn viên (có thể thuê thêm khi đặt tour)",
+        "Bảo hiểm du lịch"
+      ],
+      "pickup": "Không có xe đón – bạn tự di chuyển đến Cần Thơ – Miền Tây 2N1Đ. Điểm bắt đầu và gợi ý nơi lưu trú xem ở Ngày 1 của lịch trình.",
+      "cancelNote": "Tour tự túc: Travel không giữ dịch vụ thay bạn. Khoản đã đặt trực tiếp với khách sạn/vé tham quan theo chính sách của từng đơn vị.",
+      "departures": {
+        "mode": "flexible",
+        "note": "Tự chọn ngày đi – khởi hành mọi ngày"
+      }
+    },
+    {
+      "id": 105,
+      "name": "Phú Quốc 4N3Đ",
+      "price": 5500000,
+      "region": "Miền Nam",
+      "cat": "Biển đảo",
+      "emoji": "🌊",
+      "desc": "Thiên đường biển đảo – cát trắng nước xanh ngọc bích",
+      "rc": "south",
+      "guide": "guided",
+      "duration": "4 ngày 3 đêm",
+      "groupSize": "10–25 người",
+      "difficulty": "Nhẹ nhàng",
+      "tags": [
+        "Biển",
+        "Lặn ngắm san hô",
+        "Nghỉ dưỡng"
+      ],
+      "highlight": "Bãi Sao · Hòn Thơm · Grand World · Chợ đêm Dương Đông",
+      "imageQuery": "Phú Quốc",
+      "itinerary": [
+        {
+          "day": 1,
+          "title": "Đến Phú Quốc",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Bay đến Phú Quốc, nhận phòng"
+            },
+            {
+              "time": "Chiều",
+              "desc": "Tắm biển Bãi Dài"
+            },
+            {
+              "time": "Tối",
+              "desc": "Chợ đêm Dương Đông, hải sản"
+            }
+          ]
+        },
+        {
+          "day": 2,
+          "title": "Nam đảo",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Cano đi ngắm san hô Hòn Móng Tay"
+            },
+            {
+              "time": "Chiều",
+              "desc": "Bãi Sao, Hòn Thơm, cáp treo vượt biển"
+            },
+            {
+              "time": "Tối",
+              "desc": "Xem show Kiss of the Sea"
+            }
+          ]
+        },
+        {
+          "day": 3,
+          "title": "Bắc đảo",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Nhà thùng nước mắm, vườn tiêu"
+            },
+            {
+              "time": "Chiều",
+              "desc": "Gành Dầu, ngắm hoàng hôn Bãi Vòng"
+            },
+            {
+              "time": "Tối",
+              "desc": "Tự do"
+            }
+          ]
+        },
+        {
+          "day": 4,
+          "title": "Tạm biệt đảo",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Mua đặc sản ngọc trai, rượu sim"
+            },
+            {
+              "time": "Trưa",
+              "desc": "Ra sân bay, kết thúc"
+            }
+          ]
+        }
+      ],
+      "includes": [
+        "Xe du lịch đưa đón theo chương trình",
+        "Khách sạn tiêu chuẩn (3 đêm, 2 khách/phòng)",
+        "Vé tàu/cano và áo phao khi ra đảo (nếu có trong chương trình)",
+        "Các bữa ăn theo chương trình (3 bữa sáng, các bữa chính theo lịch trình)",
+        "Vé tham quan các điểm trong chương trình",
+        "Hướng dẫn viên suốt tuyến",
+        "Bảo hiểm du lịch nội địa",
+        "Nước suối mỗi ngày"
+      ],
+      "excludes": [
+        "Chi phí cá nhân, mua sắm",
+        "Phụ thu phòng đơn",
+        "Đồ uống ngoài chương trình",
+        "VAT (nếu cần xuất hoá đơn)",
+        "Tiền tip cho HDV và tài xế (tuỳ tâm)",
+        "Vé máy bay/tàu/xe đến nơi tập trung (nếu khởi hành từ tỉnh khác)"
+      ],
+      "pickup": "Điểm hẹn trung tâm TP. Hồ Chí Minh (HDV và xe đón đoàn). Giờ và địa điểm cụ thể được gửi qua SĐT/Zalo trước ngày đi 1 ngày; đón tận nơi trong nội thành vui lòng liên hệ để báo phụ thu.",
+      "cancelNote": "Hủy tour tính theo số ngày từ lúc báo hủy đến ngày khởi hành. Có thể đổi sang ngày khác miễn phí nếu báo sớm và còn chỗ.",
+      "departures": {
+        "mode": "weekly",
+        "weekdays": [
+          5
+        ],
+        "everyWeeks": 1,
+        "time": "06:30"
+      }
+    },
+    {
+      "id": 106,
+      "name": "Ninh Bình – Tràng An 2N1Đ",
+      "price": 1800000,
+      "region": "Miền Bắc",
+      "cat": "Thiên nhiên",
+      "emoji": "🌿",
+      "desc": "Di sản UNESCO Tràng An và hệ thống hang động huyền bí",
+      "rc": "north",
+      "guide": "self",
+      "duration": "2 ngày 1 đêm",
+      "groupSize": "Linh hoạt",
+      "difficulty": "Nhẹ nhàng",
+      "tags": [
+        "UNESCO",
+        "Hang động",
+        "Thuyền"
+      ],
+      "highlight": "Tràng An · Hang Múa · Chùa Bái Đính · Tam Cốc",
+      "imageQuery": "Tràng An",
+      "guideFee": 900000,
+      "itinerary": [
+        {
+          "day": 1,
+          "title": "Hà Nội – Ninh Bình",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Xe đi Ninh Bình, tham quan chùa Bái Đính"
+            },
+            {
+              "time": "Chiều",
+              "desc": "Đi thuyền qua các hang động Tràng An"
+            },
+            {
+              "time": "Tối",
+              "desc": "Ăn cơm cháy, dê núi"
+            }
+          ]
+        },
+        {
+          "day": 2,
+          "title": "Hang Múa – Tam Cốc",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Leo 500 bậc lên Hang Múa ngắm toàn cảnh"
+            },
+            {
+              "time": "Trưa",
+              "desc": "Đạp xe quanh Tam Cốc"
+            },
+            {
+              "time": "Chiều",
+              "desc": "Về Hà Nội"
+            }
+          ]
+        }
+      ],
+      "includes": [
+        "Lịch trình chi tiết theo từng ngày",
+        "Gợi ý ăn uống & điểm tham quan",
+        "Ước tính chi phí từng điểm",
+        "Linh hoạt sắp xếp theo ý thích"
+      ],
+      "excludes": [
+        "Vé máy bay / xe khách",
+        "Khách sạn (tự đặt)",
+        "Vé tham quan và chi phí ăn uống",
+        "Hướng dẫn viên (có thể thuê thêm khi đặt tour)",
+        "Bảo hiểm du lịch"
+      ],
+      "pickup": "Không có xe đón – bạn tự di chuyển đến Ninh Bình – Tràng An 2N1Đ. Điểm bắt đầu và gợi ý nơi lưu trú xem ở Ngày 1 của lịch trình.",
+      "cancelNote": "Tour tự túc: Travel không giữ dịch vụ thay bạn. Khoản đã đặt trực tiếp với khách sạn/vé tham quan theo chính sách của từng đơn vị.",
+      "departures": {
+        "mode": "flexible",
+        "note": "Tự chọn ngày đi – khởi hành mọi ngày"
+      }
+    },
+    {
+      "id": 107,
+      "name": "Nha Trang 3N2Đ",
+      "price": 3200000,
+      "region": "Miền Trung",
+      "cat": "Biển đảo",
+      "emoji": "🏖️",
+      "desc": "Thành phố biển sôi động với hải sản tươi ngon",
+      "rc": "central",
+      "guide": "guided",
+      "duration": "3 ngày 2 đêm",
+      "groupSize": "10–30 người",
+      "difficulty": "Nhẹ nhàng",
+      "tags": [
+        "Biển",
+        "Đảo",
+        "Hải sản"
+      ],
+      "highlight": "Tour 4 đảo · Tháp Bà Ponagar · Vinpearl · Hải sản Hòn Chồng",
+      "imageQuery": "Nha Trang",
+      "itinerary": [
+        {
+          "day": 1,
+          "title": "Đến Nha Trang",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Đến Nha Trang, nhận phòng"
+            },
+            {
+              "time": "Chiều",
+              "desc": "Tháp Bà Ponagar, tắm bùn khoáng"
+            },
+            {
+              "time": "Tối",
+              "desc": "Ăn hải sản, dạo biển"
+            }
+          ]
+        },
+        {
+          "day": 2,
+          "title": "Tour 4 đảo",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Cano đi Hòn Mun, lặn ngắm san hô"
+            },
+            {
+              "time": "Trưa",
+              "desc": "Ăn trưa trên đảo"
+            },
+            {
+              "time": "Chiều",
+              "desc": "Bãi Tranh, làng chài Hòn Miễu"
+            }
+          ]
+        },
+        {
+          "day": 3,
+          "title": "Tạm biệt Nha Trang",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Mua đặc sản yến sào, nem nướng"
+            },
+            {
+              "time": "Trưa",
+              "desc": "Ra sân bay"
+            }
+          ]
+        }
+      ],
+      "includes": [
+        "Xe du lịch đưa đón theo chương trình",
+        "Khách sạn tiêu chuẩn (2 đêm, 2 khách/phòng)",
+        "Vé tàu/cano và áo phao khi ra đảo (nếu có trong chương trình)",
+        "Các bữa ăn theo chương trình (2 bữa sáng, các bữa chính theo lịch trình)",
+        "Vé tham quan các điểm trong chương trình",
+        "Hướng dẫn viên suốt tuyến",
+        "Bảo hiểm du lịch nội địa",
+        "Nước suối mỗi ngày"
+      ],
+      "excludes": [
+        "Chi phí cá nhân, mua sắm",
+        "Phụ thu phòng đơn",
+        "Đồ uống ngoài chương trình",
+        "VAT (nếu cần xuất hoá đơn)",
+        "Tiền tip cho HDV và tài xế (tuỳ tâm)",
+        "Vé máy bay/tàu/xe đến nơi tập trung (nếu khởi hành từ tỉnh khác)"
+      ],
+      "pickup": "Điểm hẹn trung tâm Đà Nẵng (HDV và xe đón đoàn). Giờ và địa điểm cụ thể được gửi qua SĐT/Zalo trước ngày đi 1 ngày; đón tận nơi trong nội thành vui lòng liên hệ để báo phụ thu.",
+      "cancelNote": "Hủy tour tính theo số ngày từ lúc báo hủy đến ngày khởi hành. Có thể đổi sang ngày khác miễn phí nếu báo sớm và còn chỗ.",
+      "departures": {
+        "mode": "weekly",
+        "weekdays": [
+          5
+        ],
+        "everyWeeks": 1,
+        "time": "06:00"
+      }
+    },
+    {
+      "id": 108,
+      "name": "Đà Lạt 3N2Đ",
+      "price": 2600000,
+      "region": "Miền Trung",
+      "cat": "Nghỉ dưỡng",
+      "emoji": "🌸",
+      "desc": "Thành phố ngàn hoa mộng mơ, khí hậu mát mẻ quanh năm",
+      "rc": "central",
+      "guide": "self",
+      "duration": "3 ngày 2 đêm",
+      "groupSize": "Linh hoạt",
+      "difficulty": "Rất nhẹ",
+      "tags": [
+        "Se lạnh",
+        "Hoa",
+        "Cà phê"
+      ],
+      "highlight": "Hồ Xuân Hương · Langbiang · Thung lũng Tình Yêu · Chợ đêm",
+      "imageQuery": "Đà Lạt",
+      "guideFee": 1200000,
+      "itinerary": [
+        {
+          "day": 1,
+          "title": "Đến Đà Lạt",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Đến Đà Lạt, nhận phòng"
+            },
+            {
+              "time": "Chiều",
+              "desc": "Dạo hồ Xuân Hương, Quảng trường Lâm Viên"
+            },
+            {
+              "time": "Tối",
+              "desc": "Chợ đêm, bánh tráng nướng, sữa đậu nành"
+            }
+          ]
+        },
+        {
+          "day": 2,
+          "title": "Săn mây – vườn hoa",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Săn mây đồi Thiên Phúc Đức"
+            },
+            {
+              "time": "Trưa",
+              "desc": "Ăn trưa, vườn dâu"
+            },
+            {
+              "time": "Chiều",
+              "desc": "Thung lũng Tình Yêu, Langbiang"
+            }
+          ]
+        },
+        {
+          "day": 3,
+          "title": "Cà phê – quà",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Cà phê view đồi thông, ga Đà Lạt"
+            },
+            {
+              "time": "Trưa",
+              "desc": "Mua mứt, atiso, trở về"
+            }
+          ]
+        }
+      ],
+      "includes": [
+        "Lịch trình chi tiết theo từng ngày",
+        "Gợi ý ăn uống & điểm tham quan",
+        "Ước tính chi phí từng điểm",
+        "Linh hoạt sắp xếp theo ý thích"
+      ],
+      "excludes": [
+        "Vé máy bay / xe khách",
+        "Khách sạn (tự đặt)",
+        "Vé tham quan và chi phí ăn uống",
+        "Hướng dẫn viên (có thể thuê thêm khi đặt tour)",
+        "Bảo hiểm du lịch"
+      ],
+      "pickup": "Không có xe đón – bạn tự di chuyển đến Đà Lạt 3N2Đ. Điểm bắt đầu và gợi ý nơi lưu trú xem ở Ngày 1 của lịch trình.",
+      "cancelNote": "Tour tự túc: Travel không giữ dịch vụ thay bạn. Khoản đã đặt trực tiếp với khách sạn/vé tham quan theo chính sách của từng đơn vị.",
+      "departures": {
+        "mode": "flexible",
+        "note": "Tự chọn ngày đi – khởi hành mọi ngày"
+      }
+    },
+    {
+      "id": 109,
+      "name": "Huế – Cố đô 3N2Đ",
+      "price": 2900000,
+      "region": "Miền Trung",
+      "cat": "Văn hóa",
+      "emoji": "🏯",
+      "desc": "Hoàng cung, lăng tẩm triều Nguyễn và ẩm thực cung đình",
+      "rc": "central",
+      "guide": "guided",
+      "duration": "3 ngày 2 đêm",
+      "groupSize": "10–25 người",
+      "difficulty": "Nhẹ nhàng",
+      "tags": [
+        "UNESCO",
+        "Lịch sử",
+        "Ẩm thực"
+      ],
+      "highlight": "Đại Nội · Lăng Khải Định · Chùa Thiên Mụ · Sông Hương",
+      "imageQuery": "Đại Nội Huế",
+      "itinerary": [
+        {
+          "day": 1,
+          "title": "Đến Huế",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Đến Huế, tham quan Đại Nội"
+            },
+            {
+              "time": "Chiều",
+              "desc": "Chùa Thiên Mụ"
+            },
+            {
+              "time": "Tối",
+              "desc": "Đi thuyền rồng sông Hương, nghe ca Huế"
+            }
+          ]
+        },
+        {
+          "day": 2,
+          "title": "Lăng tẩm",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Lăng Tự Đức, lăng Khải Định"
+            },
+            {
+              "time": "Trưa",
+              "desc": "Cơm hến, bún bò Huế"
+            },
+            {
+              "time": "Chiều",
+              "desc": "Chợ Đông Ba, mua mè xửng"
+            }
+          ]
+        },
+        {
+          "day": 3,
+          "title": "Biển Lăng Cô",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Qua đèo Hải Vân, thăm vịnh Lăng Cô"
+            },
+            {
+              "time": "Trưa",
+              "desc": "Ăn trưa và kết thúc"
+            }
+          ]
+        }
+      ],
+      "includes": [
+        "Xe du lịch đưa đón theo chương trình",
+        "Khách sạn tiêu chuẩn (2 đêm, 2 khách/phòng)",
+        "Các bữa ăn theo chương trình (2 bữa sáng, các bữa chính theo lịch trình)",
+        "Vé tham quan các điểm trong chương trình",
+        "Hướng dẫn viên suốt tuyến",
+        "Bảo hiểm du lịch nội địa",
+        "Nước suối mỗi ngày"
+      ],
+      "excludes": [
+        "Chi phí cá nhân, mua sắm",
+        "Phụ thu phòng đơn",
+        "Đồ uống ngoài chương trình",
+        "VAT (nếu cần xuất hoá đơn)",
+        "Tiền tip cho HDV và tài xế (tuỳ tâm)",
+        "Vé máy bay/tàu/xe đến nơi tập trung (nếu khởi hành từ tỉnh khác)"
+      ],
+      "pickup": "Điểm hẹn trung tâm Đà Nẵng (HDV và xe đón đoàn). Giờ và địa điểm cụ thể được gửi qua SĐT/Zalo trước ngày đi 1 ngày; đón tận nơi trong nội thành vui lòng liên hệ để báo phụ thu.",
+      "cancelNote": "Hủy tour tính theo số ngày từ lúc báo hủy đến ngày khởi hành. Có thể đổi sang ngày khác miễn phí nếu báo sớm và còn chỗ.",
+      "departures": {
+        "mode": "weekly",
+        "weekdays": [
+          5
+        ],
+        "everyWeeks": 1,
+        "time": "06:00"
+      }
+    },
+    {
+      "id": 110,
+      "name": "Hà Giang – Mã Pí Lèng 4N3Đ",
+      "price": 3600000,
+      "region": "Miền Bắc",
+      "cat": "Khám phá",
+      "emoji": "🏞️",
+      "desc": "Cung đường đèo Mã Pí Lèng hùng vĩ và cao nguyên đá Đồng Văn",
+      "rc": "north",
+      "guide": "guided",
+      "duration": "4 ngày 3 đêm",
+      "groupSize": "6–15 người",
+      "difficulty": "Khó",
+      "tags": [
+        "Phượt",
+        "Cao nguyên đá",
+        "Dân tộc"
+      ],
+      "highlight": "Cột cờ Lũng Cú · Đèo Mã Pí Lèng · Sông Nho Quế · Phố cổ Đồng Văn",
+      "imageQuery": "Đèo Mã Pí Lèng",
+      "itinerary": [
+        {
+          "day": 1,
+          "title": "Hà Nội – Hà Giang",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Xe đi Hà Giang"
+            },
+            {
+              "time": "Chiều",
+              "desc": "Cổng trời Quản Bạ, Núi Đôi"
+            },
+            {
+              "time": "Tối",
+              "desc": "Nghỉ đêm Yên Minh"
+            }
+          ]
+        },
+        {
+          "day": 2,
+          "title": "Đồng Văn",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Dinh thự họ Vương"
+            },
+            {
+              "time": "Chiều",
+              "desc": "Cột cờ Lũng Cú, phố cổ Đồng Văn"
+            },
+            {
+              "time": "Tối",
+              "desc": "Nghỉ tại Đồng Văn"
+            }
+          ]
+        },
+        {
+          "day": 3,
+          "title": "Mã Pí Lèng",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Đèo Mã Pí Lèng, đi thuyền sông Nho Quế"
+            },
+            {
+              "time": "Chiều",
+              "desc": "Về Hà Giang"
+            }
+          ]
+        },
+        {
+          "day": 4,
+          "title": "Hà Giang – Hà Nội",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Mua đặc sản mật ong, hạt dẻ"
+            },
+            {
+              "time": "Chiều",
+              "desc": "Về Hà Nội"
+            }
+          ]
+        }
+      ],
+      "includes": [
+        "Xe du lịch đưa đón theo chương trình",
+        "Khách sạn tiêu chuẩn (3 đêm, 2 khách/phòng)",
+        "Các bữa ăn theo chương trình (3 bữa sáng, các bữa chính theo lịch trình)",
+        "Vé tham quan các điểm trong chương trình",
+        "Hướng dẫn viên suốt tuyến",
+        "Bảo hiểm du lịch nội địa",
+        "Nước suối mỗi ngày",
+        "Hướng dẫn an toàn và hỗ trợ trên các đoạn đường khó"
+      ],
+      "excludes": [
+        "Chi phí cá nhân, mua sắm",
+        "Phụ thu phòng đơn",
+        "Đồ uống ngoài chương trình",
+        "VAT (nếu cần xuất hoá đơn)",
+        "Tiền tip cho HDV và tài xế (tuỳ tâm)",
+        "Vé máy bay/tàu/xe đến nơi tập trung (nếu khởi hành từ tỉnh khác)"
+      ],
+      "pickup": "Điểm hẹn trung tâm Hà Nội (HDV và xe đón đoàn). Giờ và địa điểm cụ thể được gửi qua SĐT/Zalo trước ngày đi 1 ngày; đón tận nơi trong nội thành vui lòng liên hệ để báo phụ thu.",
+      "cancelNote": "Hủy tour tính theo số ngày từ lúc báo hủy đến ngày khởi hành. Có thể đổi sang ngày khác miễn phí nếu báo sớm và còn chỗ.",
+      "departures": {
+        "mode": "weekly",
+        "weekdays": [
+          5
+        ],
+        "everyWeeks": 1,
+        "time": "06:30"
+      }
+    },
+    {
+      "id": 111,
+      "name": "Quy Nhơn – Phú Yên 4N3Đ",
+      "price": 3400000,
+      "region": "Miền Trung",
+      "cat": "Biển đảo",
+      "emoji": "🌅",
+      "desc": "Eo Gió, Kỳ Co, Gành Đá Đĩa – biển xanh hoang sơ miền Trung",
+      "rc": "central",
+      "guide": "self",
+      "duration": "4 ngày 3 đêm",
+      "groupSize": "Linh hoạt",
+      "difficulty": "Nhẹ nhàng",
+      "tags": [
+        "Biển",
+        "Check-in",
+        "Hải sản"
+      ],
+      "highlight": "Eo Gió · Kỳ Co · Gành Đá Đĩa · Mũi Điện",
+      "imageQuery": "Quy Nhơn",
+      "guideFee": 1400000,
+      "itinerary": [
+        {
+          "day": 1,
+          "title": "Đến Quy Nhơn",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Đến Quy Nhơn"
+            },
+            {
+              "time": "Chiều",
+              "desc": "Tắm biển, tháp Đôi"
+            },
+            {
+              "time": "Tối",
+              "desc": "Bún chả cá, bánh xèo tôm nhảy"
+            }
+          ]
+        },
+        {
+          "day": 2,
+          "title": "Eo Gió – Kỳ Co",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Eo Gió, Tịnh xá Ngọc Hòa"
+            },
+            {
+              "time": "Trưa",
+              "desc": "Cano ra Kỳ Co"
+            },
+            {
+              "time": "Chiều",
+              "desc": "Tắm biển, lặn ngắm san hô"
+            }
+          ]
+        },
+        {
+          "day": 3,
+          "title": "Phú Yên",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Di chuyển sang Phú Yên"
+            },
+            {
+              "time": "Chiều",
+              "desc": "Gành Đá Đĩa, nhà thờ Mằng Lăng"
+            },
+            {
+              "time": "Tối",
+              "desc": "Nghỉ Tuy Hòa"
+            }
+          ]
+        },
+        {
+          "day": 4,
+          "title": "Mũi Điện",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Ngắm bình minh Mũi Điện"
+            },
+            {
+              "time": "Trưa",
+              "desc": "Ra sân bay Tuy Hòa"
+            }
+          ]
+        }
+      ],
+      "includes": [
+        "Lịch trình chi tiết theo từng ngày",
+        "Gợi ý ăn uống & điểm tham quan",
+        "Ước tính chi phí từng điểm",
+        "Linh hoạt sắp xếp theo ý thích"
+      ],
+      "excludes": [
+        "Vé máy bay / xe khách",
+        "Khách sạn (tự đặt)",
+        "Vé tham quan và chi phí ăn uống",
+        "Hướng dẫn viên (có thể thuê thêm khi đặt tour)",
+        "Bảo hiểm du lịch"
+      ],
+      "pickup": "Không có xe đón – bạn tự di chuyển đến Quy Nhơn – Phú Yên 4N3Đ. Điểm bắt đầu và gợi ý nơi lưu trú xem ở Ngày 1 của lịch trình.",
+      "cancelNote": "Tour tự túc: Travel không giữ dịch vụ thay bạn. Khoản đã đặt trực tiếp với khách sạn/vé tham quan theo chính sách của từng đơn vị.",
+      "departures": {
+        "mode": "flexible",
+        "note": "Tự chọn ngày đi – khởi hành mọi ngày"
+      }
+    },
+    {
+      "id": 112,
+      "name": "Côn Đảo – Hành trình tâm linh 3N2Đ",
+      "price": 6200000,
+      "region": "Miền Nam",
+      "cat": "Văn hóa",
+      "emoji": "🕯️",
+      "desc": "Hòn đảo lịch sử với nghĩa trang Hàng Dương và biển hoang sơ",
+      "rc": "south",
+      "guide": "guided",
+      "duration": "3 ngày 2 đêm",
+      "groupSize": "8–20 người",
+      "difficulty": "Nhẹ nhàng",
+      "tags": [
+        "Lịch sử",
+        "Biển",
+        "Tâm linh"
+      ],
+      "highlight": "Nghĩa trang Hàng Dương · Nhà tù Côn Đảo · Bãi Đầm Trầu · Hòn Bảy Cạnh",
+      "imageQuery": "Côn Đảo",
+      "itinerary": [
+        {
+          "day": 1,
+          "title": "Đến Côn Đảo",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Bay Côn Đảo, nhận phòng"
+            },
+            {
+              "time": "Chiều",
+              "desc": "Chùa Núi Một, Miếu bà Phi Yến"
+            },
+            {
+              "time": "Tối",
+              "desc": "Viếng nghĩa trang Hàng Dương"
+            }
+          ]
+        },
+        {
+          "day": 2,
+          "title": "Di tích – biển",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Nhà tù Côn Đảo, Chuồng Cọp"
+            },
+            {
+              "time": "Chiều",
+              "desc": "Bãi Đầm Trầu, bãi Nhát"
+            },
+            {
+              "time": "Tối",
+              "desc": "Hải sản địa phương"
+            }
+          ]
+        },
+        {
+          "day": 3,
+          "title": "Hòn Bảy Cạnh",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Cano ra Hòn Bảy Cạnh lặn ngắm san hô"
+            },
+            {
+              "time": "Trưa",
+              "desc": "Ra sân bay"
+            }
+          ]
+        }
+      ],
+      "includes": [
+        "Xe du lịch đưa đón theo chương trình",
+        "Khách sạn tiêu chuẩn (2 đêm, 2 khách/phòng)",
+        "Các bữa ăn theo chương trình (2 bữa sáng, các bữa chính theo lịch trình)",
+        "Vé tham quan các điểm trong chương trình",
+        "Hướng dẫn viên suốt tuyến",
+        "Bảo hiểm du lịch nội địa",
+        "Nước suối mỗi ngày"
+      ],
+      "excludes": [
+        "Chi phí cá nhân, mua sắm",
+        "Phụ thu phòng đơn",
+        "Đồ uống ngoài chương trình",
+        "VAT (nếu cần xuất hoá đơn)",
+        "Tiền tip cho HDV và tài xế (tuỳ tâm)",
+        "Vé máy bay/tàu/xe đến nơi tập trung (nếu khởi hành từ tỉnh khác)"
+      ],
+      "pickup": "Điểm hẹn trung tâm TP. Hồ Chí Minh (HDV và xe đón đoàn). Giờ và địa điểm cụ thể được gửi qua SĐT/Zalo trước ngày đi 1 ngày; đón tận nơi trong nội thành vui lòng liên hệ để báo phụ thu.",
+      "cancelNote": "Hủy tour tính theo số ngày từ lúc báo hủy đến ngày khởi hành. Có thể đổi sang ngày khác miễn phí nếu báo sớm và còn chỗ.",
+      "departures": {
+        "mode": "weekly",
+        "weekdays": [
+          5
+        ],
+        "everyWeeks": 1,
+        "time": "06:00"
+      }
+    },
+    {
+      "id": 113,
+      "name": "Mũi Né – Phan Thiết 2N1Đ",
+      "price": 1700000,
+      "region": "Miền Nam",
+      "cat": "Biển đảo",
+      "emoji": "🏜️",
+      "desc": "Đồi cát bay, suối Tiên và biển Mũi Né",
+      "rc": "south",
+      "guide": "self",
+      "duration": "2 ngày 1 đêm",
+      "groupSize": "Linh hoạt",
+      "difficulty": "Nhẹ nhàng",
+      "tags": [
+        "Đồi cát",
+        "Lướt ván",
+        "Hải sản"
+      ],
+      "highlight": "Đồi Cát Bay · Suối Tiên · Làng chài Mũi Né · Tháp Chàm Pô Sah Inư",
+      "imageQuery": "Mũi Né",
+      "guideFee": 900000,
+      "itinerary": [
+        {
+          "day": 1,
+          "title": "TP.HCM – Mũi Né",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Xe/tàu đi Phan Thiết"
+            },
+            {
+              "time": "Chiều",
+              "desc": "Đồi cát bay, trượt cát"
+            },
+            {
+              "time": "Tối",
+              "desc": "Hải sản làng chài"
+            }
+          ]
+        },
+        {
+          "day": 2,
+          "title": "Suối Tiên",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Ngắm bình minh đồi cát đỏ, suối Tiên"
+            },
+            {
+              "time": "Chiều",
+              "desc": "Về lại TP.HCM"
+            }
+          ]
+        }
+      ],
+      "includes": [
+        "Lịch trình chi tiết theo từng ngày",
+        "Gợi ý ăn uống & điểm tham quan",
+        "Ước tính chi phí từng điểm",
+        "Linh hoạt sắp xếp theo ý thích"
+      ],
+      "excludes": [
+        "Vé máy bay / xe khách",
+        "Khách sạn (tự đặt)",
+        "Vé tham quan và chi phí ăn uống",
+        "Hướng dẫn viên (có thể thuê thêm khi đặt tour)",
+        "Bảo hiểm du lịch"
+      ],
+      "pickup": "Không có xe đón – bạn tự di chuyển đến Mũi Né – Phan Thiết 2N1Đ. Điểm bắt đầu và gợi ý nơi lưu trú xem ở Ngày 1 của lịch trình.",
+      "cancelNote": "Tour tự túc: Travel không giữ dịch vụ thay bạn. Khoản đã đặt trực tiếp với khách sạn/vé tham quan theo chính sách của từng đơn vị.",
+      "departures": {
+        "mode": "flexible",
+        "note": "Tự chọn ngày đi – khởi hành mọi ngày"
+      }
+    },
+    {
+      "id": 114,
+      "name": "Phong Nha – Kẻ Bàng 3N2Đ",
+      "price": 3100000,
+      "region": "Miền Trung",
+      "cat": "Thiên nhiên",
+      "emoji": "🦇",
+      "desc": "Hệ thống hang động đá vôi kỳ vĩ – di sản thiên nhiên thế giới",
+      "rc": "central",
+      "guide": "guided",
+      "duration": "3 ngày 2 đêm",
+      "groupSize": "8–20 người",
+      "difficulty": "Trung bình",
+      "tags": [
+        "UNESCO",
+        "Hang động",
+        "Phiêu lưu"
+      ],
+      "highlight": "Động Phong Nha · Động Thiên Đường · Sông Chày – Hang Tối · Suối Moọc",
+      "imageQuery": "Vườn quốc gia Phong Nha - Kẻ Bàng",
+      "itinerary": [
+        {
+          "day": 1,
+          "title": "Đến Đồng Hới",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Đến Quảng Bình, nhận phòng"
+            },
+            {
+              "time": "Chiều",
+              "desc": "Động Phong Nha bằng thuyền"
+            },
+            {
+              "time": "Tối",
+              "desc": "Đặc sản bánh bột lọc, cháo canh"
+            }
+          ]
+        },
+        {
+          "day": 2,
+          "title": "Thiên Đường",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Động Thiên Đường"
+            },
+            {
+              "time": "Chiều",
+              "desc": "Sông Chày – Hang Tối, zipline, chèo kayak"
+            }
+          ]
+        },
+        {
+          "day": 3,
+          "title": "Suối Moọc",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Tắm suối Moọc, thư giãn"
+            },
+            {
+              "time": "Trưa",
+              "desc": "Kết thúc chương trình"
+            }
+          ]
+        }
+      ],
+      "includes": [
+        "Xe du lịch đưa đón theo chương trình",
+        "Khách sạn tiêu chuẩn (2 đêm, 2 khách/phòng)",
+        "Các bữa ăn theo chương trình (2 bữa sáng, các bữa chính theo lịch trình)",
+        "Vé tham quan các điểm trong chương trình",
+        "Hướng dẫn viên suốt tuyến",
+        "Bảo hiểm du lịch nội địa",
+        "Nước suối mỗi ngày"
+      ],
+      "excludes": [
+        "Chi phí cá nhân, mua sắm",
+        "Phụ thu phòng đơn",
+        "Đồ uống ngoài chương trình",
+        "VAT (nếu cần xuất hoá đơn)",
+        "Tiền tip cho HDV và tài xế (tuỳ tâm)",
+        "Vé máy bay/tàu/xe đến nơi tập trung (nếu khởi hành từ tỉnh khác)"
+      ],
+      "pickup": "Điểm hẹn trung tâm Đà Nẵng (HDV và xe đón đoàn). Giờ và địa điểm cụ thể được gửi qua SĐT/Zalo trước ngày đi 1 ngày; đón tận nơi trong nội thành vui lòng liên hệ để báo phụ thu.",
+      "cancelNote": "Hủy tour tính theo số ngày từ lúc báo hủy đến ngày khởi hành. Có thể đổi sang ngày khác miễn phí nếu báo sớm và còn chỗ.",
+      "departures": {
+        "mode": "weekly",
+        "weekdays": [
+          4
+        ],
+        "everyWeeks": 1,
+        "time": "06:00"
+      }
+    },
+    {
+      "id": 115,
+      "name": "Mộc Châu 2N1Đ",
+      "price": 1400000,
+      "region": "Miền Bắc",
+      "cat": "Nghỉ dưỡng",
+      "emoji": "🌼",
+      "desc": "Cao nguyên xanh với đồi chè, hoa mận và nông trại bò sữa",
+      "rc": "north",
+      "guide": "self",
+      "duration": "2 ngày 1 đêm",
+      "groupSize": "Linh hoạt",
+      "difficulty": "Rất nhẹ",
+      "tags": [
+        "Đồi chè",
+        "Hoa",
+        "Check-in"
+      ],
+      "highlight": "Đồi chè trái tim · Thác Dải Yếm · Cầu kính Bạch Long · Nông trường bò sữa",
+      "imageQuery": "Mộc Châu",
+      "guideFee": 700000,
+      "itinerary": [
+        {
+          "day": 1,
+          "title": "Hà Nội – Mộc Châu",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Xe đi Mộc Châu"
+            },
+            {
+              "time": "Chiều",
+              "desc": "Đồi chè trái tim, nông trường bò sữa"
+            },
+            {
+              "time": "Tối",
+              "desc": "Thịt trâu gác bếp, rau cải mèo"
+            }
+          ]
+        },
+        {
+          "day": 2,
+          "title": "Dải Yếm – Bạch Long",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Thác Dải Yếm, vườn hoa"
+            },
+            {
+              "time": "Trưa",
+              "desc": "Cầu kính Bạch Long"
+            },
+            {
+              "time": "Chiều",
+              "desc": "Về Hà Nội"
+            }
+          ]
+        }
+      ],
+      "includes": [
+        "Lịch trình chi tiết theo từng ngày",
+        "Gợi ý ăn uống & điểm tham quan",
+        "Ước tính chi phí từng điểm",
+        "Linh hoạt sắp xếp theo ý thích"
+      ],
+      "excludes": [
+        "Vé máy bay / xe khách",
+        "Khách sạn (tự đặt)",
+        "Vé tham quan và chi phí ăn uống",
+        "Hướng dẫn viên (có thể thuê thêm khi đặt tour)",
+        "Bảo hiểm du lịch"
+      ],
+      "pickup": "Không có xe đón – bạn tự di chuyển đến Mộc Châu 2N1Đ. Điểm bắt đầu và gợi ý nơi lưu trú xem ở Ngày 1 của lịch trình.",
+      "cancelNote": "Tour tự túc: Travel không giữ dịch vụ thay bạn. Khoản đã đặt trực tiếp với khách sạn/vé tham quan theo chính sách của từng đơn vị.",
+      "departures": {
+        "mode": "flexible",
+        "note": "Tự chọn ngày đi – khởi hành mọi ngày"
+      }
+    },
+    {
+      "id": 116,
+      "name": "TP.HCM – Củ Chi – Cần Giờ 2N1Đ",
+      "price": 1600000,
+      "region": "Miền Nam",
+      "cat": "Văn hóa",
+      "emoji": "🌆",
+      "desc": "Địa đạo Củ Chi, Dinh Độc Lập và rừng ngập mặn Cần Giờ",
+      "rc": "south",
+      "guide": "self",
+      "duration": "2 ngày 1 đêm",
+      "groupSize": "Linh hoạt",
+      "difficulty": "Rất nhẹ",
+      "tags": [
+        "Lịch sử",
+        "Rừng ngập mặn",
+        "Ẩm thực"
+      ],
+      "highlight": "Địa đạo Củ Chi · Dinh Độc Lập · Chợ Bến Thành · Rừng Sác Cần Giờ",
+      "imageQuery": "Dinh Độc Lập",
+      "guideFee": 800000,
+      "itinerary": [
+        {
+          "day": 1,
+          "title": "Nội thành",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Dinh Độc Lập, Bưu điện, Nhà thờ Đức Bà"
+            },
+            {
+              "time": "Chiều",
+              "desc": "Chợ Bến Thành, phố đi bộ Nguyễn Huệ"
+            },
+            {
+              "time": "Tối",
+              "desc": "Ăn phở, cơm tấm, cà phê Sài Gòn"
+            }
+          ]
+        },
+        {
+          "day": 2,
+          "title": "Củ Chi hoặc Cần Giờ",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Địa đạo Củ Chi hoặc rừng Sác Cần Giờ"
+            },
+            {
+              "time": "Chiều",
+              "desc": "Về lại thành phố"
+            }
+          ]
+        }
+      ],
+      "includes": [
+        "Lịch trình chi tiết theo từng ngày",
+        "Gợi ý ăn uống & điểm tham quan",
+        "Ước tính chi phí từng điểm",
+        "Linh hoạt sắp xếp theo ý thích"
+      ],
+      "excludes": [
+        "Vé máy bay / xe khách",
+        "Khách sạn (tự đặt)",
+        "Vé tham quan và chi phí ăn uống",
+        "Hướng dẫn viên (có thể thuê thêm khi đặt tour)",
+        "Bảo hiểm du lịch"
+      ],
+      "pickup": "Không có xe đón – bạn tự di chuyển đến TP.HCM – Củ Chi – Cần Giờ 2N1Đ. Điểm bắt đầu và gợi ý nơi lưu trú xem ở Ngày 1 của lịch trình.",
+      "cancelNote": "Tour tự túc: Travel không giữ dịch vụ thay bạn. Khoản đã đặt trực tiếp với khách sạn/vé tham quan theo chính sách của từng đơn vị.",
+      "departures": {
+        "mode": "flexible",
+        "note": "Tự chọn ngày đi – khởi hành mọi ngày"
+      }
+    },
+    {
+      "id": 117,
+      "name": "Cô Tô – Đảo xanh 3N2Đ",
+      "price": 3300000,
+      "region": "Miền Bắc",
+      "cat": "Biển đảo",
+      "emoji": "🏝️",
+      "desc": "Hòn đảo hoang sơ ở Quảng Ninh với bãi Hồng Vàn, hải đăng Cô Tô",
+      "rc": "north",
+      "guide": "guided",
+      "duration": "3 ngày 2 đêm",
+      "groupSize": "10–25 người",
+      "difficulty": "Nhẹ nhàng",
+      "tags": [
+        "Biển",
+        "Hải đăng",
+        "Hoàng hôn"
+      ],
+      "highlight": "Bãi Hồng Vàn · Hải đăng Cô Tô · Bãi Vàn Chảy · Đảo Thanh Lân",
+      "imageQuery": "Cô Tô",
+      "itinerary": [
+        {
+          "day": 1,
+          "title": "Hà Nội – Cô Tô",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Xe đi Vân Đồn, tàu cao tốc ra Cô Tô"
+            },
+            {
+              "time": "Chiều",
+              "desc": "Bãi Hồng Vàn"
+            },
+            {
+              "time": "Tối",
+              "desc": "Hải sản tươi sống"
+            }
+          ]
+        },
+        {
+          "day": 2,
+          "title": "Vòng quanh đảo",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Hải đăng Cô Tô, ngắm bình minh"
+            },
+            {
+              "time": "Chiều",
+              "desc": "Bãi Vàn Chảy, Thanh Lân"
+            }
+          ]
+        },
+        {
+          "day": 3,
+          "title": "Cô Tô – Hà Nội",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Mua đặc sản sá sùng, mực khô"
+            },
+            {
+              "time": "Trưa",
+              "desc": "Tàu về đất liền, xe về Hà Nội"
+            }
+          ]
+        }
+      ],
+      "includes": [
+        "Xe du lịch đưa đón theo chương trình",
+        "Khách sạn tiêu chuẩn (2 đêm, 2 khách/phòng)",
+        "Vé tàu/cano và áo phao khi ra đảo (nếu có trong chương trình)",
+        "Các bữa ăn theo chương trình (2 bữa sáng, các bữa chính theo lịch trình)",
+        "Vé tham quan các điểm trong chương trình",
+        "Hướng dẫn viên suốt tuyến",
+        "Bảo hiểm du lịch nội địa",
+        "Nước suối mỗi ngày"
+      ],
+      "excludes": [
+        "Chi phí cá nhân, mua sắm",
+        "Phụ thu phòng đơn",
+        "Đồ uống ngoài chương trình",
+        "VAT (nếu cần xuất hoá đơn)",
+        "Tiền tip cho HDV và tài xế (tuỳ tâm)",
+        "Vé máy bay/tàu/xe đến nơi tập trung (nếu khởi hành từ tỉnh khác)"
+      ],
+      "pickup": "Điểm hẹn trung tâm Hà Nội (HDV và xe đón đoàn). Giờ và địa điểm cụ thể được gửi qua SĐT/Zalo trước ngày đi 1 ngày; đón tận nơi trong nội thành vui lòng liên hệ để báo phụ thu.",
+      "cancelNote": "Hủy tour tính theo số ngày từ lúc báo hủy đến ngày khởi hành. Có thể đổi sang ngày khác miễn phí nếu báo sớm và còn chỗ.",
+      "departures": {
+        "mode": "weekly",
+        "weekdays": [
+          5
+        ],
+        "everyWeeks": 1,
+        "time": "06:00"
+      }
+    },
+    {
+      "id": 118,
+      "name": "Hà Nội – Phố cổ & Ẩm thực 2N1Đ",
+      "price": 1800000,
+      "region": "Miền Bắc",
+      "dest": "Hà Nội",
+      "cat": "Văn hóa",
+      "emoji": "🏯",
+      "desc": "Một vòng thủ đô nghìn năm văn hiến: phố cổ, Văn Miếu, Hồ Gươm và những món ngon đặc trưng như phở, bún chả, cà phê trứng",
+      "rc": "north",
+      "guide": "guided",
+      "duration": "2 ngày 1 đêm",
+      "groupSize": "8–20 người",
+      "difficulty": "Rất nhẹ",
+      "tags": [
+        "Văn hóa",
+        "Ẩm thực",
+        "Phố cổ",
+        "Lịch sử"
+      ],
+      "highlight": "Hồ Hoàn Kiếm · Phố cổ 36 phố phường · Văn Miếu · Hoàng thành Thăng Long · Ẩm thực đường phố",
+      "imageQuery": "Hồ Hoàn Kiếm Hà Nội",
+      "guideFee": 0,
+      "itinerary": [
+        {
+          "day": 1,
+          "title": "Hồ Gươm – Phố cổ – Văn Miếu",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Đón khách, tham quan Lăng Chủ tịch Hồ Chí Minh, Chùa Một Cột, Phủ Chủ tịch"
+            },
+            {
+              "time": "Trưa",
+              "desc": "Ăn trưa bún chả Hương Liên"
+            },
+            {
+              "time": "Chiều",
+              "desc": "Văn Miếu – Quốc Tử Giám, Hoàng thành Thăng Long"
+            },
+            {
+              "time": "Tối",
+              "desc": "Dạo phố cổ, thưởng thức cà phê trứng, xem múa rối nước"
+            }
+          ]
+        },
+        {
+          "day": 2,
+          "title": "Hồ Tây – Làng nghề – Ẩm thực",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Ăn sáng phở Hà Nội, tham quan Chùa Trấn Quốc, dạo Hồ Tây"
+            },
+            {
+              "time": "Trưa",
+              "desc": "Ăn trưa chả cá Lã Vọng"
+            },
+            {
+              "time": "Chiều",
+              "desc": "Làng gốm Bát Tràng, mua quà, kết thúc chương trình"
+            }
+          ]
+        }
+      ],
+      "includes": [
+        "Xe du lịch đưa đón theo chương trình",
+        "Khách sạn tiêu chuẩn (1 đêm, 2 khách/phòng)",
+        "Các bữa ăn theo chương trình (1 bữa sáng, các bữa chính theo lịch trình)",
+        "Vé tham quan các điểm trong chương trình",
+        "Hướng dẫn viên suốt tuyến",
+        "Bảo hiểm du lịch nội địa",
+        "Nước suối mỗi ngày"
+      ],
+      "excludes": [
+        "Chi phí cá nhân, mua sắm",
+        "Phụ thu phòng đơn",
+        "Đồ uống ngoài chương trình",
+        "VAT (nếu cần xuất hoá đơn)",
+        "Tiền tip cho HDV và tài xế (tuỳ tâm)",
+        "Vé máy bay/tàu/xe đến nơi tập trung (nếu khởi hành từ tỉnh khác)"
+      ],
+      "pickup": "Điểm hẹn trung tâm Hà Nội (HDV và xe đón đoàn). Giờ và địa điểm cụ thể được gửi qua SĐT/Zalo trước ngày đi 1 ngày; đón tận nơi trong nội thành vui lòng liên hệ để báo phụ thu.",
+      "cancelNote": "Hủy tour tính theo số ngày từ lúc báo hủy đến ngày khởi hành. Có thể đổi sang ngày khác miễn phí nếu báo sớm và còn chỗ.",
+      "departures": {
+        "mode": "weekly",
+        "weekdays": [
+          5
+        ],
+        "everyWeeks": 1,
+        "time": "06:00"
+      }
+    },
+    {
+      "id": 119,
+      "name": "Tây Nguyên – Buôn Ma Thuột – Pleiku 4N3Đ",
+      "price": 3900000,
+      "region": "Miền Trung",
+      "dest": "Tây Nguyên",
+      "cat": "Văn hóa",
+      "emoji": "🐘",
+      "desc": "Hành trình đại ngàn Tây Nguyên: không gian văn hóa cồng chiêng UNESCO, cà phê Buôn Ma Thuột, thác nước hùng vĩ và buôn làng người Ê Đê, Ba Na",
+      "rc": "center",
+      "guide": "guided",
+      "duration": "4 ngày 3 đêm",
+      "groupSize": "8–16 người",
+      "difficulty": "Trung bình",
+      "tags": [
+        "Văn hóa",
+        "Cồng chiêng",
+        "Cà phê",
+        "Thiên nhiên"
+      ],
+      "highlight": "Cồng chiêng Tây Nguyên · Thác Dray Nur · Buôn Đôn · Biển Hồ · Cà phê Buôn Ma Thuột",
+      "imageQuery": "Buôn Ma Thuột",
+      "guideFee": 0,
+      "itinerary": [
+        {
+          "day": 1,
+          "title": "Đến Buôn Ma Thuột",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Bay đến Buôn Ma Thuột, nhận phòng"
+            },
+            {
+              "time": "Chiều",
+              "desc": "Bảo tàng Đắk Lắk, Bảo tàng Thế giới Cà phê"
+            },
+            {
+              "time": "Tối",
+              "desc": "Thưởng thức cơm lam, gà nướng, cà phê phố núi"
+            }
+          ]
+        },
+        {
+          "day": 2,
+          "title": "Buôn Đôn – Thác Dray Nur",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Buôn Đôn, nhà dài người Ê Đê, thăm voi (không cưỡi)"
+            },
+            {
+              "time": "Trưa",
+              "desc": "Ăn trưa đặc sản bún đỏ, canh thụt"
+            },
+            {
+              "time": "Chiều",
+              "desc": "Thác Dray Nur – Dray Sáp, xem biểu diễn cồng chiêng"
+            },
+            {
+              "time": "Tối",
+              "desc": "Giao lưu lửa trại và rượu cần cùng buôn làng"
+            }
+          ]
+        },
+        {
+          "day": 3,
+          "title": "Buôn Ma Thuột – Pleiku",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Khởi hành đi Pleiku, ghé đồn điền cà phê"
+            },
+            {
+              "time": "Chiều",
+              "desc": "Biển Hồ (Tơ Nưng), chùa Minh Thành"
+            },
+            {
+              "time": "Tối",
+              "desc": "Phở khô Gia Lai, nghỉ đêm tại Pleiku"
+            }
+          ]
+        },
+        {
+          "day": 4,
+          "title": "Pleiku – Kon Tum – Kết thúc",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Nhà thờ Gỗ Kon Tum, cầu treo Kon Klor"
+            },
+            {
+              "time": "Trưa",
+              "desc": "Ăn trưa, mua quà đặc sản"
+            },
+            {
+              "time": "Chiều",
+              "desc": "Ra sân bay Pleiku, kết thúc chương trình"
+            }
+          ]
+        }
+      ],
+      "includes": [
+        "Xe du lịch đưa đón theo chương trình",
+        "Khách sạn tiêu chuẩn (3 đêm, 2 khách/phòng)",
+        "Các bữa ăn theo chương trình (3 bữa sáng, các bữa chính theo lịch trình)",
+        "Vé tham quan các điểm trong chương trình",
+        "Hướng dẫn viên suốt tuyến",
+        "Bảo hiểm du lịch nội địa",
+        "Nước suối mỗi ngày"
+      ],
+      "excludes": [
+        "Chi phí cá nhân, mua sắm",
+        "Phụ thu phòng đơn",
+        "Đồ uống ngoài chương trình",
+        "VAT (nếu cần xuất hoá đơn)",
+        "Tiền tip cho HDV và tài xế (tuỳ tâm)",
+        "Vé máy bay/tàu/xe đến nơi tập trung (nếu khởi hành từ tỉnh khác)"
+      ],
+      "pickup": "Điểm hẹn trung tâm Đà Nẵng (HDV và xe đón đoàn). Giờ và địa điểm cụ thể được gửi qua SĐT/Zalo trước ngày đi 1 ngày; đón tận nơi trong nội thành vui lòng liên hệ để báo phụ thu.",
+      "cancelNote": "Hủy tour tính theo số ngày từ lúc báo hủy đến ngày khởi hành. Có thể đổi sang ngày khác miễn phí nếu báo sớm và còn chỗ.",
+      "departures": {
+        "mode": "weekly",
+        "weekdays": [
+          3
+        ],
+        "everyWeeks": 1,
+        "time": "06:30"
+      }
+    },
+    {
+      "id": 120,
+      "name": "Cà Mau – Đất Mũi 3N2Đ",
+      "price": 2900000,
+      "region": "Miền Nam",
+      "dest": "Cà Mau",
+      "cat": "Thiên nhiên",
+      "emoji": "🌴",
+      "desc": "Chạm đến cực Nam Tổ quốc: cột mốc tọa độ quốc gia Mũi Cà Mau, rừng ngập mặn U Minh Hạ và ẩm thực đồng quê miền cuối đất",
+      "rc": "south",
+      "guide": "guided",
+      "duration": "3 ngày 2 đêm",
+      "groupSize": "10–20 người",
+      "difficulty": "Nhẹ nhàng",
+      "tags": [
+        "Thiên nhiên",
+        "Cực Nam",
+        "Sông nước",
+        "Rừng ngập mặn"
+      ],
+      "highlight": "Mũi Cà Mau · Cột mốc tọa độ quốc gia · Rừng U Minh Hạ · Chợ nổi Năm Căn · Cua Cà Mau",
+      "imageQuery": "Mũi Cà Mau",
+      "guideFee": 0,
+      "itinerary": [
+        {
+          "day": 1,
+          "title": "TP.HCM – Cà Mau",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Xe khởi hành từ TP.HCM đi Cà Mau, dừng chân ăn sáng"
+            },
+            {
+              "time": "Chiều",
+              "desc": "Đến Cà Mau, tham quan Khu du lịch Hòn Đá Bạc, chợ Cà Mau"
+            },
+            {
+              "time": "Tối",
+              "desc": "Ăn tối lẩu mắm U Minh, nghỉ đêm tại thành phố Cà Mau"
+            }
+          ]
+        },
+        {
+          "day": 2,
+          "title": "Đất Mũi – Rừng ngập mặn",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Đi cano qua sông Cửa Lớn đến Mũi Cà Mau, check-in cột mốc tọa độ quốc gia"
+            },
+            {
+              "time": "Trưa",
+              "desc": "Ăn trưa cua Cà Mau, cá thòi lòi nướng"
+            },
+            {
+              "time": "Chiều",
+              "desc": "Tham quan rừng ngập mặn Đất Mũi, chợ nổi Năm Căn"
+            },
+            {
+              "time": "Tối",
+              "desc": "Nghỉ tại Năm Căn, thưởng thức đờn ca tài tử"
+            }
+          ]
+        },
+        {
+          "day": 3,
+          "title": "Rừng U Minh Hạ – Về TP.HCM",
+          "items": [
+            {
+              "time": "Sáng",
+              "desc": "Đi xuồng len lỏi rừng tràm U Minh Hạ, thưởng thức mật ong rừng"
+            },
+            {
+              "time": "Trưa",
+              "desc": "Ăn trưa đặc sản, mua cá khô, tôm khô làm quà"
+            },
+            {
+              "time": "Chiều",
+              "desc": "Xe về TP.HCM, kết thúc chương trình"
+            }
+          ]
+        }
+      ],
+      "includes": [
+        "Xe du lịch đưa đón theo chương trình",
+        "Khách sạn tiêu chuẩn (2 đêm, 2 khách/phòng)",
+        "Các bữa ăn theo chương trình (2 bữa sáng, các bữa chính theo lịch trình)",
+        "Vé tham quan các điểm trong chương trình",
+        "Hướng dẫn viên suốt tuyến",
+        "Bảo hiểm du lịch nội địa",
+        "Nước suối mỗi ngày"
+      ],
+      "excludes": [
+        "Chi phí cá nhân, mua sắm",
+        "Phụ thu phòng đơn",
+        "Đồ uống ngoài chương trình",
+        "VAT (nếu cần xuất hoá đơn)",
+        "Tiền tip cho HDV và tài xế (tuỳ tâm)",
+        "Vé máy bay/tàu/xe đến nơi tập trung (nếu khởi hành từ tỉnh khác)"
+      ],
+      "pickup": "Điểm hẹn trung tâm TP. Hồ Chí Minh (HDV và xe đón đoàn). Giờ và địa điểm cụ thể được gửi qua SĐT/Zalo trước ngày đi 1 ngày; đón tận nơi trong nội thành vui lòng liên hệ để báo phụ thu.",
+      "cancelNote": "Hủy tour tính theo số ngày từ lúc báo hủy đến ngày khởi hành. Có thể đổi sang ngày khác miễn phí nếu báo sớm và còn chỗ.",
+      "departures": {
+        "mode": "weekly",
+        "weekdays": [
+          4,
+          6
+        ],
+        "everyWeeks": 1,
+        "time": "06:00"
+      }
+    }
+  ]
+}

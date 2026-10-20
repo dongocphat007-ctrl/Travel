@@ -1,0 +1,64 @@
+  <!-- PAGE: TOUR FINDER — lớp giao diện mỏng gọi TourSearch.find (cùng lõi với chatbot) -->
+  <section class="page" id="page-tour-finder">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Tìm hành trình phù hợp</h1>
+        <p class="page-sub">Kể nơi bạn muốn đến, ngân sách, số ngày và kiểu trải nghiệm. Travel chọn tối đa 12 tour có thật trong danh mục và đánh dấu vị trí trên bản đồ.</p>
+      </div>
+    </div>
+    <div class="tf-layout">
+      <div class="tf-sidebar">
+        <div class="tf-search-box">
+          <input class="tf-search-input" id="tf-search" aria-label="Mô tả tour bạn muốn tìm" placeholder="VD: 5 ngày Nhật Bản, tour Hội An...">
+          <button class="tf-search-btn" id="tf-search-btn">Tìm hành trình</button>
+          <p class="tf-search-hint">Bạn có thể viết tự nhiên, chẳng hạn: “4 ngày ở Huế, ngân sách 6 triệu, thích di sản và món địa phương”.</p>
+        </div>
+        <div class="tf-quick-searches">
+          <button class="tf-quick" onclick="document.getElementById('tf-search').value=this.textContent;document.getElementById('tf-search-btn').click()">🇯🇵 Nhật Bản 7 ngày</button>
+          <button class="tf-quick" onclick="document.getElementById('tf-search').value=this.textContent;document.getElementById('tf-search-btn').click()">Bali nghỉ dưỡng</button>
+          <button class="tf-quick" onclick="document.getElementById('tf-search').value=this.textContent;document.getElementById('tf-search-btn').click()">Hội An cổ kính</button>
+          <button class="tf-quick" onclick="document.getElementById('tf-search').value=this.textContent;document.getElementById('tf-search-btn').click()">Paris lãng mạn</button>
+        </div>
+        <div id="tf-loading" style="display:none;text-align:center;padding:30px;color:var(--muted)" role="status">Đang chọn những hành trình phù hợp…</div>
+        <div id="tf-result" hidden>
+          <p class="tf-summary" id="tf-summary"></p>
+          <div class="tf-filters" id="tf-filters" role="group" aria-label="Lọc kết quả">
+            <label>Ngân sách <select id="tf-f-budget"></select></label>
+            <label>Số ngày <select id="tf-f-days"></select></label>
+            <label>Hướng dẫn viên
+              <select id="tf-f-guide">
+                <option value="all">Tất cả</option>
+                <option value="guided">Có hướng dẫn viên</option>
+                <option value="self">Tự túc</option>
+              </select>
+            </label>
+            <label>Phạm vi
+              <select id="tf-f-scope">
+                <option value="all">Tất cả</option>
+                <option value="dom">Trong nước</option>
+                <option value="intl">Quốc tế</option>
+              </select>
+            </label>
+            <label>Sắp xếp
+              <select id="tf-f-sort">
+                <option value="rel">Phù hợp nhất</option>
+                <option value="price-asc">Giá thấp → cao</option>
+                <option value="price-desc">Giá cao → thấp</option>
+                <option value="days-asc">Ít ngày nhất</option>
+              </select>
+            </label>
+          </div>
+          <div class="tf-meta">
+            <span id="tf-count" aria-live="polite"></span>
+            <button type="button" class="tf-ask-btn" id="tf-ask-chat">💬 Hỏi chatbot để tinh chỉnh</button>
+          </div>
+        </div>
+        <div id="tf-cards"></div>
+      </div>
+      <div class="tf-map-wrap">
+        <div id="tf-map-container" style="height:100%;border-radius:12px;overflow:hidden;min-height:400px;"></div>
+        <div id="tf-map-placeholder" style="height:100%;display:flex;align-items:center;justify-content:center;color:var(--muted);border-radius:12px;background:var(--bg);border:2px dashed var(--border);">Tìm tour để hiển thị bản đồ
+        </div>
+      </div>
+    </div>
+  </section>

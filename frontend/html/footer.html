@@ -1,0 +1,83 @@
+<!-- FOOTER – mặt sau của tấm vé: lời chào, liên hệ, chính sách, phản hồi; tên thương hiệu trở lại cỡ lớn -->
+<footer class="site-footer" id="contact">
+  <div class="site-footer__inner">
+    <div class="sf-brand">
+      <p class="sf-signoff">Đi đâu cũng có người chỉ đường.</p>
+      <p class="sf-tagline">Hành trình dựng sẵn từ Bắc vào Nam và ra thế giới, giá hiển thị trước, hướng dẫn viên là người địa phương. Bạn chọn tuyến, chúng tôi lo phần còn lại.</p>
+    </div>
+    <div class="sf-col">
+      <h4 class="sf-heading">Liên hệ</h4>
+      <ul class="sf-list sf-list--contact" id="sf-contact-list">
+        <li>1800 1234</li>
+        <li>hello@travel.vn</li>
+      </ul>
+    </div>
+    <div class="sf-col">
+      <h4 class="sf-heading">Điều khoản</h4>
+      <ul class="sf-list sf-policy-links">
+        <li><a href="#page-policy" data-policy="terms">Điều khoản sử dụng</a></li>
+        <li><a href="#page-policy" data-policy="refund">Hủy và hoàn cọc</a></li>
+        <li><a href="#page-policy" data-policy="privacy">Bảo mật</a></li>
+        <li><a href="#page-policy" data-policy="contact">Liên hệ và pháp lý</a></li>
+      </ul>
+    </div>
+    <div class="sf-col sf-col--form">
+      <button class="sf-accordion-btn" id="sf-feedback-toggle" aria-expanded="false" aria-controls="sf-feedback-body">
+        Gửi phản hồi <span class="sf-acc-arrow" aria-hidden="true">▾</span>
+      </button>
+      <div class="sf-accordion-body" id="sf-feedback-body">
+        <div class="contact-success" id="contact-success">
+          <div style="font-size:15px;font-weight:700;color:#fff">Đã gửi phản hồi.</div>
+          <div style="font-size:14px;opacity:.75;margin-top:4px">Cảm ơn bạn. Chúng tôi sẽ đọc và trả lời sớm.</div>
+        </div>
+        <form id="form-contact" novalidate class="sf-form">
+          <div class="sf-form-row">
+            <div class="form-group">
+              <label class="form-label sf-label" for="cf-name">Họ và tên <span class="req">*</span></label>
+              <input type="text" id="cf-name" class="form-input sf-input" placeholder="Nguyễn Văn A">
+              <div class="form-err" id="ce-name"></div>
+            </div>
+            <div class="form-group">
+              <label class="form-label sf-label" for="cf-email">Email <span class="req">*</span></label>
+              <input type="text" id="cf-email" class="form-input sf-input" placeholder="email@example.com">
+              <div class="form-err" id="ce-email"></div>
+            </div>
+          </div>
+          <div class="sf-form-row">
+            <div class="form-group">
+              <label class="form-label sf-label" for="cf-phone">Điện thoại</label>
+              <input type="text" id="cf-phone" class="form-input sf-input" placeholder="0901 234 567">
+              <div class="form-err" id="ce-phone"></div>
+            </div>
+            <div class="form-group">
+              <label class="form-label sf-label" for="cf-topic">Chủ đề</label>
+              <select id="cf-topic" class="form-select sf-input">
+                <option value="feedback">Góp ý tính năng</option>
+                <option value="bug">Báo lỗi</option>
+                <option value="question">Câu hỏi</option>
+                <option value="other">Khác</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label sf-label" for="cf-msg">Nội dung <span class="req">*</span></label>
+            <textarea id="cf-msg" class="form-textarea sf-input" placeholder="Nhập nội dung..." style="min-height:80px"></textarea>
+            <div class="form-err" id="ce-msg"></div>
+          </div>
+          <button type="submit" class="btn btn-accent" style="width:100%">Gửi phản hồi</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="sf-bottom">
+    <span>© 2026 Travel</span>
+    <span>TP. Hồ Chí Minh, Việt Nam</span>
+    <a class="sf-facebook" href="https://www.facebook.com/phat.nguyen.914332" target="_blank" rel="noopener noreferrer" aria-label="Facebook của tác giả">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.05V9.41c0-3.02 1.79-4.69 4.53-4.69 1.31 0 2.68.24 2.68.24v2.97h-1.51c-1.49 0-1.96.93-1.96 1.88v2.26h3.33l-.53 3.49h-2.8V24C19.61 23.1 24 18.1 24 12.07z"/></svg>
+      Facebook
+    </a>
+  </div>
+  <div class="sf-wordmark" aria-hidden="true">Travel</div>
+</footer>
+
+<!-- Chatbot được khởi tạo qua chatbot.js -->

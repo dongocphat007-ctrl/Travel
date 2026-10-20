@@ -1,0 +1,39 @@
+  <!-- PAGE: WORLD MAP -->
+  <section class="page" id="page-world-map">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Bản đồ thế giới</h1>
+        <p class="page-sub">Khám phá các quốc gia và điểm đến du lịch — click vào điểm trên bản đồ để xem thông tin</p>
+      </div>
+    </div>
+    <div class="wm-layout">
+      <div class="wm-sidebar">
+        <div class="wm-search-wrap" id="wm-search-wrap">
+          <input class="wm-search" id="wm-search" aria-label="Tìm quốc gia trên bản đồ" placeholder="Tìm quốc gia">
+          <div class="wm-dropdown" id="wm-dropdown"></div>
+        </div>
+        <!-- 8.6: dropdown chọn quốc gia (gồm cả nước chỉ có trong dữ liệu tour) -->
+        <div class="wm-country-wrap">
+          <label for="wm-country-select" class="wm-label">Chọn quốc gia</label>
+          <select id="wm-country-select" class="wm-select"><option value="">Tất cả quốc gia</option></select>
+        </div>
+        <div class="wm-region-pills">
+          <button class="wm-pill active" onclick="WorldMap.filterRegion('all');this.closest('.wm-region-pills').querySelectorAll('.wm-pill').forEach(b=>b.classList.remove('active'));this.classList.add('active')">Tất cả</button>
+          <button class="wm-pill" onclick="WorldMap.filterRegion('Asia');this.closest('.wm-region-pills').querySelectorAll('.wm-pill').forEach(b=>b.classList.remove('active'));this.classList.add('active')">Châu Á</button>
+          <button class="wm-pill" onclick="WorldMap.filterRegion('Europe');this.closest('.wm-region-pills').querySelectorAll('.wm-pill').forEach(b=>b.classList.remove('active'));this.classList.add('active')">Châu Âu</button>
+          <button class="wm-pill" onclick="WorldMap.filterRegion('Americas');this.closest('.wm-region-pills').querySelectorAll('.wm-pill').forEach(b=>b.classList.remove('active'));this.classList.add('active')">Châu Mỹ</button>
+          <button class="wm-pill" onclick="WorldMap.filterRegion('Africa');this.closest('.wm-region-pills').querySelectorAll('.wm-pill').forEach(b=>b.classList.remove('active'));this.classList.add('active')">Châu Phi</button>
+          <button class="wm-pill" onclick="WorldMap.filterRegion('Oceania');this.closest('.wm-region-pills').querySelectorAll('.wm-pill').forEach(b=>b.classList.remove('active'));this.classList.add('active')">Châu Đại Dương</button>
+        </div>
+        <!-- 8.7 + 8.8: danh sách tour (lọc theo quốc gia), bấm một tour → bản đồ bay tới -->
+        <div class="wm-tours" id="wm-tours" aria-live="polite">
+          <div class="wm-tours-head"><b id="wm-tours-title">Danh sách tour</b><span id="wm-tours-count"></span></div>
+          <div class="wm-tours-list" id="wm-tours-list"></div>
+        </div>
+        <div id="wm-info-panel" class="wm-info-panel" style="display:none;"></div>
+      </div>
+      <div class="wm-map-wrap">
+        <div id="wm-map-container" style="height:100%;border-radius:12px;overflow:hidden;min-height:460px;"></div>
+      </div>
+    </div>
+  </section>

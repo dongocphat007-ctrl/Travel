@@ -1,0 +1,80 @@
+/* responsive.css – Responsive Design (Media Queries) */
+
+/* TABLET (≤ 768px) */
+@media (max-width: 768px) {
+  .nav { padding: 0 12px; }
+  .nav-logo small { display: none; }
+
+  .main { padding: 0 10px 60px; }
+
+  /* Grid collapse */
+  .budget-grid,
+  .stats-grid,
+  .two-col,
+  .feature-grid,
+  .contact-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Form row thành 1 cột */
+  .form-row { grid-template-columns: 1fr; }
+
+  /* Trip hero stack */
+  .trip-hero {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  /* Trips grid 1 hoặc 2 cột tùy màn hình */
+  .trips-grid {
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  }
+}
+
+/* MOBILE (≤ 480px) */
+@media (max-width: 480px) {
+  /* Tabs xếp dọc */
+  .tabs { flex-direction: column; }
+
+  /* Page header xếp dọc */
+  .page-header { flex-direction: column; }
+
+  /* Search bar xếp dọc */
+  .search-bar { flex-direction: column; }
+
+  /* Page title nhỏ hơn */
+  .page-title { font-size: 22px; }
+
+  /* Stats grid 2 cột trên mobile */
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+
+  /* Trips grid 1 cột */
+  .trips-grid { grid-template-columns: 1fr; }
+
+  /* Hero actions */
+  .hero-actions { flex-direction: column; align-items: flex-start; gap: 6px; }
+
+  /* Trip card actions */
+  .trip-actions { flex-wrap: wrap; }
+
+  /* About page */
+  .about-hero { padding: 32px 16px; }
+  .about-hero h2 { font-size: 26px; }
+}
+
+/* ACCESSIBILITY: Giảm chuyển động */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* PRINT */
+@media print {
+  .nav, .trip-actions, .form-actions,
+  .back-btn, .tabs, #toasts,
+  .btn-danger, .btn-accent { display: none !important; }
+  .page { display: block !important; }
+  .card { box-shadow: none; border: 1px solid #ccc; }
+}

@@ -1,0 +1,65 @@
+  <!-- PAGE: ADD/EDIT LOCATION -->
+  <section class="page" id="page-add-loc">
+    <button class="back-btn" id="back-to-detail">← Quay lại lịch trình</button>
+    <div class="page-header">
+      <div>
+        <h1 class="page-title" id="loc-form-title">Thêm địa điểm</h1>
+        <p class="page-sub" id="loc-form-sub"></p>
+      </div>
+    </div>
+    <div class="card"><div class="card-body">
+      <form id="form-loc" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="lf-name">Tên địa điểm <span class="req">*</span></label>
+          <input type="text" id="lf-name" class="form-input" placeholder="VD: Cầu Rồng, Phố cổ Hội An...">
+          <div class="form-err" id="le-name"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="lf-cat">Loại địa điểm <span class="req">*</span></label>
+            <select id="lf-cat" class="form-select">
+              <option value="landmark">🏛️ Địa danh / Thắng cảnh</option>
+              <option value="food">🍜 Ăn uống</option>
+              <option value="hotel">🏨 Chỗ ở</option>
+              <option value="transport">🚌 Di chuyển</option>
+              <option value="activity">🎯 Hoạt động vui chơi</option>
+              <option value="other">📌 Khác</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="lf-time">Thời gian</label>
+            <input type="time" id="lf-time" class="form-input">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="lf-planned">Chi phí dự kiến (VNĐ)</label>
+            <div class="num-input-wrap">
+              <input type="text" id="lf-planned" class="form-input" placeholder="0" inputmode="numeric" autocomplete="off">
+              <span class="num-suffix">₫</span>
+            </div>
+            <div class="form-err" id="le-planned"></div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="lf-actual">Chi phí thực tế (VNĐ)</label>
+            <div class="num-input-wrap">
+              <input type="text" id="lf-actual" class="form-input" placeholder="0" inputmode="numeric" autocomplete="off">
+              <span class="num-suffix">₫</span>
+            </div>
+            <div class="form-err" id="le-actual"></div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="lf-note">Ghi chú</label>
+          <textarea id="lf-note" class="form-textarea" placeholder="Địa chỉ, giờ mở cửa, mẹo du lịch..."></textarea>
+        </div>
+        <input type="hidden" id="lf-trip-id">
+        <input type="hidden" id="lf-day-id">
+        <input type="hidden" id="lf-loc-id">
+        <div class="form-actions">
+          <button type="button" class="btn btn-outline" id="cancel-loc-form">Hủy</button>
+          <button type="submit" class="btn btn-accent" id="lf-submit">Thêm địa điểm</button>
+        </div>
+      </form>
+    </div></div>
+  </section>

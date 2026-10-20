@@ -1,0 +1,94 @@
+<!-- LOGIN MODAL -->
+<div class="overlay" id="modal-login">
+  <div class="login-card">
+    <button class="login-close-btn" id="login-close-btn" title="Đóng">✕</button>
+    <div class="login-logo"><img class="brand-logo brand-logo--login" src="img/favicon/logo.png" alt="Travel" width="84" height="84"></div>
+    <h2 class="login-title">Travel</h2>
+    <p class="login-sub" id="login-sub-msg">Đăng nhập để tiếp tục đặt tour và quản lý những chuyến đi đã lưu.</p>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-login-btn">Đăng nhập</button>
+      <button class="auth-tab" id="tab-register-btn">Đăng ký</button>
+    </div>
+    <div id="panel-login">
+      <div class="form-group" style="margin-bottom:14px">
+        <label class="form-label" for="li-email">Email</label>
+        <input type="email" id="li-email" class="form-input" placeholder="example@email.com" autocomplete="email">
+        <div class="form-err" id="err-li-email"></div>
+      </div>
+      <div class="form-group" style="margin-bottom:6px">
+        <label class="form-label" for="li-pass">Mật khẩu</label>
+        <div class="pass-wrap">
+          <input type="password" id="li-pass" class="form-input" placeholder="Nhập mật khẩu" autocomplete="current-password">
+          <button type="button" class="pass-toggle" data-target="li-pass">👁</button>
+        </div>
+        <div class="form-err" id="err-li-pass"></div>
+      </div>
+      <div class="form-err auth-err" id="err-li-general"></div>
+      <button class="btn btn-accent" id="btn-do-login" style="width:100%;margin-top:16px;padding:12px">Đăng nhập</button>
+      <div class="login-divider" style="margin:20px 0">hoặc đăng nhập bằng</div>
+      <div class="login-btns">
+        <div id="google-signin-wrapper" style="display:flex;justify-content:center;margin-bottom:4px">
+          <div id="g_id_signin_btn"></div>
+        </div>
+        <button class="btn-facebook btn-oauth-pending" id="btn-fb-login">
+          <svg width="20" height="20" viewBox="0 0 32 32" fill="white"><path d="M16 2C8.268 2 2 8.268 2 16c0 6.989 5.12 12.772 11.818 13.817V20.03h-3.554v-4.03h3.554v-3.073c0-3.51 2.09-5.447 5.29-5.447 1.532 0 3.135.273 3.135.273V11.2h-1.766c-1.74 0-2.282 1.08-2.282 2.187V16h3.883l-.62 4.03h-3.263v9.787C24.88 28.772 30 22.989 30 16c0-7.732-6.268-14-14-14z"/></svg>
+          Tiếp tục với Facebook
+          <span class="oauth-badge">Sắp ra mắt</span>
+        </button>
+      </div>
+    </div>
+    <div id="panel-register" style="display:none">
+      <div class="form-group" style="margin-bottom:14px">
+        <label class="form-label" for="reg-name">Họ và tên <span class="req">*</span></label>
+        <input type="text" id="reg-name" class="form-input" placeholder="VD: Nguyễn Văn An" autocomplete="name">
+        <div class="form-err" id="err-reg-name"></div>
+      </div>
+      <div class="form-group" style="margin-bottom:14px">
+        <label class="form-label" for="reg-email">Email <span class="req">*</span></label>
+        <input type="email" id="reg-email" class="form-input" placeholder="tenban@gmail.com" autocomplete="email">
+        <div class="form-err" id="err-reg-email"></div>
+      </div>
+      <div class="form-group" style="margin-bottom:6px">
+        <label class="form-label" for="reg-pass">Mật khẩu <span class="req">*</span></label>
+        <div class="pass-wrap">
+          <input type="password" id="reg-pass" class="form-input" placeholder="Tối thiểu 6 ký tự" autocomplete="new-password">
+          <button type="button" class="pass-toggle" data-target="reg-pass">👁</button>
+        </div>
+        <div class="form-err" id="err-reg-pass"></div>
+      </div>
+      <div class="form-group" style="margin-bottom:6px">
+        <label class="form-label" for="reg-pass2">Xác nhận mật khẩu <span class="req">*</span></label>
+        <div class="pass-wrap">
+          <input type="password" id="reg-pass2" class="form-input" placeholder="Nhập lại mật khẩu" autocomplete="new-password">
+          <button type="button" class="pass-toggle" data-target="reg-pass2">👁</button>
+        </div>
+        <div class="form-err" id="err-reg-pass2"></div>
+      </div>
+      <div class="form-err auth-err" id="err-reg-general"></div>
+      <button class="btn btn-accent" id="btn-do-register" style="width:100%;margin-top:16px;padding:12px">📧 Gửi mã xác nhận</button>
+    </div>
+    <div id="panel-otp" style="display:none">
+      <div class="otp-info-box">
+        <div class="otp-info-icon">📬</div>
+        <p class="otp-info-text">Mã xác nhận 6 chữ số đã được gửi tới</p>
+        <p class="otp-email-display" id="otp-email-display"></p>
+        <p class="otp-info-sub">Kiểm tra hộp thư đến (hoặc thư rác). Mã có hiệu lực trong <strong>5 phút</strong>.</p>
+      </div>
+      <div class="form-group" style="margin-bottom:6px;margin-top:18px">
+        <label class="form-label" for="otp-input">Mã OTP</label>
+        <input type="text" id="otp-input" class="form-input otp-input-field" placeholder="_ _ _ _ _ _" maxlength="6" autocomplete="one-time-code" inputmode="numeric">
+        <div class="form-err" id="err-otp"></div>
+      </div>
+      <div class="form-err auth-err" id="err-otp-general"></div>
+      <button class="btn btn-accent" id="btn-verify-otp" style="width:100%;margin-top:16px;padding:12px">✅ Xác nhận & Tạo tài khoản</button>
+      <div class="otp-resend-wrap">
+        <span class="otp-resend-label">Không nhận được mã?</span>
+        <button class="otp-resend-btn" id="btn-resend-otp" disabled>Gửi lại (<span id="otp-countdown">60</span>s)</button>
+      </div>
+      <button class="otp-back-btn" id="btn-back-to-register">← Quay lại chỉnh sửa</button>
+    </div>
+    <p class="login-legal-note">
+      Bằng cách tiếp tục, bạn đồng ý với Điều khoản sử dụng của Travel
+    </p>
+  </div>
+</div>
