@@ -230,6 +230,10 @@ const Staff = (() => {
   function gate(inner) { document.body.innerHTML = `<div class="gate"><div class="box">${inner}</div></div>`; }
 
   function loginScreen(cfg, msg) {
+    try {
+      localStorage.removeItem("travel_auth_v1");
+      localStorage.removeItem("travel_session_v1");
+    } catch (e) {}
     // 1 chỗ đăng nhập duy nhất: chuyển hướng về modal đăng nhập trang chủ
     const target = encodeURIComponent(location.pathname + location.search + location.hash);
     location.href = `/?login=1&redirect=${target}`;

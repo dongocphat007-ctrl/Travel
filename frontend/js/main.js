@@ -855,11 +855,6 @@ function requireAuth(callback) {
 
 // ROUTER – Điều hướng trang
 function navigate(page, opts = {}) { // Default parameter (ES6+)
-  const staffLanding = staffHomeUrl(Auth.getUser());
-  if (staffLanding) {
-    location.replace(staffLanding);
-    return;
-  }
   PAGES.forEach(p => $id(`page-${p}`)?.classList.toggle("active", p === page));
 
   // forEach() – cập nhật nav active
