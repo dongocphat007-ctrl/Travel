@@ -3,28 +3,32 @@
  *   GuidePicker.attach({ select, row, msg, getDate, getDays, isNeeded }) → { refresh, getValue }
  * Guide bận (trùng ngày trong khoảng [ngày đi, ngày đi + số ngày tour)) hoặc "Tạm nghỉ" bị khoá (disabled).
  * Việc kiểm tra thật nằm ở SERVER (POST /api/bookings); ở đây chỉ để người dùng thấy trước.
- * Phụ thuộc: shared/guide-availability.js (GuideAvailability), data-api.js (Api)
+ * Phụ thuộc: shared/guide-availability.js (GuideAvailability), api-client.js (Api)
  */
 const GuidePicker = (() => {
   let cache = null, loading = null;
   const dmy = d => d.split("-").reverse().join("/");
 
-  // Lấy danh sách guide: server trước, không có server thì đọc file mẫu (giống trang Hướng dẫn viên)
+  // Lấy danh sách guide: đọc file hồ sơ ở frontend trước; lịch bận thật (đơn đã đặt) chỉ server biết nên hỏi server để cập nhật ngày bận
   async function load(force) {
     if (!force && cache) return cache;
     if (loading && !force) return loading;
     loading = (async () => {
       let list = null;
       try {
+        const res = await fetch("data/guides-seed.json");
+        const j = res.ok ? await res.json() : null;
+        if (Array.isArray(j)) list = j;
+      } catch (e) { /* file không đọc được → hỏi server bên dưới */ }
+      let live = null;
+      try {
         const r = await Api.get("/api/guides");
-        if (r.ok && Array.isArray(r.data.guides)) list = r.data.guides;
-      } catch (e) { /* thử file mẫu */ }
-      if (!list) {
-        try {
-          const res = await fetch("data/guides-seed.json");
-          const j = res.ok ? await res.json() : [];
-          list = Array.isArray(j) ? j : [];
-        } catch (e) { list = []; }
+        if (r.ok && Array.isArray(r.data.guides)) live = r.data.guides;
+      } catch (e) { /* không có server */ }
+      if (!list) list = live || [];
+      else if (live) {
+        const byId = new Map(live.map(g => [g.id, g]));
+        list = list.map(g => byId.has(g.id) ? Object.assign({}, g, { busyDates: byId.get(g.id).busyDates || g.busyDates }) : g);
       }
       cache = list; loading = null;
       return list;
@@ -52,10 +56,15 @@ const GuidePicker = (() => {
       none.value = ""; none.textContent = "— Để công ty sắp xếp giúp —";
       sel.appendChild(none);
 
-      guides.forEach(g => {
+      // HDV đúng khu vực của tour xếp lên trước (giữ nguyên thứ tự trong cùng nhóm)
+      const region = ctx.getRegion ? ctx.getRegion() : "";
+      const fits = g => !!region && (g.regions || []).includes(region);
+      const ordered = guides.filter(fits).concat(guides.filter(g => !fits(g)));
+
+      ordered.forEach(g => {
         const o = document.createElement("option");
         o.value = g.id;
-        let label = g.name + " · " + (g.experience || 0) + " năm · " + (g.languages || []).join("/");
+        let label = g.name + (g.rating ? " · ★" + Number(g.rating).toFixed(1) : "") + " · " + (g.experience || 0) + " năm · " + (g.languages || []).join("/") + (fits(g) ? " · đúng khu vực" : "");
         if (g.status === "off") { o.disabled = true; label += " — tạm nghỉ"; }
         else if (date && !GuideAvailability.isFreeRange(g, date, days)) {
           o.disabled = true;

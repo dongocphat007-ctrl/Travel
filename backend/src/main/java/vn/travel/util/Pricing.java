@@ -13,6 +13,9 @@ public final class Pricing {
 
     public static final int DEPOSIT_PCT = 20;
     public static final double CHILD_HALF_RATE = 0.5;
+    /** Dưới tuổi này = em bé (miễn phí); từ đây đến dưới CHILD_HALF_UNDER = trẻ em (50%); từ CHILD_HALF_UNDER = người lớn. Khớp js/constants.js. */
+    public static final int CHILD_FREE_UNDER = 5;
+    public static final int CHILD_HALF_UNDER = 11;
     public static final long GUIDE_DAY_FEE = 1_500_000L;
     public static final int GUIDE_DAY_HOURS = 8;
     public static final long GUIDE_EXTRA_HOUR_FEE = 200_000L;

@@ -1,7 +1,58 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="160" height="160" role="img" aria-label="VT">
-  <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#10B981"/><stop offset="1" stop-color="#047857"/></linearGradient></defs>
-  <rect width="160" height="160" fill="url(#g)"/>
-  <circle cx="80" cy="64" r="26" fill="rgba(255,255,255,.28)"/>
-  <path d="M28 160c0-30 23-50 52-50s52 20 52 50z" fill="rgba(255,255,255,.28)"/>
-  <text x="80" y="92" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="30" font-weight="700" fill="#fff">VT</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240">
+  <defs>
+    <linearGradient id="bg_mn01" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="50%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#334155"/>
+    </linearGradient>
+    <linearGradient id="skin_mn01" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fbd8b5"/>
+      <stop offset="100%" stop-color="#e2b186"/>
+    </linearGradient>
+    <linearGradient id="shirt_mn01" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0284c7"/>
+      <stop offset="100%" stop-color="#0369a1"/>
+    </linearGradient>
+    <filter id="shadow_mn01" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+  <rect width="240" height="240" rx="120" fill="url(#bg_mn01)"/>
+  <!-- Decorative halo -->
+  <circle cx="120" cy="120" r="108" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="2"/>
+  
+  <!-- Shoulders & Shirt -->
+  <path d="M48 240c0-42 32-68 72-68s72 26 72 68z" fill="url(#shirt_mn01)" filter="url(#shadow_mn01)"/>
+  <!-- Collar & Neck -->
+  <path d="M102 145h36v34h-36z" fill="#d49e70"/>
+  <path d="M96 172l24 22 24-22-12-6-12 10-12-10z" fill="#0c4a6e"/>
+  <path d="M110 182l10 12 10-12z" fill="#f8fafc"/>
+  
+  <!-- Head & Ears -->
+  <ellipse cx="76" cy="116" rx="7" ry="12" fill="#e2b186"/>
+  <ellipse cx="164" cy="116" rx="7" ry="12" fill="#e2b186"/>
+  <ellipse cx="120" cy="114" rx="42" ry="50" fill="url(#skin_mn01)"/>
+  
+  <!-- Hair (modern side-part) -->
+  <path d="M76 102c0-30 20-48 44-48 26 0 46 16 46 40 0 10-4 18-8 22-2-12-10-22-24-26-16-4-32 2-46 6-6 2-10 4-12 6z" fill="#1e1e24"/>
+  
+  <!-- Eyebrows -->
+  <path d="M92 98c6-3 16-2 20 2" stroke="#1e1e24" stroke-width="3" stroke-linecap="round" fill="none"/>
+  <path d="M128 100c4-4 14-5 20-2" stroke="#1e1e24" stroke-width="3" stroke-linecap="round" fill="none"/>
+  
+  <!-- Eyes -->
+  <ellipse cx="102" cy="110" rx="4.5" ry="5" fill="#1e1e24"/>
+  <circle cx="104" cy="108" r="1.5" fill="#fff"/>
+  <ellipse cx="138" cy="110" rx="4.5" ry="5" fill="#1e1e24"/>
+  <circle cx="140" cy="108" r="1.5" fill="#fff"/>
+  
+  <!-- Nose & Smile -->
+  <path d="M120 114v12l5 2" stroke="#c08c62" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+  <path d="M106 138c6 8 22 8 28 0" stroke="#a1623a" stroke-width="3" stroke-linecap="round" fill="none"/>
+  <path d="M108 138c5 5 19 5 24 0" fill="#fff"/>
+  
+  <!-- Guide Badge Lanyard -->
+  <path d="M112 190l8 16 8-16" stroke="#f59e0b" stroke-width="3" fill="none"/>
+  <rect x="110" y="206" width="20" height="26" rx="3" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+  <rect x="113" y="210" width="14" height="8" fill="#0284c7"/>
 </svg>

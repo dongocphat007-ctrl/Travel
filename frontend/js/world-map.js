@@ -128,8 +128,12 @@ const WorldMap = (() => {
     mapInst.flyTo([t.lat, t.lng], t.zoom || 9, { duration: 1.2, easeLinearity: 0.3 });
     clearTourMarker();
     const esc = x => String(x == null ? "" : x).replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
+    // NEW-13: popup đầy đủ (ảnh, giá, ★ đánh giá, lượt đặt, nút Xem chi tiết) khi có id tour; thiếu module → popup gọn cũ
+    const rich = t.id != null && window.TourPopup;
+    if (rich) TourPopup.bindMap(mapInst);
     tourMarker = L.marker([t.lat, t.lng], { zIndexOffset: 1200 }).addTo(mapInst)
-      .bindPopup(`<strong>${esc(t.name)}</strong>${t.note ? `<br><small>${esc(t.note)}</small>` : ""}`).openPopup();
+      .bindPopup(rich ? TourPopup.html(t) : `<strong>${esc(t.name)}</strong>${t.note ? `<br><small>${esc(t.note)}</small>` : ""}`, rich ? { maxWidth: 260, minWidth: 240 } : {})
+      .openPopup();
     return true;
   }
 

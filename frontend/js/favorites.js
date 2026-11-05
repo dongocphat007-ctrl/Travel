@@ -7,7 +7,7 @@
  *   11.7  mở trang với ?tour=ID → chuyển tới đúng tour (config.openTour; mặc định đổi hash sang config.tourUrl(id))
  * Gắn vào card: thêm vào phần tử gốc của card tour trong template   data-tour-card="<tourId>"
  *   (hoặc đổi TravelFav.config.cardSelector / getTourId cho khớp markup có sẵn).  Dữ liệu tour cho trang Yêu thích: config.getTours (mặc định GET /api/tours).
- * Phần thuần (createListStore, renderFavoriteCards…) chạy được trong Node:  node scripts/test-favorites.js
+ * Phần thuần (createListStore, renderFavoriteCards…) không phụ thuộc DOM nên có thể nạp bằng require() trong Node để thử
  */
 (function (root, factory) {
   if (typeof module === "object" && module.exports) module.exports = factory(null);
@@ -66,11 +66,26 @@
     return api;
   }
 
-  /** Chuẩn hoá 1 tour từ API về { id, name, image, price, duration } (chỉnh alias cho khớp dữ liệu thật). */
+  /** Chuẩn hoá 1 tour từ API về { id, name, image, price, duration... } (chỉnh alias cho khớp dữ liệu thật). */
   function tourView(t) {
     t = t || {};
     var dur = t.duration != null ? t.duration : t.days;
     var rt = t.rating != null ? t.rating : (t.avgRating != null ? t.avgRating : t.stars);
+    var dest = [t.destination, t.location, t.place, t.region, t.city].filter(function (x) { return typeof x === "string" && x; })[0] || "";
+    var uses = t.uses != null ? t.uses : (t.bookingCount != null ? t.bookingCount : (t.orders != null ? t.orders : null));
+    var hotel = t.hotel || t.accommodation || (t.desc && String(t.desc).toLowerCase().indexOf("du thuyền") !== -1 ? "Du thuyền tiêu chuẩn" : "Khách sạn 3–4 sao");
+    var trans = t.transport || t.vehicle || (t.region === "Quốc tế" ? "Máy bay khứ hồi" : "Xe du lịch đời mới");
+    var itin = "";
+    if (Array.isArray(t.itinerary) && t.itinerary.length) {
+      itin = t.itinerary.map(function (it, idx) { return (it.title || ("Ngày " + (idx + 1))); }).join(" → ");
+    } else if (typeof t.itinerary === "string") {
+      itin = t.itinerary;
+    } else if (t.highlight) {
+      itin = t.highlight;
+    }
+    var gt = t.guideType === "international" || t.region === "Quốc tế" ? "HDV Quốc tế" : (t.guideType === "domestic" || t.guide === "guided" || t.guide ? "HDV Nội địa" : "Theo chương trình");
+    var cancel = t.cancellationPolicy || t.cancelPolicy || "Hoàn 100% trước 7 ngày, 50% trước 3 ngày";
+
     return {
       id: String(t.tourId != null ? t.tourId : t.id), name: t.name || t.title || "",
       image: t.image || t.img || t.thumbnail || (Array.isArray(t.images) ? t.images[0] : "") || "",
@@ -79,10 +94,17 @@
       duration: typeof dur === "number" ? dur + " ngày" : (dur || ""),
       ratingNum: isFinite(parseFloat(rt)) && parseFloat(rt) > 0 ? parseFloat(rt) : null,
       reviews: t.reviewCount != null ? t.reviewCount : (t.reviews != null && typeof t.reviews !== "object" ? t.reviews : null),
-      location: [t.location, t.destination, t.place, t.region, t.city].filter(function (x) { return typeof x === "string" && x; })[0] || "",
+      location: dest,
+      destination: dest,
       departure: t.departure || t.startDate || t.date || "",
-      transport: t.transport || t.vehicle || "",
-      groupSize: t.groupSize != null ? t.groupSize : (t.maxPeople != null ? t.maxPeople : "")
+      transport: trans,
+      hotel: hotel,
+      groupSize: t.groupSize != null ? t.groupSize : (t.maxPeople != null ? t.maxPeople : ""),
+      uses: uses != null ? uses + " lượt" : "",
+      usesNum: uses != null ? Number(uses) : null,
+      itinerarySummary: itin,
+      guideTypeDisplay: gt,
+      cancellationPolicy: cancel
     };
   }
 
@@ -118,7 +140,7 @@
     return out;
   }
 
-  // ── 11.5 bảng so sánh ──
+  // ── 11.5 / 12.2 / 12.3 bảng so sánh mở rộng ──
   function shareBtn(id, name) { return '<button type="button" class="fv-share" data-share-id="' + escapeHtml(id) + '" aria-label="Chia sẻ tour' + (name ? ": " + escapeHtml(name) : "") + '" title="Chia sẻ"><span aria-hidden="true">⤴</span></button>'; }
   /** Các hàng của bảng: [{ label, cells:[text…], best:index|-1 }]. Hàng không tour nào có dữ liệu thì bỏ. */
   function compareRows(views) {
@@ -129,12 +151,15 @@
     }
     var defs = [
       { label: "Giá", get: function (v) { return v.price; }, best: best("priceNum", -1) },
-      { label: "Thời gian", get: function (v) { return v.duration; } },
+      { label: "Số ngày", get: function (v) { return v.duration; } },
+      { label: "Điểm đến", get: function (v) { return v.destination || v.location; } },
       { label: "Đánh giá", get: function (v) { return v.ratingNum != null ? v.ratingNum.toFixed(1) + " ★" + (v.reviews != null ? " (" + v.reviews + ")" : "") : ""; }, best: best("ratingNum", 1) },
-      { label: "Địa điểm", get: function (v) { return v.location; } },
-      { label: "Khởi hành", get: function (v) { return v.departure; } },
+      { label: "Lượt dùng tour", get: function (v) { return v.uses; }, best: best("usesNum", 1) },
       { label: "Phương tiện", get: function (v) { return v.transport; } },
-      { label: "Số khách", get: function (v) { return v.groupSize === "" ? "" : String(v.groupSize); } }
+      { label: "Khách sạn", get: function (v) { return v.hotel; } },
+      { label: "Lịch trình tóm tắt", get: function (v) { return v.itinerarySummary; } },
+      { label: "Loại HDV", get: function (v) { return v.guideTypeDisplay; } },
+      { label: "Chính sách hủy", get: function (v) { return v.cancellationPolicy; } }
     ];
     return defs.map(function (d) { return { label: d.label, cells: views.map(d.get), best: d.best == null ? -1 : d.best }; })
       .filter(function (r) { return r.cells.some(function (c) { return c !== ""; }); });

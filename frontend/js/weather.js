@@ -4,7 +4,7 @@
  *   Weather.fetchWeather(lat, lon)  → { temperature, unit, code, description, icon, isDay, time, lat, lon }
  *   Weather.parseCurrent(json)      → như trên, từ JSON thô của Open-Meteo (thuần, test được)
  *   Weather.describeCode(code, isDay) → { description, icon }  (mã thời tiết WMO)
- *   Weather.locationOf(tourId)      → { country, city, lat, lng } từ /api/locations (mục 7.1)
+ *   Weather.locationOf(tourId)      → { country, city, lat, lng } từ data/locations.json (frontend trước, /api/locations chỉ khi thiếu) (mục 7.1)
  *   Weather.parseRain(json)         → { today, hourlyMax } khả năng mưa % (mục 7.5)
  *   Weather.parseDaily(json, n)     → [{ date, tmax, tmin, code, description, icon, rain }] dự báo n ngày (mục 7.7)
  *   Weather.weatherHtml(data)       → chuỗi HTML khối thời tiết (thuần, test được) (mục 7.6)
@@ -180,16 +180,23 @@
     return parseCurrent(json);
   }
 
-  // Vị trí của tour (7.1): /api/locations, không có server thì đọc data/locations.json
-  var locCache = null;
+  // Vị trí của tour (7.1): đọc data/locations.json ở frontend trước; chỉ hỏi /api/locations khi file không đọc được
+  // hoặc tour không có trong file (tour Admin tự thêm chỉ có ở server) — hỏi server tối đa 1 lần.
+  var locCache = null, serverAsked = false;
   async function locationOf(tourId) {
     if (!locCache) {
       var list = null;
-      try { var r = await fetch("/api/locations"); if (r.ok) list = (await r.json()).locations; } catch (e) { /* thử file */ }
-      if (!list) { try { list = (await (await fetch("data/locations.json")).json()).locations; } catch (e) { list = []; } }
+      try { list = (await (await fetch("data/locations.json")).json()).locations; } catch (e) { /* hỏi server bên dưới */ }
       locCache = new Map((list || []).map(function (l) { return [String(l.tourId), l]; }));
+      if (!list || !list.length) await fromServer();
     }
-    return locCache.get(String(tourId)) || null;
+    var hit = locCache.get(String(tourId));
+    if (!hit && !serverAsked) { await fromServer(); hit = locCache.get(String(tourId)); }
+    return hit || null;
+  }
+  async function fromServer() {
+    serverAsked = true;
+    try { var r = await fetch("/api/locations"); if (r.ok) (await r.json()).locations.forEach(function (l) { locCache.set(String(l.tourId), l); }); } catch (e) { /* không có server */ }
   }
 
   return { parseRain: parseRain, parseDaily: parseDaily, weatherHtml: weatherHtml, renderWeather: renderWeather, dayLabel: dayLabel, NO_DATA: NO_DATA, fetchWeather: fetchWeather, parseCurrent: parseCurrent, describeCode: describeCode, buildUrl: buildUrl, locationOf: locationOf, WMO: WMO };

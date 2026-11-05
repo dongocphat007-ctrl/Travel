@@ -61,14 +61,28 @@ public class SessionService {
         }
     }
 
+    /** Phiên đã xác minh: userId + số phiên bản token (tăng khi đổi mật khẩu/đổi vai trò/khóa để thu hồi token cũ). */
+    public record Verified(String uid, int ver) { }
+
     public String create(String userId) {
+        return create(userId, 0);
+    }
+
+    /** Token mang theo số phiên bản của tài khoản tại lúc đăng nhập: "uid|hạn|v&lt;ver&gt;". */
+    public String create(String userId, int ver) {
         long exp = clock.millis() / 1000 + TTL_SECONDS;
-        String body = Base64.getUrlEncoder().withoutPadding().encodeToString((userId + "|" + exp).getBytes(StandardCharsets.UTF_8));
+        String body = Base64.getUrlEncoder().withoutPadding().encodeToString((userId + "|" + exp + "|v" + ver).getBytes(StandardCharsets.UTF_8));
         return body + "." + sign(body);
     }
 
     /** userId nếu token hợp lệ và chưa hết hạn, ngược lại null. */
     public String verify(String token) {
+        Verified v = verifyFull(token);
+        return v == null ? null : v.uid();
+    }
+
+    /** Như {@link #verify} nhưng trả thêm số phiên bản token (token cũ không có phần này → 0). */
+    public Verified verifyFull(String token) {
         if (token == null) return null;
         int dot = token.indexOf('.');
         if (dot <= 0) return null;
@@ -77,9 +91,17 @@ public class SessionService {
             return null;
         try {
             String raw = new String(Base64.getUrlDecoder().decode(body), StandardCharsets.UTF_8);
+            int ver = 0;
+            int lastBar = raw.lastIndexOf('|');
+            if (lastBar < 0) return null;
+            String tail = raw.substring(lastBar + 1);
+            if (tail.startsWith("v")) {
+                ver = Integer.parseInt(tail.substring(1));
+                raw = raw.substring(0, lastBar);
+            }
             int bar = raw.lastIndexOf('|');
             if (bar < 0 || Long.parseLong(raw.substring(bar + 1)) < clock.millis() / 1000) return null;
-            return raw.substring(0, bar);
+            return new Verified(raw.substring(0, bar), ver);
         } catch (IllegalArgumentException e) {
             return null;
         }

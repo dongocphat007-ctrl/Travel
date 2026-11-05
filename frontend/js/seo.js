@@ -5,8 +5,7 @@
  *   Trang riêng tư (hồ sơ, admin, tạo/sửa chuyến đi…) → <meta name="robots" content="noindex, nofollow">
  * Route chưa khai báo trong ROUTES → tiêu đề lấy từ <h1> đang hiển thị; mô tả dùng mô tả mặc định.
  * Tên tour: ngoài ?tour=ID / #/tour/ID sẽ lấy từ GET /api/tours (hoặc config.getTours) rồi dùng làm title + description.
- * Phía máy chủ (crawler không chạy JS): server/seo.js chèn cùng bộ thẻ này vào index.html cho /?tour=ID.
- *   node scripts/test-seo.js
+ * Phía máy chủ (crawler không chạy JS): TourPageController (Spring Boot) chèn cùng bộ thẻ này + JSON-LD vào index.html cho /?tour=ID.
  */
 (function (root, factory) {
   if (typeof module === "object" && module.exports) module.exports = factory(null);

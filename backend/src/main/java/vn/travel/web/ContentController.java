@@ -15,8 +15,10 @@ public class ContentController {
     private final Guides guides;
     private final Reviews reviews;
     private final CurrentUser current;
+    private final TourCatalog tours;
 
-    public ContentController(Banners banners, Stats stats, Guides guides, Reviews reviews, CurrentUser current) {
+    public ContentController(Banners banners, Stats stats, Guides guides, Reviews reviews, CurrentUser current, TourCatalog tours) {
+        this.tours = tours;
         this.banners = banners;
         this.stats = stats;
         this.guides = guides;
@@ -34,6 +36,32 @@ public class ContentController {
         return Maps.of("ok", true, "tours", stats.featured(), "serverTime", java.time.Instant.now().toString());
     }
 
+    /** NEW-13: điểm đánh giá, số đánh giá và lượt đặt của MỌI tour có số liệu (popup bản đồ). Chỉ trả số, không lộ thông tin khách. */
+    @GetMapping("/api/tours/stats")
+    public Map<String, Object> tourStats() {
+        return Maps.of("ok", true, "stats", stats.ranking());
+    }
+
+    /** Danh sách tour khách thấy: tour mẫu + tour Admin đã đồng bộ. ?group=core|bac|trung|nam|intl (bỏ trống = tất cả). */
+    @GetMapping("/api/tours")
+    public Map<String, Object> tours(@RequestParam(required = false) String group) {
+        var list = tours.list(group);
+        if (list == null) throw HttpError.bad("Nhóm tour không hợp lệ", "group");
+        return Maps.of("ok", true, "tours", list, "count", list.size());
+    }
+
+    @GetMapping("/api/tours/{id}")
+    public Map<String, Object> tour(@PathVariable String id) {
+        Map<String, Object> t = tours.publicTour(id);
+        if (t == null) throw HttpError.notFound("Không tìm thấy tour");
+        return Maps.of("ok", true, "tour", t);
+    }
+
+    @GetMapping("/api/locations")
+    public Map<String, Object> locations() {
+        return Maps.of("ok", true, "locations", tours.locations());
+    }
+
     @GetMapping("/api/guides")
     public Map<String, Object> guides() {
         return Maps.of("ok", true, "guides", guides.list());
@@ -47,8 +75,8 @@ public class ContentController {
     }
 
     @GetMapping("/api/reviews")
-    public Map<String, Object> reviews(@RequestParam(required = false) String tourId) {
-        return reviews.read(tourId);
+    public Map<String, Object> reviews(@RequestParam(required = false) String tourId, @RequestParam(required = false) String targetType) {
+        return reviews.read(tourId, targetType);
     }
 
     @GetMapping("/api/reviews/eligible")
@@ -58,6 +86,17 @@ public class ContentController {
 
     @PostMapping("/api/reviews")
     public Map<String, Object> postReview(@RequestBody(required = false) Map<String, Object> body, HttpServletRequest req) {
-        return Maps.of("ok", true, "review", reviews.create(current.require(req), body == null ? Map.of() : body));
+        return Maps.of("ok", true, "review", reviews.create(current.requirePermission(req, vn.travel.security.Permission.REVIEW_CREATE_OWN), body == null ? Map.of() : body));
+    }
+
+    @PostMapping("/api/reviews/comment")
+    public Map<String, Object> postComment(@RequestBody(required = false) Map<String, Object> body, HttpServletRequest req) {
+        return Maps.of("ok", true, "review", reviews.addComment(current.require(req), body == null ? Map.of() : body));
+    }
+
+    /** Phản hồi công khai trong chuỗi bình luận của một đánh giá. */
+    @PostMapping("/api/reviews/{id}/replies")
+    public Map<String, Object> reply(@PathVariable String id, @RequestBody(required = false) Map<String, Object> body, HttpServletRequest req) {
+        return Maps.of("ok", true, "reply", reviews.addCommunityReply(current.require(req), id, body == null ? Map.of() : body));
     }
 }

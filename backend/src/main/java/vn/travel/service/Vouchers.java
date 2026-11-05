@@ -1,16 +1,22 @@
 package vn.travel.service;
 
+import java.time.Clock;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.springframework.stereotype.Service;
+
 import vn.travel.store.Db;
 import vn.travel.util.Ids;
 import vn.travel.util.Maps;
 import vn.travel.util.Times;
 import vn.travel.web.HttpError;
-
-import java.time.Clock;
-import java.time.LocalDate;
-import java.time.ZonedDateTime;
-import java.util.*;
 
 /**
  * Voucher (A1, A2): mã gắn tài khoản, đánh dấu đã dùng khi tạo đơn, chống dùng lại, hạn tính theo GIỜ SERVER.
@@ -106,6 +112,26 @@ public class Vouchers {
                 uid, null, key, Times.iso(start), Times.iso(end), 1), "SINHNHAT" + cand.getYear() + "-");
         noti.add(uid, "voucher", "🎂 Chúc mừng sinh nhật!", "Tặng bạn mã " + v.get("code") + " giảm " + BIRTHDAY_PCT + "%, dùng trong " + BIRTHDAY_DAYS + " ngày.", "profile", key);
         return publicView(v);
+    }
+
+    public static final int AFTER_TOUR_PCT = 5, AFTER_TOUR_DAYS = 60;
+
+    /** 7.8: tặng 1 mã cho lần đặt sau khi hoàn thành tour; mỗi đơn đúng 1 mã, gắn tài khoản, dùng 1 lần. Trả mã (hoặc null nếu đã tặng). */
+    public String grantAfterTour(String uid, String bookingId) {
+        String key = "after-" + bookingId;
+        boolean has = db.list("vouchers").stream().anyMatch(v -> uid.equals(v.get("ownerId")) && key.equals(v.get("source")));
+        if (has) return null;
+        Map<String, Object> v = insertUnique(newVoucher("LANSAU-" + Ids.suffix(), "Cảm ơn bạn đã đi tour – giảm " + AFTER_TOUR_PCT + "% lần đặt sau", "percent", AFTER_TOUR_PCT, uid,
+                null, key, null, Times.iso(clock.millis() + AFTER_TOUR_DAYS * DAY), 1), "LANSAU-");
+        noti.add(uid, "voucher", "🎁 Quà sau chuyến đi", "Tặng bạn mã " + v.get("code") + " giảm " + AFTER_TOUR_PCT + "% cho lần đặt sau, dùng trong " + AFTER_TOUR_DAYS + " ngày.", "profile", key);
+        return Maps.str(v, "code");
+    }
+
+    /** 7.10: đổi điểm lấy voucher cố định (1 điểm = 1.000 ₫), dùng 1 lần, hạn 90 ngày. */
+    public String grantPointsVoucher(String uid, long points) {
+        Map<String, Object> v = insertUnique(newVoucher("DIEM" + points + "-" + Ids.suffix(), "Đổi " + points + " điểm", "fixed", points * 1000, uid,
+                null, "points", null, Times.iso(clock.millis() + 90 * DAY), 1), "DIEM" + points + "-");
+        return Maps.str(v, "code");
     }
 
     private static LocalDate anniversary(LocalDate bd, int year) {

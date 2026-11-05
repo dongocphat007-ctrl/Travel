@@ -1452,10 +1452,10 @@ html body .tc-facts {
   display: inline;
   margin-right: 8px;
   color: var(--accent);
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  text-transform: none;
 }
 html body .tc-right {
   display: flex;

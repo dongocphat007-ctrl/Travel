@@ -115,6 +115,7 @@
     },
     {
       "id": 102,
+      "image": "img/tours_mau/mien-trung/da-nang/da-nang-cau-vang.jpg",
       "name": "Đà Nẵng – Hội An 4N3Đ",
       "price": 3800000,
       "region": "Miền Trung",
@@ -226,6 +227,7 @@
     },
     {
       "id": 103,
+      "image": "img/tours_mau/mien-bac/lao-cai/sapa-san-may.jpg",
       "name": "Sapa – Fansipan 3N2Đ",
       "price": 2800000,
       "region": "Miền Bắc",
@@ -295,7 +297,7 @@
           "items": [
             {
               "time": "Sáng",
-              "desc": "Tham quan Thác Bạc, ruộng bậc thang"
+              "desc": "Tham quan thác Bạc, ruộng bậc thang"
             },
             {
               "time": "Trưa",
@@ -536,6 +538,7 @@
     },
     {
       "id": 106,
+      "image": "img/tours_mau/mien-bac/ninh-binh/ninh-binh-tam-coc.jpg",
       "name": "Ninh Bình – Tràng An 2N1Đ",
       "price": 1800000,
       "region": "Miền Bắc",
@@ -809,6 +812,7 @@
     },
     {
       "id": 109,
+      "image": "img/tours_mau/mien-trung/thua-thien-hue/hue-dai-noi.jpg",
       "name": "Huế – Cố đô 3N2Đ",
       "price": 2900000,
       "region": "Miền Trung",
@@ -1310,6 +1314,7 @@
     },
     {
       "id": 114,
+      "image": "img/tours_mau/mien-trung/quang-binh/quang-binh-hang-dong.jpg",
       "name": "Phong Nha – Kẻ Bàng 3N2Đ",
       "price": 3100000,
       "region": "Miền Trung",

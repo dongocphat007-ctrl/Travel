@@ -1,16 +1,292 @@
-/* Trang Tìm Tour: tóm tắt, bộ lọc, thẻ kết quả thật, nút hỏi chatbot. Nạp trước design.css (token màu lấy từ :root). */
-#page-tour-finder .tf-summary { margin: 4px 0 12px; font-size: .95rem; line-height: 1.55; color: var(--ink-2, var(--text-muted)); }
-#page-tour-finder .tf-filters { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; margin-bottom: 10px; }
-#page-tour-finder .tf-filters label { display: flex; flex-direction: column; gap: 3px; font-size: .72rem; font-weight: 600; color: var(--text-muted); }
-#page-tour-finder .tf-filters select { font: inherit; font-size: .82rem; padding: 7px 8px; border: 1px solid var(--border); border-radius: var(--r, 6px); background: var(--bg-card, #fff); color: var(--text); min-height: 36px; }
-#page-tour-finder .tf-meta { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; font-size: .8rem; color: var(--text-muted); }
-#page-tour-finder .tf-ask-btn { font: inherit; font-size: .8rem; font-weight: 600; padding: 7px 12px; min-height: 36px; background: transparent; color: var(--accent); border: 1px solid var(--accent); border-radius: var(--r, 6px); cursor: pointer; }
-#page-tour-finder .tf-ask-btn:hover { background: var(--accent); color: #fff; }
-#page-tour-finder .tm-tour-card.is-active { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft, rgba(79,70,229,.2)); }
-#page-tour-finder .tf-n { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; margin-right: 6px; border-radius: 50%; background: var(--ink, #1e293b); color: #fff; font-size: .72rem; font-weight: 700; }
-#page-tour-finder .tm-card-price small { font-weight: 500; color: var(--text-muted); font-size: .7rem; }
-#page-tour-finder .tf-card-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-#page-tour-finder .tf-btn-detail { font: inherit; font-size: .8rem; font-weight: 600; padding: 6px 14px; min-height: 36px; background: transparent; color: var(--text); border: 1px solid var(--border); border-radius: var(--r, 6px); cursor: pointer; }
-#page-tour-finder .tf-btn-detail:hover { border-color: var(--accent); color: var(--accent); }
-#page-tour-finder .tf-empty { padding: 20px 14px; border: 1px dashed var(--border); border-radius: var(--r, 8px); color: var(--text-muted); font-size: .9rem; line-height: 1.5; }
-@media (max-width: 600px) { #page-tour-finder .tf-ask-btn, #page-tour-finder .tf-btn-detail, #page-tour-finder .tm-btn-map { min-height: 44px; } }
+/* Trang Tìm Tour: bố cục rộng rãi, ô tìm kiếm thông minh, bộ lọc cân đối, thẻ kết quả & bản đồ */
+#page-tour-finder .tf-layout {
+  display: grid;
+  grid-template-columns: 460px 1fr;
+  gap: 24px;
+  height: calc(100vh - 190px);
+  min-height: 580px;
+}
+
+@media (max-width: 1024px) {
+  #page-tour-finder .tf-layout {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+}
+
+#page-tour-finder .tf-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+/* Ô tìm kiếm hành trình */
+#page-tour-finder .tf-search-box {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 4px 16px rgba(13, 33, 55, 0.05);
+}
+
+#page-tour-finder .tf-search-row {
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+}
+
+#page-tour-finder .tf-search-input {
+  flex: 1;
+  padding: 11px 16px;
+  border: 1.5px solid var(--border, #cbd5e1);
+  border-radius: 10px;
+  background: var(--bg-card, #f8fafc);
+  color: var(--text, #0f172a);
+  font-size: 0.92rem;
+  font-family: inherit;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+#page-tour-finder .tf-search-input:focus {
+  border-color: var(--teal, #0891b2);
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.15);
+}
+
+#page-tour-finder .tf-search-btn {
+  padding: 11px 20px;
+  background: linear-gradient(135deg, var(--navy, #0d2137), #1e3a5f);
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(13, 33, 55, 0.2);
+}
+
+#page-tour-finder .tf-search-btn:hover {
+  background: var(--teal, #0891b2);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(8, 145, 178, 0.3);
+}
+
+#page-tour-finder .tf-search-hint {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--text-muted, #64748b);
+  line-height: 1.5;
+}
+
+#page-tour-finder .tf-search-hint span {
+  color: var(--navy, #0d2137);
+  font-weight: 500;
+}
+
+/* Thẻ tìm nhanh */
+#page-tour-finder .tf-quick-searches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+#page-tour-finder .tf-quick {
+  padding: 6px 14px;
+  border-radius: 99px;
+  border: 1px solid var(--border, #cbd5e1);
+  background: var(--surface, #ffffff);
+  color: var(--text, #1e293b);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+#page-tour-finder .tf-quick:hover {
+  border-color: var(--teal, #0891b2);
+  color: var(--teal, #0891b2);
+  background: rgba(8, 145, 178, 0.08);
+  transform: translateY(-1px);
+}
+
+/* Tóm tắt & Bộ lọc */
+#page-tour-finder .tf-summary {
+  margin: 8px 0 14px;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--text, #1e293b);
+  background: rgba(8, 145, 178, 0.06);
+  padding: 10px 14px;
+  border-left: 3px solid var(--teal, #0891b2);
+  border-radius: 0 8px 8px 0;
+}
+
+#page-tour-finder .tf-filters {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px 12px;
+  margin-bottom: 12px;
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: 12px;
+  padding: 14px;
+}
+
+#page-tour-finder .tf-filters label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted, #475569);
+}
+
+#page-tour-finder .tf-filters select {
+  font: inherit;
+  font-size: 0.85rem;
+  padding: 8px 10px;
+  border: 1px solid var(--border, #cbd5e1);
+  border-radius: 8px;
+  background: var(--bg-card, #f8fafc);
+  color: var(--text, #0f172a);
+  min-height: 38px;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+#page-tour-finder .tf-filters select:focus {
+  border-color: var(--teal, #0891b2);
+}
+
+#page-tour-finder .tf-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+  font-size: 0.85rem;
+  color: var(--text-muted, #64748b);
+  font-weight: 500;
+}
+
+#page-tour-finder .tf-ask-btn {
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 8px 14px;
+  min-height: 36px;
+  background: transparent;
+  color: var(--teal, #0891b2);
+  border: 1.5px solid var(--teal, #0891b2);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+#page-tour-finder .tf-ask-btn:hover {
+  background: var(--teal, #0891b2);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+/* Thẻ kết quả tour */
+#page-tour-finder .tm-tour-card {
+  background: var(--surface, #ffffff);
+  border: 1.5px solid var(--border, #e2e8f0);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+#page-tour-finder .tm-tour-card:hover {
+  border-color: var(--teal, #0891b2);
+  box-shadow: 0 6px 20px rgba(8, 145, 178, 0.12);
+  transform: translateY(-2px);
+}
+
+#page-tour-finder .tm-tour-card.is-active {
+  border-color: var(--amber, #f59e0b);
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.25);
+  background: #fffdfa;
+}
+
+#page-tour-finder .tf-n {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin-right: 8px;
+  border-radius: 50%;
+  background: var(--navy, #0d2137);
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+#page-tour-finder .tm-card-price {
+  font-weight: 800;
+  color: var(--teal, #0891b2);
+  font-size: 0.95rem;
+}
+
+#page-tour-finder .tm-card-price small {
+  font-weight: 500;
+  color: var(--text-muted, #64748b);
+  font-size: 0.75rem;
+}
+
+#page-tour-finder .tf-card-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+#page-tour-finder .tf-btn-detail {
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 7px 14px;
+  min-height: 34px;
+  background: transparent;
+  color: var(--navy, #0d2137);
+  border: 1.5px solid var(--border, #cbd5e1);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+#page-tour-finder .tf-btn-detail:hover {
+  border-color: var(--navy, #0d2137);
+  background: rgba(13, 33, 55, 0.05);
+}
+
+#page-tour-finder .tf-empty {
+  padding: 28px 18px;
+  border: 1.5px dashed var(--border, #cbd5e1);
+  border-radius: 12px;
+  color: var(--text-muted, #64748b);
+  font-size: 0.92rem;
+  line-height: 1.6;
+  text-align: center;
+  background: var(--surface, #ffffff);
+}

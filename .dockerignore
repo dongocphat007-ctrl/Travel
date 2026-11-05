@@ -1,0 +1,13 @@
+.git
+.github
+.vscode
+.env
+.env.*
+**/.env
+**/.env.*
+backend/target
+backend/storage
+**/node_modules
+**/*.log
+outputs
+tools/_archive_cleaned_files

@@ -39,8 +39,13 @@ public class Otp {
 
     /** Có bắt buộc OTP khi đăng ký không: chỉ khi gửi được email (hoặc đang bật log dev). */
     public boolean required() { return mailer.enabled() || devLog; }
+    public boolean mailEnabled() { return mailer.enabled(); }
 
     public void send(String name, String email) {
+        send(name, email, "register");
+    }
+
+    public void send(String name, String email, String purpose) {
         String e = email == null ? "" : email.trim().toLowerCase();
         if (!e.matches("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")) throw HttpError.bad("Email không hợp lệ");
         if (!required()) throw new HttpError(503, "Chưa cấu hình dịch vụ gửi email trên máy chủ");
@@ -49,11 +54,25 @@ public class Otp {
         if (old != null && now - old.sentAt < RESEND) throw new HttpError(429, "Vui lòng đợi " + ((RESEND - (now - old.sentAt)) / 1000 + 1) + " giây rồi gửi lại");
         String code = String.valueOf(Ids.sixDigits());
         pending.put(e, new Pending(code, now + TTL, now, 0));
-        if (devLog && !mailer.enabled()) LOG.warning("[OTP DEV] " + e + " → " + code);
-        else if (!mailer.send(e, "Travel – Mã xác nhận của bạn", "<p>Xin chào " + Mailer.esc(name) + ",</p><p>Mã xác nhận Travel của bạn là <b style=\"font-size:20px\">" + code
-                + "</b>. Mã có hiệu lực trong 5 phút. Nếu không phải bạn yêu cầu, hãy bỏ qua email này.</p>")) {
-            pending.remove(e);
-            throw new HttpError(502, "Gửi email thất bại. Vui lòng thử lại sau.");
+        
+        if (devLog) LOG.warning("[OTP DEV] " + e + " (" + purpose + ") : " + code);
+        if (mailer.enabled()) {
+            boolean isForgot = "forgot".equalsIgnoreCase(purpose);
+            String title = isForgot ? "Travel – Mã xác nhận đặt lại mật khẩu" : "Travel – Mã xác nhận của bạn";
+            String greeting = name != null && !name.isBlank() ? "<p>Xin chào " + Mailer.esc(name) + ",</p>" : "<p>Xin chào bạn,</p>";
+            String actionDesc = isForgot ? "đặt lại mật khẩu tài khoản" : "xác nhận";
+            String body = greeting + "<p>Mã " + actionDesc + " Travel của bạn là <b style=\"font-size:20px;letter-spacing:2px\">" + code
+                    + "</b>. Mã có hiệu lực trong 5 phút. Nếu không phải bạn yêu cầu, hãy bỏ qua email này.</p>";
+            boolean sent = mailer.send(e, title, body);
+            if (!sent) {
+                LOG.warning("Gui email khong thanh cong toi " + e);
+                if (!devLog) {
+                    pending.remove(e);
+                    throw new HttpError(502, "Gửi email thất bại. Vui lòng thử lại sau.");
+                }
+            }
+        } else {
+            LOG.warning("mailer.enabled() tra ve false (chua cau hinh email hoac chua nhan dien cau hinh)");
         }
     }
 

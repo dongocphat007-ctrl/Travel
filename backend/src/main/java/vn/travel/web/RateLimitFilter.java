@@ -28,13 +28,24 @@ public class RateLimitFilter extends OncePerRequestFilter {
 
     /** {nhóm, tối đa, cửa sổ ms} hoặc null nếu đường dẫn không bị giới hạn. */
     static Object[] rule(String method, String path) {
+        if ("GET".equals(method)) {   // nguồn trực tuyến tốn hạn mức API → giới hạn theo IP
+            if (path.equals("/api/flights/search") || path.equals("/api/hotels/search") || path.equals("/api/flights/booking-links")) return new Object[]{"live", 40, 60_000L};
+            if (path.equals("/api/places/photo")) return new Object[]{"photo", 150, 60_000L};
+            return null;
+        }
         if (!"POST".equals(method)) return null;
         if (path.equals("/api/auth/login") || path.equals("/api/auth/google")) return new Object[]{"login", 10, 60_000L};
         if (path.equals("/api/auth/register") || path.equals("/api/auth/migrate") || path.equals("/api/auth/check-email")) return new Object[]{"register", 10, 60_000L};
+        if (path.startsWith("/api/auth/forgot-password")) return new Object[]{"forgot", 8, 60_000L};
         if (path.startsWith("/api/otp/")) return new Object[]{"otp", 8, 60_000L};
         if (path.startsWith("/api/ai/")) return new Object[]{"ai", 20, 60_000L};
+        if (path.equals("/api/rag/search")) return new Object[]{"rag", 30, 60_000L};          // mỗi lượt có thể gọi API embedding
+        if (path.equals("/api/admin/rag/reindex")) return new Object[]{"ragindex", 3, 60_000L};
         if (path.equals("/api/vouchers/validate")) return new Object[]{"voucher", 30, 60_000L};
         if (path.equals("/api/reviews")) return new Object[]{"review", 5, 60_000L};
+        if (path.equals("/api/reviews/comment")) return new Object[]{"reviewcomment", 10, 60_000L};
+        if (path.matches("/api/reviews/[^/]+/replies")) return new Object[]{"reviewreply", 20, 60_000L};
+        if (path.equals("/api/upload/review")) return new Object[]{"reviewupload", 20, 60_000L};
         return null;
     }
 

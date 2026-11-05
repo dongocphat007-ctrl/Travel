@@ -46,6 +46,22 @@ final class Fixture {
     final Banners banners;
     final Reviews reviews;
     final Otp otp;
+    final Audit audit;
+    final SystemConfig config;
+    final OpsCore core;
+    final Refunds refunds;
+    final CashierOps cashier;
+    final AdminOps adminOps;
+    final OperatorOps operator;
+    final GuideOps guideOps;
+    final SupportOps support;
+    final ContentOps content;
+    final StaffOps staff;
+    final CustomerOps customerOps;
+    final Messages messages;
+    final OpsSweeper sweeper;
+    final StatsOps statsOps;
+    final LegacyMigration migration;
 
     Fixture(Path tmp) throws IOException {
         this(tmp, "WEBHOOK-SECRET", false);
@@ -72,8 +88,9 @@ final class Fixture {
         Files.writeString(web.resolve("data/reviews-seed.json"), """
                 {"reviews":[{"id":"rv_seed_1","tourId":"101","name":"Mẫu","rating":5,"content":"Rất tuyệt vời","createdAt":"2026-10-01T00:00:00Z","source":"demo"}]}
                 """);
-        props = new TravelProperties(web.toString(), db.toString(), "", "", "boss@example.com", "test-session-secret-0123456789abcdef", "", "client-id",
-                "", "gemini-2.5-flash", "", "", "", otpDev, webhookSecret, "Vietcombank", "123456789", "NGUYEN VAN A", "TRAVEL", "", false);
+        props = new TravelProperties(web.toString(), db.toString(), "", "", "test-session-secret-0123456789abcdef", "", "client-id",
+                "", "gemini-1.5-flash", "", "", "", otpDev, webhookSecret, "Vietcombank", "123456789", "NGUYEN VAN A", "TRAVEL", "", false, true, false,
+                "", "", "https://cloud.langfuse.com");
         JsonStore store = new JsonStore(db, mapper);
         dbs = new Db(store);
         sessions = new SessionService("test-session-secret-0123456789abcdef", clock);
@@ -85,15 +102,31 @@ final class Fixture {
         guides = new Guides(dbs, web.resolve("data/guides-seed.json"), mapper);
         mailer = new Mailer(props, mapper);
         data = new PublicData(web.resolve("data"), mapper);
-        stats = new Stats(dbs, data);
-        bookings = new Bookings(dbs, tours, vouchers, guides, noti, mailer, accounts, clock, props);
+        stats = new Stats(dbs, data, true);
+        audit = new Audit(dbs, clock);
+        config = new SystemConfig(dbs, audit);
+        bookings = new Bookings(dbs, tours, vouchers, guides, noti, mailer, accounts, config, clock, props);
         payments = new Payments(dbs, bookings, noti, clock, props);
         banners = new Banners(dbs, stats, clock, web.resolve("img/banners"));
-        reviews = new Reviews(dbs, data, stats, accounts, clock);
+        reviews = new Reviews(dbs, data, stats, accounts, clock, false);
         otp = new Otp(mailer, sessions, clock, props);
+        core = new OpsCore(dbs, accounts, tours, noti, config, audit, vouchers, clock);
+        refunds = new Refunds(dbs, core);
+        cashier = new CashierOps(dbs, core, refunds, mailer);
+        adminOps = new AdminOps(dbs, core, refunds);
+        operator = new OperatorOps(dbs, core);
+        guideOps = new GuideOps(dbs, core);
+        support = new SupportOps(dbs, core, refunds);
+        content = new ContentOps(dbs, core, reviews);
+        staff = new StaffOps(dbs, accounts, hasher, core);
+        customerOps = new CustomerOps(dbs, core, adminOps);
+        messages = new Messages(dbs, core);
+        sweeper = new OpsSweeper(core, adminOps, operator, support);
+        statsOps = new StatsOps(core);
+        migration = new LegacyMigration(dbs, core);
     }
 
     java.util.Map<String, Object> newUser(String email) {
-        return (java.util.Map<String, Object>) accounts.register("Nguyễn Văn A", email, "matkhau123").get("user");
+        return (java.util.Map<String, Object>) accounts.register("Nguyễn Văn A", email, "Matkhau@123").get("user");
     }
 }

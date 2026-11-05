@@ -4,7 +4,7 @@
  * 8.6 Dropdown quốc gia: gộp 30 nước trong WorldMap.countries + mọi nước có tour trong data/locations.json (kèm số tour).
  * 8.7 Chọn quốc gia → lọc danh sách tour (và map bay tới nước đó). Chọn/bấm nước bằng cách khác (ô tìm kiếm, chấm trên map, nút châu lục) cũng đồng bộ dropdown + danh sách.
  * 8.8 Bấm tour trong danh sách → map flyTo đúng toạ độ tour (lat/lng trong locations.json) + ghim popup.
- * Phần logic (buildIndex, filterTours, createController…) thuần, test được trong Node: node scripts/test-world-tours.js
+ * Phần logic (buildIndex, filterTours, createController…) thuần, có thể nạp bằng require() trong Node để thử
  */
 (function (root, factory) {
   if (typeof module === "object" && module.exports) module.exports = factory();
@@ -12,7 +12,7 @@
 })(typeof self !== "undefined" ? self : this, function () {
   var PAGE = 20;                                         // số tour hiện mỗi lần (Việt Nam có hơn 500 tour)
   var ALIAS = { "Morocco": "Maroc" };                    // bảng WorldMap viết "Morocco", dữ liệu tour viết "Maroc"
-  var ZOOM = { city: 11, province: 9, country: 6 };      // theo độ chính xác của toạ độ (data/locations.json)
+  var ZOOM = { city: 11, place: 12, province: 9, country: 6 };      // theo độ chính xác của toạ độ (data/locations.json)
   var HOME = "Việt Nam";
 
   function canon(n) { return ALIAS[n] || n; }
@@ -36,7 +36,8 @@
       if (!country) return;
       var lat = l ? +l.lat : NaN, lng = l ? +l.lng : NaN, ok = validCoord(lat, lng);
       out.push({ id: String(t.id), name: t.name || ("Tour " + t.id), price: t.price, duration: t.duration || "", country: country,
-        city: (l && l.city) || "", lat: ok ? lat : null, lng: ok ? lng : null, precision: (l && l.precision) || "", hasCoords: ok });
+        city: (l && l.city) || "", place: (l && l.place) || "", lat: ok ? lat : null, lng: ok ? lng : null, precision: (l && l.precision) || "", hasCoords: ok,
+        emoji: t.emoji || "", image: t.image || "", imageQuery: t.imageQuery || "", dest: t.destination || t.dest || "" });
     });
     return out;
   }
@@ -95,8 +96,9 @@
       if (!t) return false;
       activeId = t.id; draw();
       if (!t.hasCoords) { if (view.notify) view.notify("Tour này chưa có toạ độ trên bản đồ"); return false; }
-      return !!(world.flyToTour && world.flyToTour({ name: t.name, lat: t.lat, lng: t.lng, zoom: zoomFor(t.precision),
-        note: (t.city ? t.city + ", " : "") + t.country + (t.precision === "city" ? "" : " · vị trí đại diện, không phải địa chỉ chính xác") }));
+      return !!(world.flyToTour && world.flyToTour({ id: t.id, name: t.name, price: t.price, duration: t.duration, place: t.place, city: t.city, precision: t.precision,
+        emoji: t.emoji, image: t.image, imageQuery: t.imageQuery, dest: t.dest, lat: t.lat, lng: t.lng, zoom: zoomFor(t.precision),
+        note: (t.city ? t.city + ", " : "") + t.country + (t.precision === "city" ? "" : t.precision === "place" ? " · vị trí gần đúng của điểm đến" : " · vị trí đại diện, không phải địa chỉ chính xác") }));
     }
     return { setData: setData, selectCountry: selectCountry, onWorldFocus: onWorldFocus, more: more, pickTour: pickTour, state: state };
   }
@@ -119,8 +121,8 @@
     var tours = [], locs = [];
     try { if (typeof loadHomeData === "function") await loadHomeData(); } catch (e) { /* dùng dữ liệu đã có */ }
     tours = (typeof window !== "undefined" && window.TOUR_SAMPLES) || [];
-    try { var r = await fetch("/api/locations"); if (r.ok) locs = (await r.json()).locations || []; } catch (e) { /* thử file */ }
-    if (!locs.length) { try { locs = (await (await fetch("data/locations.json")).json()).locations || []; } catch (e) { locs = []; } }
+    try { locs = (await (await fetch("data/locations.json")).json()).locations || []; } catch (e) { /* file không đọc được → hỏi server */ }
+    if (!locs.length) { try { var r = await fetch("/api/locations"); if (r.ok) locs = (await r.json()).locations || []; } catch (e) { locs = []; } }
     return { tours: tours, locs: locs };
   }
 

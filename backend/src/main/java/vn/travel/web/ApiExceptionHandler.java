@@ -13,7 +13,7 @@ import java.util.Map;
 
 /**
  * BE-07: lỗi JSON thống nhất. Hợp đồng hiện tại của frontend là {"ok":false,"msg":"...","field"?:"..."}
- * (js/data-api.js, auth.js, main.js đọc `msg` và `field`); đồng thời trả thêm khóa "error" = msg để khớp mô tả trong TASKS.
+ * (js/api-client.js, auth.js, main.js đọc `msg` và `field`); đồng thời trả thêm khóa "error" = msg để khớp mô tả trong TASKS.
  */
 @RestControllerAdvice
 public class ApiExceptionHandler {
@@ -30,7 +30,7 @@ public class ApiExceptionHandler {
 
     /**
      * Endpoint /api/... KHÔNG do Spring Boot xử lý (vd /api/tours, /api/locations: frontend đọc thẳng file JSON công khai)
-     * → 404 với thân RỖNG. js/data-api.js hiểu "404 không có JSON" = không có máy chủ cho phần này và tự dùng file JSON.
+     * → 404 với thân RỖNG. js/api-client.js hiểu "404 không có JSON" = không có máy chủ cho phần này và tự dùng file JSON.
      */
     @ExceptionHandler({NoResourceFoundException.class, HttpRequestMethodNotSupportedException.class})
     public ResponseEntity<Void> notHandled(Exception e) {

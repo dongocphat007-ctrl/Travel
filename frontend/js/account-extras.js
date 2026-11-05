@@ -5,7 +5,7 @@
  *   - Trang Hồ sơ: hiện giới tính, ngày sinh, trạng thái xác thực và mục "Thông báo"
  * Mọi dữ liệu do SERVER giữ (Spring Boot: /api/notifications/*, /api/auth/profile); ở đây chỉ hiển thị.
  * Khi mở bằng máy chủ tĩnh (không có server) thì ẩn chuông; form xác thực vẫn lưu tạm vào localStorage.
- * Phụ thuộc: data-api.js (Api), auth.js (Auth), utils.js (showToast, $id, esc), render.js (renderProfile), main.js (navigate)
+ * Phụ thuộc: api-client.js (Api), auth.js (Auth), utils.js (showToast, $id, esc), trip-views.js (renderProfile), main.js (navigate)
  */
 const AccountExtras = (() => {
   const $ = id => document.getElementById(id);
@@ -309,3 +309,130 @@ const AccountExtras = (() => {
   return { onLoggedIn, openVerify, load, markRead, remove };
 })();
 window.AccountExtras = AccountExtras;
+
+;
+/**
+ * Khách: hủy tour (xem trước tiền hoàn theo chính sách), xin đổi ngày, gửi khiếu nại.
+ * Mọi quyết định do server làm; trang này chỉ hỏi và hiển thị kết quả. Bắt sự kiện ủy quyền trên document nên chạy cho mọi thẻ đơn.
+ */
+(() => {
+  const fmt = n => new Intl.NumberFormat("vi-VN").format(n || 0) + " ₫";
+  const esc = t => String(t == null ? "" : t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  const toast = (m, k) => (typeof showToast === "function" ? showToast(m, k || "info") : alert(m));
+
+  function dialog(title, html, okLabel, okClass) {
+    return new Promise(res => {
+      const ov = document.createElement("div");
+      ov.className = "overlay open"; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-modal", "true");
+      ov.innerHTML = `<div class="login-card" style="max-width:460px;text-align:left"><h2 class="login-title" style="font-size:20px">${esc(title)}</h2><div class="co-body">${html}</div>
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px"><button class="btn" data-x>Đóng</button>${okLabel ? `<button class="btn ${okClass || "btn-accent"}" data-ok>${esc(okLabel)}</button>` : ""}</div></div>`;
+      const close = v => { ov.remove(); res(v); };
+      ov.querySelector("[data-x]").onclick = () => close(null);
+      const ok = ov.querySelector("[data-ok]"); if (ok) ok.onclick = () => close(ov);
+      document.body.appendChild(ov);
+      ov.addEventListener("keydown", e => { if (e.key === "Escape") close(null); });
+    });
+  }
+  const refresh = async () => { try { await window.Api?.refreshBookings?.(true); } catch (e) { /* bỏ qua */ } try { if (typeof renderProfile === "function") renderProfile(); } catch (e) { /* bỏ qua */ } };
+  const fail = r => toast((r && r.data && (r.data.msg || r.data.error || r.data.message)) || "Không thực hiện được, vui lòng thử lại", "error");
+
+  async function cancel(id) {
+    const p = await Api.get(`/api/bookings/${encodeURIComponent(id)}/cancel-preview`);
+    if (!p.ok) return fail(p);
+    const d = p.data;
+    if (!d.canCancel) return void (await dialog("Không hủy được", `<p>${esc(d.reason || "Đơn này không thể hủy.")}</p>`));
+    const tiers = (d.policy || []).slice().sort((a, b) => b.minDaysBefore - a.minDaysBefore).map(t => `<li>Hủy trước ngày đi từ ${t.minDaysBefore} ngày: hoàn ${t.pct}%</li>`).join("");
+    const body = `<p>Còn <b>${d.daysBefore}</b> ngày đến ngày khởi hành.</p>${d.paid > 0 ? `<p>Bạn đã thanh toán <b>${fmt(d.paid)}</b>. Theo chính sách bạn được hoàn <b>${d.refundPct}%</b> = <b style="color:#166534">${fmt(d.refundAmount)}</b>.</p>` : "<p>Bạn chưa thanh toán nên đơn sẽ được hủy ngay, không phát sinh hoàn tiền.</p>"}
+      <ul class="small" style="margin:8px 0 10px 18px">${tiers}</ul><label class="form-label" for="co-reason">Lý do (không bắt buộc)</label><textarea id="co-reason" class="form-input" rows="2"></textarea>`;
+    const ov = await dialog("Hủy tour", body, "Xác nhận hủy tour", "btn-danger"); if (!ov) return;
+    const r = await Api.post(`/api/bookings/${encodeURIComponent(id)}/cancel`, { reason: ov.querySelector("#co-reason").value });
+    if (!r.ok) return fail(r);
+    toast(d.paid > 0 ? "Đã gửi yêu cầu hủy. Tiền hoàn sẽ được duyệt và chuyển sau." : "Đã hủy đơn.", "success");
+    await refresh();
+  }
+
+  async function resched(id) {
+    const ov = await dialog("Xin đổi ngày khởi hành", `<p class="small">Mỗi đơn đổi ngày được một lần. Điều hành sẽ kiểm tra chỗ trống và lịch hướng dẫn viên.</p><label class="form-label" for="co-date">Ngày mới</label><input type="date" id="co-date" class="form-input" min="${new Date().toISOString().slice(0, 10)}"><label class="form-label" for="co-why" style="margin-top:8px">Lý do</label><textarea id="co-why" class="form-input" rows="2"></textarea>`, "Gửi yêu cầu");
+    if (!ov) return;
+    const date = ov.querySelector("#co-date").value; if (!date) return toast("Hãy chọn ngày mới", "error");
+    const r = await Api.post(`/api/bookings/${encodeURIComponent(id)}/reschedule`, { date, reason: ov.querySelector("#co-why").value });
+    if (!r.ok) return fail(r); toast("Đã gửi yêu cầu đổi ngày. Chúng tôi sẽ phản hồi sớm.", "success"); await refresh();
+  }
+
+  // 8.7–8.16: gia hạn thêm ngày
+  async function extend(id) {
+    const base = `/api/bookings/${encodeURIComponent(id)}/extensions`;
+    const first = await Api.get(base + "/preview?days=1");
+    if (!first.ok) return fail(first);
+    if (!first.data.canExtend) return toast((first.data.problems || ["Đơn này chưa gia hạn được"])[0], "error");
+    const max = first.data.maxDays || 2, one = first.data.quote || {};
+    const ov = await dialog("Gia hạn thêm ngày", `<p class="small">Tối đa ${max} ngày, phần ngày thêm thu đủ 100% (không đặt cọc), xin trước ngày cuối ít nhất 24 giờ.</p><label class="form-label" for="co-xd">Số ngày thêm</label><select id="co-xd" class="form-input">${Array.from({ length: max }, (_, i) => `<option value="${i + 1}">${i + 1} ngày</option>`).join("")}</select><div class="small" style="margin-top:8px">Khoảng <b>${Number(one.perDay || 0).toLocaleString("vi-VN")} ₫</b>/ngày thêm (thành tiền 1 ngày: ${Number(one.amount || 0).toLocaleString("vi-VN")} ₫, đã tính voucher nếu còn hạn). Hệ thống tính lại khi gửi.</div><label class="form-label" for="co-xn" style="margin-top:8px">Ghi chú</label><textarea id="co-xn" class="form-input" rows="2"></textarea>`, "Gửi yêu cầu");
+    if (!ov) return;
+    const r = await Api.post(base, { days: Number(ov.querySelector("#co-xd").value), note: ov.querySelector("#co-xn").value });
+    if (!r.ok) return fail(r);
+    toast(r.data.extension.status === "requested" ? "Đã gửi yêu cầu, chờ Điều hành duyệt." : "Đã tạo yêu cầu. Hãy chuyển khoản theo mã " + r.data.extension.paymentCode, "success");
+    await refresh();
+  }
+
+  async function extCancel(v) {
+    const [id, no] = v.split("|");
+    if (!window.confirm("Hủy phần gia hạn này? Tiền đã thanh toán (nếu có) được hoàn theo bảng hoàn tiền, đơn gốc không bị ảnh hưởng.")) return;
+    const r = await Api.post(`/api/bookings/${encodeURIComponent(id)}/extensions/${no}/cancel`, {});
+    if (!r.ok) return fail(r); toast("Đã hủy phần gia hạn.", "success"); await refresh();
+  }
+
+  // 8.5: công ty hủy chuyến – khách chọn hoàn 100% hoặc đổi ngày
+  async function offer(id) {
+    const ov = await dialog("Công ty hủy chuyến đi", `<p class="small">Bạn có thể nhận hoàn 100% hoặc đổi sang ngày khác, không mất phí.</p><label class="form-label" for="co-oc">Lựa chọn</label><select id="co-oc" class="form-input"><option value="refund">Nhận hoàn 100%</option><option value="reschedule">Đổi sang ngày khác</option></select><label class="form-label" for="co-od" style="margin-top:8px">Ngày mới (nếu đổi ngày)</label><input type="date" id="co-od" class="form-input" min="${new Date().toISOString().slice(0, 10)}">`, "Xác nhận");
+    if (!ov) return;
+    const choice = ov.querySelector("#co-oc").value, date = ov.querySelector("#co-od").value;
+    if (choice === "reschedule" && !date) return toast("Hãy chọn ngày mới", "error");
+    const r = await Api.post(`/api/bookings/${encodeURIComponent(id)}/company-offer`, { choice, date });
+    if (!r.ok) return fail(r); toast(choice === "refund" ? "Đã ghi nhận, khoản hoàn sẽ được chuyển cho bạn." : "Đã gửi yêu cầu đổi ngày.", "success"); await refresh();
+  }
+
+  // 6.7: thu nhỏ ảnh minh chứng (cạnh dài ≤ 1280px, JPEG) trước khi gửi để nhẹ và dưới giới hạn server
+  function shrink(file) {
+    return new Promise((res, rej) => {
+      const fr = new FileReader();
+      fr.onerror = () => rej(new Error("Không đọc được ảnh"));
+      fr.onload = () => {
+        const img = new Image();
+        img.onerror = () => rej(new Error("Tệp không phải ảnh hợp lệ"));
+        img.onload = () => {
+          const k = Math.min(1, 1280 / Math.max(img.width, img.height)), c = document.createElement("canvas");
+          c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+          c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+          const url = c.toDataURL("image/jpeg", 0.8);
+          url.length > 880000 ? rej(new Error("Ảnh quá lớn, hãy chọn ảnh nhỏ hơn")) : res(url);
+        };
+        img.src = fr.result;
+      };
+      fr.readAsDataURL(file);
+    });
+  }
+  async function readImages(files) {
+    const list = Array.from(files || []);
+    if (list.length > 3) throw new Error("Chỉ đính kèm tối đa 3 ảnh");
+    return Promise.all(list.map(shrink));
+  }
+
+  async function complain(id) {
+    const ov = await dialog("Gửi khiếu nại / phản hồi", `<label class="form-label" for="co-t">Tiêu đề</label><input id="co-t" class="form-input" maxlength="120"><label class="form-label" for="co-c" style="margin-top:8px">Nội dung</label><textarea id="co-c" class="form-input" rows="4"></textarea><label class="form-label" for="co-i" style="margin-top:8px">Ảnh minh chứng (tối đa 3 ảnh, không bắt buộc)</label><input id="co-i" type="file" accept="image/png,image/jpeg,image/webp" multiple class="form-input">`, "Gửi");
+    if (!ov) return;
+    const title = ov.querySelector("#co-t").value.trim(), content = ov.querySelector("#co-c").value.trim();
+    if (title.length < 3 || content.length < 5) return toast("Vui lòng nhập tiêu đề và nội dung", "error");
+    let images;
+    try { images = await readImages(ov.querySelector("#co-i").files); } catch (e) { return toast(e.message || "Không đọc được ảnh", "error"); }
+    const r = await Api.post("/api/complaints", { bookingId: id, title, content, images });
+    if (!r.ok) return fail(r); toast("Đã gửi. Bộ phận CSKH sẽ phản hồi trong thời gian sớm nhất.", "success");
+  }
+
+  document.addEventListener("click", e => {
+    const t = e.target.closest("[data-bk-cancel],[data-bk-resched],[data-bk-complain],[data-bk-extend],[data-bk-extcancel],[data-bk-offer]"); if (!t) return;
+    e.preventDefault();
+    const run = t.dataset.bkCancel ? cancel(t.dataset.bkCancel) : t.dataset.bkResched ? resched(t.dataset.bkResched) : t.dataset.bkExtend ? extend(t.dataset.bkExtend)
+      : t.dataset.bkExtcancel ? extCancel(t.dataset.bkExtcancel) : t.dataset.bkOffer ? offer(t.dataset.bkOffer) : complain(t.dataset.bkComplain);
+    run.catch(() => toast("Có lỗi xảy ra, vui lòng thử lại", "error"));
+  });
+})();

@@ -4,7 +4,7 @@
  *     Basemap dùng chung trong js/map-basemap.js: Google Maps (tiếng Việt) nếu có key, không thì OpenStreetMap,
  *     hoặc MapTiler custom style khi cấu hình public browser key + style ID.
  *   TourLocationMap.show(el, loc, opts)   → vẽ/di chuyển marker theo loc.lat/lng (thuần, test được bằng Leaflet giả: opts.L)
- *   TourLocationMap.renderMap(el, tourId) → lấy toạ độ tour (Weather.locationOf → /api/locations) rồi show()
+ *   TourLocationMap.renderMap(el, tourId) → lấy toạ độ tour (Weather.locationOf → data/locations.json, server chỉ khi thiếu) rồi show()
  *   TourLocationMap.destroy()             → gỡ map đang giữ
  * Dùng được cả trong Node để kiểm thử (module.exports).
  */
@@ -14,7 +14,7 @@
 })(typeof self !== "undefined" ? self : this, function (mapTiles) {
   var NO_LOC = "Chưa có vị trí của tour trên bản đồ";
   var NO_LIB = "Chưa tải được bản đồ (kiểm tra kết nối mạng)";
-  var ZOOM = { city: 10, province: 8, country: 5 };      // theo độ chính xác trong data/locations.json
+  var ZOOM = { city: 10, place: 12, province: 8, country: 5 };      // theo độ chính xác trong data/locations.json
   var inst = null;                                       // { el, map, marker } — chỉ giữ MỘT map nhỏ (modal chi tiết chỉ mở một cái)
   var seq = 0;                                           // chống "kết quả về trễ" khi mở tour khác liên tiếp
 
@@ -29,6 +29,7 @@
   function esc(x) { return String(x == null ? "" : x).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
   function note(loc) {                                   // nói rõ khi chỉ là vị trí đại diện
     if (!loc || loc.precision === "city") return "";
+    if (loc.precision === "place") return "Vị trí gần đúng của điểm đến, không phải địa chỉ chính xác.";
     return loc.precision === "country" ? "Vị trí đại diện của quốc gia, không phải địa chỉ chính xác." : "Vị trí đại diện của tỉnh/thành, không phải địa chỉ chính xác.";
   }
 
@@ -48,7 +49,7 @@
     var p = pin(loc);
     if (!p) { destroy(); el.innerHTML = '<div class="tlm-empty">' + NO_LOC + '</div>'; return { ok: false, reason: "no-coords" }; }
     if (!L || typeof L.map !== "function") { destroy(); el.innerHTML = '<div class="tlm-empty">' + NO_LIB + '</div>'; return { ok: false, reason: "no-leaflet" }; }
-    var z = zoomFor(loc), popup = '<strong>' + esc(loc.name || loc.city || "Điểm đến") + '</strong>' + (loc.city && loc.name ? '<br><small>' + esc(loc.city) + (loc.country ? ", " + esc(loc.country) : "") + '</small>' : "");
+    var z = zoomFor(loc), head = loc.name || loc.place || loc.city || "Điểm đến", popup = '<strong>' + esc(head) + '</strong>' + (loc.city && head !== loc.city ? '<br><small>' + esc(loc.city) + (loc.country ? ", " + esc(loc.country) : "") + '</small>' : "");
 
     if (inst && inst.el === el) {                                       // 8.4 cùng khung: dời marker
       inst.marker.setLatLng([p.lat, p.lng]);

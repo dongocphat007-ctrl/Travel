@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240">
+  <defs>
+    <linearGradient id="bg_mn02" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#064e3b"/>
+      <stop offset="60%" stop-color="#047857"/>
+      <stop offset="100%" stop-color="#0d9488"/>
+    </linearGradient>
+    <linearGradient id="skin_mn02" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fee3cc"/>
+      <stop offset="100%" stop-color="#f5c29b"/>
+    </linearGradient>
+    <linearGradient id="shirt_mn02" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fef08a"/>
+      <stop offset="100%" stop-color="#fde047"/>
+    </linearGradient>
+    <pattern id="scarf_pattern" width="10" height="10" patternUnits="userSpaceOnUse">
+      <rect width="5" height="5" fill="#1e293b"/>
+      <rect x="5" width="5" height="5" fill="#f8fafc"/>
+      <rect y="5" width="5" height="5" fill="#f8fafc"/>
+      <rect x="5" y="5" width="5" height="5" fill="#1e293b"/>
+    </pattern>
+  </defs>
+  <rect width="240" height="240" rx="120" fill="url(#bg_mn02)"/>
+  <circle cx="120" cy="120" r="108" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="2"/>
+  
+  <!-- Hair Behind -->
+  <ellipse cx="120" cy="120" rx="52" ry="58" fill="#18181b"/>
+  
+  <!-- Shoulders & Yellow Shirt -->
+  <path d="M50 240c0-38 30-62 70-62s70 24 70 62z" fill="url(#shirt_mn02)"/>
+  
+  <!-- Traditional Khan Ran Scarf -->
+  <path d="M80 166c10 26 22 42 28 74h24c6-32 18-48 28-74-12 12-26 18-40 18s-28-6-40-18z" fill="url(#scarf_pattern)" stroke="#334155" stroke-width="1.5"/>
+  <path d="M78 162c8-8 26-14 42-14s34 6 42 14c-10 10-24 16-42 16s-32-6-42-16z" fill="url(#scarf_pattern)" stroke="#334155" stroke-width="1.5"/>
+  
+  <!-- Neck & Face -->
+  <path d="M106 138h28v22h-28z" fill="#f5c29b"/>
+  <ellipse cx="82" cy="118" rx="6" ry="10" fill="#f5c29b"/>
+  <ellipse cx="158" cy="118" rx="6" ry="10" fill="#f5c29b"/>
+  <ellipse cx="120" cy="116" rx="38" ry="46" fill="url(#skin_mn02)"/>
+  
+  <!-- Front Hair -->
+  <path d="M80 110c2-26 18-48 40-48 24 0 42 22 42 46-8-12-22-18-42-18s-32 6-40 20z" fill="#18181b"/>
+  <!-- Elegant Bangs -->
+  <path d="M82 100c14-16 34-18 50-8 6-8 16-12 28-6-4 12-14 20-24 22-18 4-36-2-54-8z" fill="#18181b"/>
+  
+  <!-- Eyebrows -->
+  <path d="M94 98c5-3 14-2 18 1" stroke="#27272a" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+  <path d="M128 99c4-3 13-4 18-1" stroke="#27272a" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+  
+  <!-- Eyes -->
+  <ellipse cx="103" cy="108" rx="4.5" ry="4.5" fill="#18181b"/>
+  <circle cx="105" cy="106" r="1.5" fill="#fff"/>
+  <ellipse cx="137" cy="108" rx="4.5" ry="4.5" fill="#18181b"/>
+  <circle cx="139" cy="106" r="1.5" fill="#fff"/>
+  
+  <!-- Soft blush -->
+  <circle cx="94" cy="120" r="8" fill="rgba(244,63,94,0.18)"/>
+  <circle cx="146" cy="120" r="8" fill="rgba(244,63,94,0.18)"/>
+  
+  <!-- Nose & Smile -->
+  <path d="M120 112v8l3 1.5" stroke="#d99566" stroke-width="2" stroke-linecap="round" fill="none"/>
+  <path d="M107 132c6 7 20 7 26 0" stroke="#be123c" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+  <path d="M109 132c4 4 18 4 22 0" fill="#fff"/>
+</svg>

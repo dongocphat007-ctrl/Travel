@@ -43,6 +43,35 @@ public class Notifications {
         });
     }
 
+    /**
+     * Như {@link #add} nhưng thay thế thông báo cũ cùng key (dùng cho hội thoại: mỗi cuộc trò chuyện chỉ giữ MỘT thông báo
+     * mới nhất trên chuông, đọc rồi mà có tin mới thì hiện lại chưa đọc). {@code extra} gắn thêm trường (vd. người gửi, mã hội thoại).
+     */
+    public void put(String userId, String type, String title, String body, String link, String key, Map<String, Object> extra) {
+        if (userId == null || userId.isEmpty() || key == null || key.isEmpty()) return;
+        db.edit("notifications", all -> {
+            all.removeIf(n -> userId.equals(n.get("userId")) && key.equals(n.get("key")));
+            Map<String, Object> n = Maps.of("id", Ids.newId("nt"), "userId", userId, "type", type, "title", title, "body", body,
+                    "link", link == null ? "" : link, "key", key, "read", false, "createdAt", Times.iso(clock.millis()));
+            if (extra != null) for (Map.Entry<String, Object> e : extra.entrySet()) n.putIfAbsent(e.getKey(), e.getValue());
+            all.add(n);
+            List<Map<String, Object>> mine = all.stream().filter(x -> userId.equals(x.get("userId"))).collect(Collectors.toList());
+            if (mine.size() > MAX_PER_USER) {
+                Set<Object> drop = new HashSet<>();
+                for (int i = 0; i < mine.size() - MAX_PER_USER; i++) drop.add(mine.get(i).get("id"));
+                all.removeIf(x -> drop.contains(x.get("id")));
+            }
+        });
+    }
+
+    /** Đánh dấu đã đọc mọi thông báo của người dùng có đúng key (mở hội thoại thì tắt chấm chưa đọc trên chuông). */
+    public void markReadByKey(String userId, String key) {
+        if (userId == null || key == null || key.isEmpty()) return;
+        db.edit("notifications", all -> all.forEach(n -> {
+            if (userId.equals(n.get("userId")) && key.equals(n.get("key"))) n.put("read", true);
+        }));
+    }
+
     public Map<String, Object> list(String userId) {
         List<Map<String, Object>> mine = new ArrayList<>();
         for (Map<String, Object> n : db.list("notifications")) if (userId.equals(n.get("userId"))) mine.add(n);

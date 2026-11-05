@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class AccountsTest {
     @Test void registerCreatesAccountWelcomeAndTourVouchers(@TempDir Path tmp) throws Exception {
         Fixture f = new Fixture(tmp);
-        Map<String, Object> r = f.accounts.register("Nguyễn Văn A", "A@Gmail.com", "matkhau123");
+        Map<String, Object> r = f.accounts.register("Nguyễn Văn A", "A@Gmail.com", "Matkhau@123");
         Map<String, Object> user = Maps.map(r.get("user"));
         assertEquals("a@gmail.com", user.get("email"));
         assertFalse(user.containsKey("passHash"), "không được trả passHash ra ngoài");
@@ -25,24 +25,24 @@ class AccountsTest {
         // passHash lưu trên đĩa là PBKDF2, không phải mật khẩu
         String h = Maps.str(f.accounts.byEmail("a@gmail.com"), "passHash");
         assertTrue(h.startsWith("pbkdf2$"));
-        assertFalse(h.contains("matkhau123"));
+        assertFalse(h.contains("Matkhau@123"));
     }
 
     @Test void duplicateEmailAndValidation(@TempDir Path tmp) throws Exception {
         Fixture f = new Fixture(tmp);
         f.newUser("a@gmail.com");
-        HttpError dup = assertThrows(HttpError.class, () -> f.accounts.register("Tên Khác", "A@gmail.com", "matkhau123"));
+        HttpError dup = assertThrows(HttpError.class, () -> f.accounts.register("Tên Khác", "A@gmail.com", "Matkhau@123"));
         assertEquals(409, dup.status());
         assertEquals("reg-email", dup.field());
         assertEquals("reg-pass", assertThrows(HttpError.class, () -> f.accounts.register("Tên", "b@gmail.com", "123")).field());
-        assertEquals("reg-name", assertThrows(HttpError.class, () -> f.accounts.register("A", "b@gmail.com", "matkhau123")).field());
-        assertEquals("reg-email", assertThrows(HttpError.class, () -> f.accounts.register("Tên", "khong-phai-email", "matkhau123")).field());
+        assertEquals("reg-name", assertThrows(HttpError.class, () -> f.accounts.register("A", "b@gmail.com", "Matkhau@123")).field());
+        assertEquals("reg-email", assertThrows(HttpError.class, () -> f.accounts.register("Tên", "khong-phai-email", "Matkhau@123")).field());
     }
 
     @Test void loginRules(@TempDir Path tmp) throws Exception {
         Fixture f = new Fixture(tmp);
         f.newUser("a@gmail.com");
-        assertEquals("a@gmail.com", f.accounts.login("A@GMAIL.com", "matkhau123").get("email"));
+        assertEquals("a@gmail.com", f.accounts.login("A@GMAIL.com", "Matkhau@123").get("email"));
         assertEquals(401, assertThrows(HttpError.class, () -> f.accounts.login("a@gmail.com", "sai-mat-khau")).status());
         HttpError none = assertThrows(HttpError.class, () -> f.accounts.login("khong@gmail.com", "x"));
         assertEquals(404, none.status());   // frontend dựa vào 404 để thử tài khoản cũ ở localStorage
@@ -103,5 +103,52 @@ class AccountsTest {
         Fixture f = new Fixture(tmp);
         assertEquals(401, assertThrows(HttpError.class, () -> f.accounts.google("aaa.bbb.ccc")).status());
         assertEquals(401, assertThrows(HttpError.class, () -> f.accounts.google("khong-phai-jwt")).status());
+    }
+
+    @Test void allSampleAccountsSeededAndCanLogin(@TempDir Path tmp) throws Exception {
+        Fixture f = new Fixture(tmp);
+        Map<String, String> expectedRoles = Map.of(
+            "admin@travel.vn", "admin",
+            "thungan@travel.vn", "cashier",
+            "dieuhanh@travel.vn", "operator",
+            "cskh@travel.vn", "support",
+            "bientap@travel.vn", "content",
+            "hdv.quan@travel.vn", "guide",
+            "hdv.son@travel.vn", "guide",
+            "hdv.phuc@travel.vn", "guide",
+            "hdv.tuan@travel.vn", "guide",
+            "hdv.dang@travel.vn", "guide"
+        );
+        for (Map.Entry<String, String> entry : expectedRoles.entrySet()) {
+            Map<String, Object> u = f.accounts.login(entry.getKey(), "Travel@2026");
+            assertNotNull(u, "Tài khoản " + entry.getKey() + " phải đăng nhập được");
+            assertEquals(entry.getValue(), u.get("role"));
+            assertNotNull(u.get("permissions"), "Phải có danh sách permissions trả về");
+        }
+    }
+
+    @Test void resetPasswordUpdatesHashAndAllowsLogin(@TempDir Path tmp) throws Exception {
+        Fixture f = new Fixture(tmp);
+        f.newUser("reset_me@gmail.com");
+        f.accounts.resetPassword("reset_me@gmail.com", "Matkhaumoi@456");
+        assertNotNull(f.accounts.login("reset_me@gmail.com", "Matkhaumoi@456"));
+        assertEquals(401, assertThrows(HttpError.class, () -> f.accounts.login("reset_me@gmail.com", "Matkhau@123")).status());
+    }
+
+    @Test void resetPasswordValidations(@TempDir Path tmp) throws Exception {
+        Fixture f = new Fixture(tmp);
+        assertEquals(404, assertThrows(HttpError.class, () -> f.accounts.resetPassword("not_found@gmail.com", "Matkhau@123")).status());
+        f.newUser("short_pass@gmail.com");
+        assertEquals(400, assertThrows(HttpError.class, () -> f.accounts.resetPassword("short_pass@gmail.com", "123")).status());
+    }
+
+    @Test void passwordComplexityValidation() {
+        assertEquals("Mật khẩu phải có ít nhất 8 ký tự", Accounts.passwordProblem("Ab1@"));
+        assertEquals("Mật khẩu phải có ít nhất 1 chữ in hoa (A-Z)", Accounts.passwordProblem("matkhau@123"));
+        assertEquals("Mật khẩu phải có ít nhất 1 chữ thường (a-z)", Accounts.passwordProblem("MATKHAU@123"));
+        assertEquals("Mật khẩu phải có ít nhất 1 chữ số (0-9)", Accounts.passwordProblem("Matkhau@abc"));
+        assertEquals("Mật khẩu phải có ít nhất 1 ký tự đặc biệt (!@#$%...)", Accounts.passwordProblem("Matkhau123"));
+        assertNull(Accounts.passwordProblem("Matkhau@123"));
+        assertNull(Accounts.passwordProblem("Travel@2026"));
     }
 }

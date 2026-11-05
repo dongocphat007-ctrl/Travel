@@ -28,7 +28,7 @@ class BookingFlowTest {
         Map<String, Object> b = f.bookings.create(u, in);
         assertEquals(5_000_000L, ((Number) b.get("price")).longValue());
         assertEquals(1_000_000L, ((Number) b.get("deposit")).longValue());
-        assertEquals("pending", b.get("status"));
+        assertEquals("pending_payment", b.get("status"));
         assertTrue(Maps.str(b, "payCode").matches("TRAVEL\\d{13}"));
         assertEquals(Maps.str(u, "id"), b.get("userId"));
     }
@@ -91,11 +91,16 @@ class BookingFlowTest {
         Fixture f = new Fixture(tmp);
         Map<String, Object> a = f.newUser("a@gmail.com");
         Map<String, Object> in = req("s1", "2026-11-10"); in.put("guideId", "g1");
-        assertEquals("guide", assertThrows(HttpError.class, () -> f.bookings.create(a, in)).field());
+        // Tour tự túc không hỗ trợ thuê hoặc chọn hướng dẫn viên
+        assertEquals(400, assertThrows(HttpError.class, () -> f.bookings.create(a, in)).status());
         in.put("hdvOn", true); in.put("hdvHours", 10);
+        assertEquals(400, assertThrows(HttpError.class, () -> f.bookings.create(a, in)).status());
+        // Đặt tour tự túc bình thường không HDV (2 người × 1.000.000)
+        in.remove("guideId");
+        in.remove("hdvOn");
+        in.remove("hdvHours");
         Map<String, Object> b = f.bookings.create(a, in);
-        // 2 người × 1.000.000 + HDV 2 ngày × (1.500.000 + 2h × 200.000)
-        assertEquals(2_000_000L + 2 * 1_900_000L, ((Number) b.get("price")).longValue());
+        assertEquals(2_000_000L, ((Number) b.get("price")).longValue());
     }
 
     @Test void permissionsOnListCancelAndSync(@TempDir Path tmp) throws Exception {
@@ -115,7 +120,7 @@ class BookingFlowTest {
         f.bookings.sync(a, List.of(Map.of("id", id, "depositPaid", true, "status", "confirmed", "price", 1, "payCode", "TRAVEL1", "adminNote", "x")));
         Map<String, Object> after = f.bookings.find(id);
         assertEquals(false, after.get("depositPaid"));
-        assertEquals("pending", after.get("status"));
+        assertEquals("pending_payment", after.get("status"));
         assertEquals(5_000_000L, ((Number) after.get("price")).longValue());
         assertEquals(b.get("payCode"), after.get("payCode"));
         // người khác không sửa được đơn của mình
@@ -125,11 +130,16 @@ class BookingFlowTest {
         f.bookings.sync(a, List.of(Map.of("id", id, "payChoice", "full", "claims", Map.of("deposit", "2026-11-01T03:00:00Z"))));
         assertEquals("full", f.bookings.find(id).get("payChoice"));
         assertNotNull(Maps.map(f.bookings.find(id).get("claims")).get("deposit"));
-        // Admin xác nhận được
-        f.bookings.sync(admin, List.of(Map.of("id", id, "status", "confirmed", "adminNote", "ok")));
-        assertEquals("confirmed", f.bookings.find(id).get("status"));
-        // đã xác nhận thì khách không tự hủy được
+        // Admin KHÔNG đổi được trạng thái / cờ thanh toán qua sync (phải qua vòng đời đơn: thu ngân → admin duyệt)
+        f.bookings.sync(admin, List.of(Map.of("id", id, "status", "confirmed", "depositPaid", true, "adminNote", "ok")));
+        assertEquals("pending_payment", f.bookings.find(id).get("status"));
+        assertEquals(false, f.bookings.find(id).get("depositPaid"));
+        assertEquals("ok", f.bookings.find(id).get("adminNote"));
+        // đã thanh toán thì khách không tự hủy bằng đường cũ được
+        f.bookings.mutate(id, x -> { x.put("status", "paid_deposit"); x.put("depositPaid", true); });
         assertEquals(409, assertThrows(HttpError.class, () -> f.bookings.cancel(id, a)).status());
+        assertEquals(0, f.bookings.delete(List.of(id)), "đơn đang hoạt động không xóa được");
+        f.bookings.mutate(id, x -> { x.put("status", "cancelled"); x.put("depositPaid", false); });
         assertEquals(1, f.bookings.delete(List.of(id)));
     }
 }

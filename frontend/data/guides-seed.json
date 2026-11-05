@@ -1,7 +1,648 @@
-[
-  {"id":"g_hn01","name":"Nguyễn Minh Quân","avatar":"img/guides/g_hn01.svg","bio":"Hướng dẫn viên Hà Nội – Hạ Long, 8 năm dẫn tour văn hóa và du thuyền. Thích kể chuyện phố cổ và ẩm thực đường phố cho khách lần đầu đến miền Bắc.","languages":["Tiếng Việt","English"],"experience":8,"regions":["Miền Bắc"],"status":"active","busyDates":["2026-11-02","2026-11-03","2026-11-14","2026-11-15","2026-12-05"],"demo":true},
-  {"id":"g_hn02","name":"Trần Thu Hà","avatar":"img/guides/g_hn02.svg","bio":"Chuyên tour Tây Bắc – Sa Pa – Hà Giang, am hiểu văn hóa dân tộc thiểu số, đường đèo và các phiên chợ vùng cao.","languages":["Tiếng Việt","English","Français"],"experience":6,"regions":["Miền Bắc"],"status":"active","busyDates":["2026-10-28","2026-10-29","2026-11-09","2026-11-20","2026-11-21","2026-12-12"],"demo":true},
-  {"id":"g_mt01","name":"Lê Hoàng Phúc","avatar":"img/guides/g_mt01.svg","bio":"Hướng dẫn viên Huế – Đà Nẵng – Hội An, kể chuyện lịch sử cố đô và dẫn khách đi những quán ăn địa phương ít người biết.","languages":["Tiếng Việt","English"],"experience":10,"regions":["Miền Trung"],"status":"active","busyDates":["2026-11-05","2026-11-06","2026-11-07","2026-11-22","2026-12-01"],"demo":true},
-  {"id":"g_mn01","name":"Võ Anh Tuấn","avatar":"img/guides/g_mn01.svg","bio":"Hướng dẫn viên Sài Gòn – miền Tây sông nước, chuyên tour ẩm thực, chợ nổi và vườn trái cây theo mùa.","languages":["Tiếng Việt","English"],"experience":7,"regions":["Miền Nam"],"status":"busy","busyDates":["2026-10-16","2026-10-17","2026-10-18","2026-11-02","2026-11-28"],"demo":true},
-  {"id":"g_qt01","name":"Đặng Bảo Ngọc","avatar":"img/guides/g_qt01.svg","bio":"Dẫn đoàn quốc tế Đông Nam Á và Đông Bắc Á, thành thạo thủ tục xuất nhập cảnh và hỗ trợ khách đoàn gia đình.","languages":["Tiếng Việt","English","日本語"],"experience":9,"regions":["Quốc tế"],"status":"off","busyDates":["2026-11-10","2026-11-11","2026-11-12","2026-11-13","2026-12-20","2026-12-21"],"demo":true}
+﻿[
+  {
+    "id": "g_hn01",
+    "name": "Nguyễn Minh Quân",
+    "avatar": "img/guides/g_hn01.jpg",
+    "bio": "Hướng dẫn viên Hà Nội – Hạ Long, 8 năm dẫn tour văn hóa và du thuyền. Thích kể chuyện phố cổ và ẩm thực đường phố cho khách lần đầu đến miền Bắc.",
+    "languages": [
+      "Tiếng Việt",
+      "English"
+    ],
+    "experience": 8,
+    "regions": [
+      "Miền Bắc"
+    ],
+    "status": "active",
+    "busyDates": [
+      "2026-11-02",
+      "2026-11-03",
+      "2026-11-14",
+      "2026-11-15",
+      "2026-12-05"
+    ],
+    "demo": true,
+    "title": "HDV nội địa",
+    "rating": 4.8,
+    "reviewCount": 126,
+    "toursLed": 310,
+    "specialties": [
+      "Văn hóa phố cổ",
+      "Du thuyền Hạ Long",
+      "Ẩm thực đường phố"
+    ],
+    "provinces": [
+      "Hà Nội",
+      "Quảng Ninh",
+      "Hải Phòng"
+    ],
+    "certifications": [
+      "Thẻ HDV du lịch nội địa",
+      "Sơ cấp cứu"
+    ]
+  },
+  {
+    "id": "g_hn02",
+    "name": "Trần Thu Hà",
+    "avatar": "img/guides/g_hn02.jpg",
+    "bio": "Chuyên tour Tây Bắc – Sa Pa – Hà Giang, am hiểu văn hóa dân tộc thiểu số, đường đèo và các phiên chợ vùng cao.",
+    "languages": [
+      "Tiếng Việt",
+      "English",
+      "Français"
+    ],
+    "experience": 6,
+    "regions": [
+      "Miền Bắc"
+    ],
+    "status": "active",
+    "busyDates": [
+      "2026-10-28",
+      "2026-10-29",
+      "2026-11-09",
+      "2026-11-20",
+      "2026-11-21",
+      "2026-12-12"
+    ],
+    "demo": true,
+    "title": "HDV quốc tế",
+    "rating": 4.9,
+    "reviewCount": 98,
+    "toursLed": 240,
+    "specialties": [
+      "Di sản & lịch sử",
+      "Ẩm thực",
+      "Khách nói tiếng Pháp"
+    ],
+    "provinces": [
+      "Hà Nội",
+      "Ninh Bình",
+      "Hà Nam"
+    ],
+    "certifications": [
+      "Thẻ HDV du lịch quốc tế",
+      "Sơ cấp cứu"
+    ]
+  },
+  {
+    "id": "g_hn03",
+    "name": "Hoàng Văn Sơn",
+    "avatar": "img/guides/g_hn03.jpg",
+    "bio": "Hướng dẫn viên Tây Bắc, 9 năm dẫn tour trekking Sapa – Hà Giang. Quen đường đèo, bản làng và các mùa săn mây, phù hợp nhóm bạn thích vận động.",
+    "languages": [
+      "Tiếng Việt",
+      "English"
+    ],
+    "experience": 9,
+    "regions": [
+      "Miền Bắc"
+    ],
+    "status": "active",
+    "busyDates": [
+      "2026-11-07",
+      "2026-11-08",
+      "2026-12-12",
+      "2026-12-13"
+    ],
+    "demo": true,
+    "title": "HDV nội địa",
+    "rating": 4.8,
+    "reviewCount": 76,
+    "toursLed": 190,
+    "specialties": [
+      "Trekking Tây Bắc",
+      "Săn mây",
+      "Văn hóa dân tộc"
+    ],
+    "provinces": [
+      "Lào Cai",
+      "Hà Giang",
+      "Yên Bái"
+    ],
+    "certifications": [
+      "Thẻ HDV du lịch nội địa",
+      "Sơ cấp cứu vùng núi"
+    ]
+  },
+  {
+    "id": "g_hn04",
+    "name": "Phạm Thị Lan",
+    "avatar": "img/guides/g_hn04.jpg",
+    "bio": "Hướng dẫn viên vùng biển đảo Đông Bắc, 5 năm đưa gia đình và nhóm bạn đi Cát Bà, Cô Tô. Chu đáo với khách có trẻ nhỏ và người lớn tuổi.",
+    "languages": [
+      "Tiếng Việt",
+      "English",
+      "中文"
+    ],
+    "experience": 5,
+    "regions": [
+      "Miền Bắc"
+    ],
+    "status": "active",
+    "busyDates": [
+      "2026-11-20",
+      "2026-11-21",
+      "2026-11-22"
+    ],
+    "demo": true,
+    "title": "HDV nội địa",
+    "rating": 4.7,
+    "reviewCount": 64,
+    "toursLed": 150,
+    "specialties": [
+      "Biển đảo Cát Bà – Cô Tô",
+      "Gia đình có trẻ nhỏ",
+      "Hải sản"
+    ],
+    "provinces": [
+      "Hải Phòng",
+      "Quảng Ninh"
+    ],
+    "certifications": [
+      "Thẻ HDV du lịch nội địa"
+    ]
+  },
+  {
+    "id": "g_hn05",
+    "name": "Bùi Đức Thắng",
+    "avatar": "img/guides/g_hn05.jpg",
+    "bio": "Hướng dẫn viên 12 năm với các tuyến Mộc Châu – Sơn La – Điện Biên. Kinh nghiệm điều phối đoàn đông và kể chuyện lịch sử chiến dịch Điện Biên Phủ.",
+    "languages": [
+      "Tiếng Việt"
+    ],
+    "experience": 12,
+    "regions": [
+      "Miền Bắc"
+    ],
+    "status": "busy",
+    "busyDates": [
+      "2026-11-01",
+      "2026-11-02",
+      "2026-11-03",
+      "2026-11-04",
+      "2026-11-05",
+      "2026-11-15",
+      "2026-11-16"
+    ],
+    "demo": true,
+    "title": "HDV nội địa",
+    "rating": 4.6,
+    "reviewCount": 91,
+    "toursLed": 330,
+    "specialties": [
+      "Mộc Châu – Sơn La",
+      "Điện Biên lịch sử",
+      "Đoàn đông người"
+    ],
+    "provinces": [
+      "Sơn La",
+      "Điện Biên",
+      "Hòa Bình"
+    ],
+    "certifications": [
+      "Thẻ HDV du lịch nội địa"
+    ]
+  },
+  {
+    "id": "g_mt01",
+    "name": "Lê Hoàng Phúc",
+    "avatar": "img/guides/g_mt01.jpg",
+    "bio": "Hướng dẫn viên Huế – Đà Nẵng – Hội An, kể chuyện lịch sử cố đô và dẫn khách đi những quán ăn địa phương ít người biết.",
+    "languages": [
+      "Tiếng Việt",
+      "English"
+    ],
+    "experience": 10,
+    "regions": [
+      "Miền Trung"
+    ],
+    "status": "active",
+    "busyDates": [
+      "2026-11-05",
+      "2026-11-06",
+      "2026-11-07",
+      "2026-11-22",
+      "2026-12-01"
+    ],
+    "demo": true,
+    "title": "HDV nội địa",
+    "rating": 4.7,
+    "reviewCount": 142,
+    "toursLed": 420,
+    "specialties": [
+      "Cố đô Huế",
+      "Phố cổ Hội An",
+      "Di sản miền Trung"
+    ],
+    "provinces": [
+      "Thừa Thiên Huế",
+      "Đà Nẵng",
+      "Quảng Nam"
+    ],
+    "certifications": [
+      "Thẻ HDV du lịch nội địa"
+    ]
+  },
+  {
+    "id": "g_mt02",
+    "name": "Nguyễn Thị Mai",
+    "avatar": "img/guides/g_mt02.jpg",
+    "bio": "Hướng dẫn viên Quảng Bình 6 năm, chuyên các tuyến hang động Phong Nha – Kẻ Bàng. Thuộc địa hình, an toàn khi vào hang và biết điểm chụp ảnh đẹp.",
+    "languages": [
+      "Tiếng Việt",
+      "English"
+    ],
+    "experience": 6,
+    "regions": [
+      "Miền Trung"
+    ],
+    "status": "active",
+    "busyDates": [
+      "2026-11-09",
+      "2026-11-10",
+      "2026-12-01"
+    ],
+    "demo": true,
+    "title": "HDV nội địa",
+    "rating": 4.8,
+    "reviewCount": 83,
+    "toursLed": 175,
+    "specialties": [
+      "Hang động Phong Nha",
+      "Khám phá thiên nhiên",
+      "Chụp ảnh"
+    ],
+    "provinces": [
+      "Quảng Bình",
+      "Quảng Trị"
+    ],
+    "certifications": [
+      "Thẻ HDV du lịch nội địa",
+      "Cứu hộ hang động cơ bản"
+    ]
+  },
+  {
+    "id": "g_mt03",
+    "name": "Trương Quốc Bảo",
+    "avatar": "img/guides/g_mt03.jpg",
+    "bio": "Hướng dẫn viên duyên hải Nam Trung Bộ, 7 năm dẫn tour biển đảo Nha Trang – Phú Yên – Quy Nhơn, nói được tiếng Hàn giao tiếp cho đoàn khách Hàn Quốc.",
+    "languages": [
+      "Tiếng Việt",
+      "English",
+      "한국어"
+    ],
+    "experience": 7,
+    "regions": [
+      "Miền Trung"
+    ],
+    "status": "active",
+    "busyDates": [
+      "2026-11-12",
+      "2026-11-13",
+      "2026-11-27",
+      "2026-11-28"
+    ],
+    "demo": true,
+    "title": "HDV nội địa",
+    "rating": 4.7,
+    "reviewCount": 102,
+    "toursLed": 230,
+    "specialties": [
+      "Biển đảo Nha Trang – Phú Yên",
+      "Khách Hàn Quốc",
+      "Lặn ngắm san hô"
+    ],
+    "provinces": [
+      "Khánh Hòa",
+      "Phú Yên",
+      "Bình Định"
+    ],
+    "certifications": [
+      "Thẻ HDV du lịch nội địa",
+      "Cứu hộ bơi lội"
+    ]
+  },
+  {
+    "id": "g_mt04",
+    "name": "Đinh Công Hiếu",
+    "avatar": "img/guides/g_mt04.jpg",
+    "bio": "Hướng dẫn viên Tây Nguyên 9 năm, quen Đà Lạt, Buôn Ma Thuột, Kon Tum. Giới thiệu văn hóa cồng chiêng và đưa khách đi các điểm săn mây, đồi cà phê.",
+    "languages": [
+      "Tiếng Việt",
+      "English"
+    ],
+    "experience": 9,
+    "regions": [
+      "Miền Trung"
+    ],
+    "status": "active",
+    "busyDates": [
+      "2026-11-18",
+      "2026-11-19",
+      "2026-12-08"
+    ],
+    "demo": true,
+    "title": "HDV nội địa",
+    "rating": 4.6,
+    "reviewCount": 71,
+    "toursLed": 200,
+    "specialties": [
+      "Tây Nguyên",
+      "Văn hóa cồng chiêng",
+      "Cà phê & săn mây"
+    ],
+    "provinces": [
+      "Lâm Đồng",
+      "Đắk Lắk",
+      "Kon Tum",
+      "Gia Lai"
+    ],
+    "certifications": [
+      "Thẻ HDV du lịch nội địa"
+    ]
+  },
+  {
+    "id": "g_mn01",
+    "name": "Võ Anh Tuấn",
+    "avatar": "img/guides/.jpg",
+    "bio": "Hướng dẫn viên Sài Gòn – miền Tây sông nước, chuyên tour ẩm thực, chợ nổi và vườn trái cây theo mùa.",
+    "languages": [
+      "Tiếng Việt",
+      "English"
+    ],
+    "experience": 7,
+    "regions": [
+      "Miền Nam"
+    ],
+    "status": "busy",
+    "busyDates": [
+      "2026-10-16",
+      "2026-10-17",
+      "2026-10-18",
+      "2026-11-02",
+      "2026-11-28"
+    ],
+    "demo": true,
+    "title": "HDV nội địa",
+    "rating": 4.6,
+    "reviewCount": 87,
+    "toursLed": 205,
+    "specialties": [
+      "Sông nước miền Tây",
+      "Chợ nổi",
+      "Ẩm thực Nam Bộ"
+    ],
+    "provinces": [
+      "Cần Thơ",
+      "Tiền Giang",
+      "Bến Tre"
+    ],
+    "certifications": [
+      "Thẻ HDV du lịch nội địa"
+    ]
+  },
+  {
+    "id": "g_mn02",
+    "name": "Châu Ngọc Diệp",
+    "avatar": "img/guides/.jpg",
+    "bio": "Hướng dẫn viên miền Tây 6 năm, am hiểu vườn trái cây, chợ nổi và đời sống sông nước. Nói được tiếng Anh và tiếng Pháp.",
+    "languages": [
+      "Tiếng Việt",
+      "English",
+      "Français"
+    ],
+    "experience": 6,
+    "regions": [
+      "Miền Nam"
+    ],
+    "status": "active",
+    "busyDates": [
+      "2026-11-06",
+      "2026-11-07",
+      "2026-12-19",
+      "2026-12-20"
+    ],
+    "demo": true,
+    "title": "HDV nội địa",
+    "rating": 4.8,
+    "reviewCount": 95,
+    "toursLed": 215,
+    "specialties": [
+      "Miền Tây sông nước",
+      "Homestay & vườn trái cây",
+      "Khách nói tiếng Pháp"
+    ],
+    "provinces": [
+      "Cần Thơ",
+      "Bến Tre",
+      "Vĩnh Long",
+      "Đồng Tháp"
+    ],
+    "certifications": [
+      "Thẻ HDV du lịch nội địa"
+    ]
+  },
+  {
+    "id": "g_mn03",
+    "name": "Lý Thanh Tùng",
+    "avatar": "img/guides/.jpg",
+    "bio": "Hướng dẫn viên TP.HCM 11 năm, dẫn các tuyến Sài Gòn – Củ Chi – Cần Giờ – Vũng Tàu. Nói tiếng Anh và tiếng Hoa, phù hợp đoàn doanh nghiệp.",
+    "languages": [
+      "Tiếng Việt",
+      "English",
+      "中文"
+    ],
+    "experience": 11,
+    "regions": [
+      "Miền Nam"
+    ],
+    "status": "active",
+    "busyDates": [
+      "2026-11-03",
+      "2026-11-04",
+      "2026-11-24"
+    ],
+    "demo": true,
+    "title": "HDV quốc tế",
+    "rating": 4.7,
+    "reviewCount": 134,
+    "toursLed": 380,
+    "specialties": [
+      "TP.HCM – Củ Chi – Cần Giờ",
+      "Lịch sử chiến tranh",
+      "Khách Hoa ngữ"
+    ],
+    "provinces": [
+      "TP. Hồ Chí Minh",
+      "Bà Rịa – Vũng Tàu",
+      "Tây Ninh"
+    ],
+    "certifications": [
+      "Thẻ HDV du lịch quốc tế",
+      "Sơ cấp cứu"
+    ]
+  },
+  {
+    "id": "g_mn04",
+    "name": "Huỳnh Kim Ngân",
+    "avatar": "img/guides/.jpg",
+    "bio": "Hướng dẫn viên biển đảo phía Nam, 5 năm dẫn tour Phú Quốc, Hà Tiên và Côn Đảo. Chú trọng lịch trình nhẹ nhàng cho gia đình và cặp đôi.",
+    "languages": [
+      "Tiếng Việt",
+      "English"
+    ],
+    "experience": 5,
+    "regions": [
+      "Miền Nam"
+    ],
+    "status": "active",
+    "busyDates": [
+      "2026-11-14",
+      "2026-11-15",
+      "2026-12-24",
+      "2026-12-25"
+    ],
+    "demo": true,
+    "title": "HDV nội địa",
+    "rating": 4.7,
+    "reviewCount": 58,
+    "toursLed": 140,
+    "specialties": [
+      "Đảo Phú Quốc – Côn Đảo",
+      "Nghỉ dưỡng biển",
+      "Tâm linh Côn Đảo"
+    ],
+    "provinces": [
+      "Kiên Giang",
+      "Bà Rịa – Vũng Tàu"
+    ],
+    "certifications": [
+      "Thẻ HDV du lịch nội địa",
+      "Cứu hộ bơi lội"
+    ]
+  },
+  {
+    "id": "g_qt01",
+    "name": "Đặng Bảo Ngọc",
+    "avatar": "img/guides/.jpg",
+    "bio": "Dẫn đoàn quốc tế Đông Nam Á và Đông Bắc Á, thành thạo thủ tục xuất nhập cảnh và hỗ trợ khách đoàn gia đình.",
+    "languages": [
+      "Tiếng Việt",
+      "English",
+      "日本語"
+    ],
+    "experience": 9,
+    "regions": [
+      "Quốc tế"
+    ],
+    "status": "off",
+    "busyDates": [
+      "2026-11-10",
+      "2026-11-11",
+      "2026-11-12",
+      "2026-11-13",
+      "2026-12-20",
+      "2026-12-21"
+    ],
+    "demo": true,
+    "title": "HDV quốc tế",
+    "rating": 4.9,
+    "reviewCount": 110,
+    "toursLed": 260,
+    "specialties": [
+      "Nhật Bản",
+      "Văn hóa & lễ hội",
+      "Tour đoàn quốc tế"
+    ],
+    "provinces": [
+      "Nhật Bản",
+      "Hàn Quốc"
+    ],
+    "certifications": [
+      "Thẻ HDV du lịch quốc tế",
+      "JLPT N2"
+    ]
+  },
+  {
+    "id": "g_qt02",
+    "name": "Mai Anh Thư",
+    "avatar": "img/guides/.jpg",
+    "bio": "Hướng dẫn viên tour Đông Nam Á, 8 năm dẫn đoàn Bangkok – Pattaya, Singapore, Kuala Lumpur. Xử lý tốt thủ tục xuất nhập cảnh cho đoàn gia đình.",
+    "languages": [
+      "Tiếng Việt",
+      "English",
+      "ภาษาไทย"
+    ],
+    "experience": 8,
+    "regions": [
+      "Quốc tế"
+    ],
+    "status": "active",
+    "busyDates": [
+      "2026-11-10",
+      "2026-11-11",
+      "2026-11-12",
+      "2026-12-03"
+    ],
+    "demo": true,
+    "title": "HDV quốc tế",
+    "rating": 4.8,
+    "reviewCount": 119,
+    "toursLed": 270,
+    "specialties": [
+      "Thái Lan – Singapore – Malaysia",
+      "Tour đoàn gia đình",
+      "Mua sắm & ẩm thực"
+    ],
+    "provinces": [
+      "Thái Lan",
+      "Singapore",
+      "Malaysia"
+    ],
+    "certifications": [
+      "Thẻ HDV du lịch quốc tế",
+      "Sơ cấp cứu"
+    ]
+  },
+  {
+    "id": "g_qt03",
+    "name": "Vũ Hải Đăng",
+    "avatar": "img/guides/.jpg",
+    "bio": "Hướng dẫn viên Đông Bắc Á, 7 năm dẫn tour Seoul – Jeju, Thượng Hải – Bắc Kinh. Nói được tiếng Hàn và tiếng Trung giao tiếp.",
+    "languages": [
+      "Tiếng Việt",
+      "English",
+      "한국어",
+      "中文"
+    ],
+    "experience": 7,
+    "regions": [
+      "Quốc tế"
+    ],
+    "status": "active",
+    "busyDates": [
+      "2026-11-16",
+      "2026-11-17",
+      "2026-11-18",
+      "2026-12-10"
+    ],
+    "demo": true,
+    "title": "HDV quốc tế",
+    "rating": 4.7,
+    "reviewCount": 88,
+    "toursLed": 205,
+    "specialties": [
+      "Hàn Quốc – Trung Quốc",
+      "Mùa hoa anh đào & lá đỏ",
+      "Đoàn doanh nghiệp"
+    ],
+    "provinces": [
+      "Hàn Quốc",
+      "Trung Quốc",
+      "Đài Loan"
+    ],
+    "certifications": [
+      "Thẻ HDV du lịch quốc tế",
+      "TOPIK 4"
+    ]
+  }
 ]

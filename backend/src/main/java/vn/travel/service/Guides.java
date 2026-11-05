@@ -27,11 +27,20 @@ public class Guides {
 
     @Autowired
     public Guides(Db db, TravelProperties props, ObjectMapper mapper) {
-        this(db, Paths.get(props.webRoot(), "data", "guides-seed.json"), mapper);
+        this(db, Paths.get(props.webRoot(), "data", "guides-seed.json"), mapper, props.showSample());
     }
 
     public Guides(Db db, Path seedFile, ObjectMapper mapper) {
+        this(db, seedFile, mapper, true);
+    }
+
+    /** sampleData=false: gỡ HDV demo khỏi storage và không nạp lại từ file seed. */
+    public Guides(Db db, Path seedFile, ObjectMapper mapper, boolean sampleData) {
         this.db = db;
+        if (!sampleData) {
+            db.edit("guides", all -> all.removeIf(g -> Maps.bool(g, "demo")));
+            return;
+        }
         try {
             if (Files.exists(seedFile)) {
                 List<Map<String, Object>> seed = mapper.readValue(Files.readString(seedFile), Db.LIST);
@@ -66,7 +75,7 @@ public class Guides {
         for (Object d : Maps.list(g.get("busyDates"))) busy.add(String.valueOf(d));
         String id = Maps.str(g, "id");
         for (Map<String, Object> b : bookings) {
-            if (!id.equals(Maps.str(b, "guideId")) || "cancelled".equals(b.get("status"))) continue;
+            if (!id.equals(Maps.str(b, "guideId")) || vn.travel.util.Flow.inactive(b.get("status"))) continue;
             busy.addAll(GuideAvailability.rangeDays(b.get("date"), tourDays(b)));
         }
         Map<String, Object> o = new LinkedHashMap<>(g);

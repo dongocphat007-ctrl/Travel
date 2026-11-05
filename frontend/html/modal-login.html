@@ -11,8 +11,8 @@
     </div>
     <div id="panel-login">
       <div class="form-group" style="margin-bottom:14px">
-        <label class="form-label" for="li-email">Email</label>
-        <input type="email" id="li-email" class="form-input" placeholder="example@email.com" autocomplete="email">
+        <label class="form-label" for="li-email">Email hoặc mã nhân viên</label>
+        <input type="text" id="li-email" class="form-input" placeholder="example@email.com hoặc mã nhân viên" autocomplete="username">
         <div class="form-err" id="err-li-email"></div>
       </div>
       <div class="form-group" style="margin-bottom:6px">
@@ -22,6 +22,9 @@
           <button type="button" class="pass-toggle" data-target="li-pass">👁</button>
         </div>
         <div class="form-err" id="err-li-pass"></div>
+        <div style="display:flex;justify-content:flex-end;margin-top:6px">
+          <button type="button" class="btn-link-forgot" id="btn-show-forgot" style="background:none;border:none;color:var(--primary,#0F766E);font-size:0.8125rem;cursor:pointer;padding:0;text-decoration:underline">Quên mật khẩu?</button>
+        </div>
       </div>
       <div class="form-err auth-err" id="err-li-general"></div>
       <button class="btn btn-accent" id="btn-do-login" style="width:100%;margin-top:16px;padding:12px">Đăng nhập</button>
@@ -48,12 +51,18 @@
         <input type="email" id="reg-email" class="form-input" placeholder="tenban@gmail.com" autocomplete="email">
         <div class="form-err" id="err-reg-email"></div>
       </div>
+      <div class="form-group" style="margin-bottom:14px">
+        <label class="form-label" for="reg-birthday">Ngày sinh <span class="req">*</span></label>
+        <input type="date" id="reg-birthday" class="form-input" autocomplete="bday">
+        <div class="form-err" id="err-reg-birthday"></div>
+      </div>
       <div class="form-group" style="margin-bottom:6px">
         <label class="form-label" for="reg-pass">Mật khẩu <span class="req">*</span></label>
         <div class="pass-wrap">
-          <input type="password" id="reg-pass" class="form-input" placeholder="Tối thiểu 6 ký tự" autocomplete="new-password">
+          <input type="password" id="reg-pass" class="form-input" placeholder="Tối thiểu 8 ký tự (hoa, thường, số, ký tự đặc biệt)" autocomplete="new-password">
           <button type="button" class="pass-toggle" data-target="reg-pass">👁</button>
         </div>
+        <div class="pass-hint" style="font-size:0.75rem;color:var(--muted,#6B7280);margin-top:3px">Bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt</div>
         <div class="form-err" id="err-reg-pass"></div>
       </div>
       <div class="form-group" style="margin-bottom:6px">
@@ -86,6 +95,60 @@
         <button class="otp-resend-btn" id="btn-resend-otp" disabled>Gửi lại (<span id="otp-countdown">60</span>s)</button>
       </div>
       <button class="otp-back-btn" id="btn-back-to-register">← Quay lại chỉnh sửa</button>
+    </div>
+    <!-- PANEL FORGOT PASSWORD: BƯỚC 1 - NHẬP EMAIL -->
+    <div id="panel-forgot" style="display:none">
+      <div class="otp-info-box" style="margin-bottom:16px">
+        <div class="otp-info-icon">🔑</div>
+        <p class="otp-info-text"><strong>Quên mật khẩu?</strong></p>
+        <p class="otp-info-sub">Nhập email tài khoản của bạn để nhận mã xác nhận OTP đặt lại mật khẩu mới.</p>
+      </div>
+      <div class="form-group" style="margin-bottom:14px">
+        <label class="form-label" for="fp-email">Email tài khoản <span class="req">*</span></label>
+        <input type="email" id="fp-email" class="form-input" placeholder="tenban@gmail.com" autocomplete="email">
+        <div class="form-err" id="err-fp-email"></div>
+      </div>
+      <div class="form-err auth-err" id="err-fp-general"></div>
+      <button class="btn btn-accent" id="btn-fp-send-otp" style="width:100%;margin-top:14px;padding:12px">📧 Gửi mã xác nhận</button>
+      <button class="otp-back-btn" id="btn-fp-back" style="margin-top:14px">← Quay lại đăng nhập</button>
+    </div>
+    <!-- PANEL FORGOT PASSWORD: BƯỚC 2 - NHẬP OTP & MẬT KHẨU MỚI -->
+    <div id="panel-forgot-reset" style="display:none">
+      <div class="otp-info-box" style="margin-bottom:16px">
+        <div class="otp-info-icon">📬</div>
+        <p class="otp-info-text">Mã xác nhận 6 chữ số đã được gửi tới</p>
+        <p class="otp-email-display" id="fp-email-display"></p>
+        <p class="otp-info-sub">Kiểm tra hộp thư đến (hoặc thư rác). Mã có hiệu lực trong <strong>5 phút</strong>.</p>
+      </div>
+      <div class="form-group" style="margin-bottom:12px">
+        <label class="form-label" for="fp-otp-input">Mã OTP <span class="req">*</span></label>
+        <input type="text" id="fp-otp-input" class="form-input otp-input-field" placeholder="_ _ _ _ _ _" maxlength="6" autocomplete="one-time-code" inputmode="numeric">
+        <div class="form-err" id="err-fp-otp"></div>
+      </div>
+      <div class="form-group" style="margin-bottom:12px">
+        <label class="form-label" for="fp-new-pass">Mật khẩu mới <span class="req">*</span></label>
+        <div class="pass-wrap">
+          <input type="password" id="fp-new-pass" class="form-input" placeholder="Tối thiểu 8 ký tự (hoa, thường, số, ký tự đặc biệt)" autocomplete="new-password">
+          <button type="button" class="pass-toggle" data-target="fp-new-pass">👁</button>
+        </div>
+        <div class="pass-hint" style="font-size:0.75rem;color:var(--muted,#6B7280);margin-top:3px">Bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt</div>
+        <div class="form-err" id="err-fp-new-pass"></div>
+      </div>
+      <div class="form-group" style="margin-bottom:6px">
+        <label class="form-label" for="fp-new-pass2">Xác nhận mật khẩu mới <span class="req">*</span></label>
+        <div class="pass-wrap">
+          <input type="password" id="fp-new-pass2" class="form-input" placeholder="Nhập lại mật khẩu mới" autocomplete="new-password">
+          <button type="button" class="pass-toggle" data-target="fp-new-pass2">👁</button>
+        </div>
+        <div class="form-err" id="err-fp-new-pass2"></div>
+      </div>
+      <div class="form-err auth-err" id="err-fp-reset-general"></div>
+      <button class="btn btn-accent" id="btn-fp-do-reset" style="width:100%;margin-top:16px;padding:12px">🔒 Đặt lại mật khẩu</button>
+      <div class="otp-resend-wrap" style="margin-top:14px">
+        <span class="otp-resend-label">Không nhận được mã?</span>
+        <button class="otp-resend-btn" id="btn-fp-resend-otp" disabled>Gửi lại (<span id="fp-otp-countdown">60</span>s)</button>
+      </div>
+      <button class="otp-back-btn" id="btn-fp-back-step1" style="margin-top:10px">← Quay lại đổi email khác</button>
     </div>
     <p class="login-legal-note">
       Bằng cách tiếp tục, bạn đồng ý với Điều khoản sử dụng của Travel

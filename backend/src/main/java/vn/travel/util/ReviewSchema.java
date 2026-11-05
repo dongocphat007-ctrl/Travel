@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 public final class ReviewSchema {
     private ReviewSchema() { }
 
-    public static final int CONTENT_MIN = 5, CONTENT_MAX = 1000, IMAGE_MAX = 500;
+    public static final int CONTENT_MIN = 5, COMMENT_MIN = 3, CONTENT_MAX = 1000, IMAGE_MAX = 500, MAX_IMAGES = 5;
     public static final Map<String, String> CRITERIA = new LinkedHashMap<>();
     static {
         CRITERIA.put("guide", "Hướng dẫn viên");
@@ -39,6 +39,20 @@ public final class ReviewSchema {
         if (!(s instanceof String str) || str.isEmpty() || str.length() > IMAGE_MAX) return false;
         if (HTTP.matcher(str).matches()) return true;
         return IMG.matcher(str).matches() && !str.contains("..");
+    }
+
+    /** Danh sách ảnh công khai đính kèm review/comment; giới hạn số lượng và từng URL. */
+    public static List<String> validateImages(Object raw) {
+        if (raw == null) return List.of();
+        if (!(raw instanceof List<?> list)) throw new IllegalArgumentException("Danh sách ảnh không hợp lệ");
+        if (list.size() > MAX_IMAGES) throw new IllegalArgumentException("Mỗi bài viết được đính kèm tối đa " + MAX_IMAGES + " ảnh");
+        List<String> out = new ArrayList<>();
+        for (Object item : list) {
+            if (!safeImage(item)) throw new IllegalArgumentException("Ảnh phải là liên kết HTTPS hoặc ảnh Travel đã tải lên");
+            String path = String.valueOf(item);
+            if (!out.contains(path)) out.add(path);
+        }
+        return out;
     }
 
     /** Kết quả kiểm tra: value != null nếu hợp lệ, ngược lại msg + field. */
@@ -76,10 +90,29 @@ public final class ReviewSchema {
             }
             if (!c.isEmpty()) value.put("criteria", c);
         }
+        Object gr = b.get("guideRating");   // 7.3: đánh giá riêng cho HDV (tùy chọn)
+        if (gr != null && !"".equals(gr)) {
+            int g = toRating(gr);
+            if (g < 0) return fail("guideRating", "Điểm hướng dẫn viên phải là số nguyên từ 1 đến 5 sao");
+            value.put("guideRating", g);
+        }
+        if (b.get("guideComment") instanceof String gcRaw) {
+            String gc = CTRL.matcher(gcRaw).replaceAll("").trim();
+            if (gc.codePointCount(0, gc.length()) > 300) return fail("guideComment", "Nhận xét về hướng dẫn viên tối đa 300 ký tự");
+            if (!gc.isEmpty()) value.put("guideComment", gc);
+        }
         Object img = b.get("image");
         if (img != null && !"".equals(img)) {
             if (!safeImage(img)) return fail("image", "Ảnh phải là liên kết https hoặc đường dẫn img/… hợp lệ (tối đa " + IMAGE_MAX + " ký tự)");
             value.put("image", img);
+        }
+        if (b.get("images") != null) {
+            try {
+                List<String> images = validateImages(b.get("images"));
+                if (!images.isEmpty()) value.put("images", images);
+            } catch (IllegalArgumentException e) {
+                return fail("images", e.getMessage());
+            }
         }
         return new Check(value, null, null);
     }
@@ -89,18 +122,49 @@ public final class ReviewSchema {
         String created = String.valueOf(r.getOrDefault("createdAt", ""));
         Map<String, Object> o = new LinkedHashMap<>();
         o.put("id", r.get("id"));
-        o.put("tourId", String.valueOf(r.get("tourId")));
+        o.put("tourId", r.get("tourId") == null ? "" : String.valueOf(r.get("tourId")));
+        if (r.get("tourName") != null) o.put("tourName", r.get("tourName"));
+        if (r.get("targetType") != null) o.put("targetType", r.get("targetType"));
+        if (r.get("foodName") != null) o.put("foodName", r.get("foodName"));
         o.put("name", r.get("name") == null || "".equals(r.get("name")) ? "Khách" : r.get("name"));
-        o.put("rating", r.get("rating"));
-        o.put("content", r.get("content"));
+        if (toRating(r.get("rating")) > 0) o.put("rating", toRating(r.get("rating")));
+        o.put("content", r.get("content") != null ? r.get("content") : r.get("comment"));
         Object date = r.get("date");
         o.put("date", date != null && !"".equals(date) ? date : created.substring(0, Math.min(10, created.length())));
         o.put("createdAt", r.get("createdAt"));
         if (r.get("criteria") != null) o.put("criteria", r.get("criteria"));
+        if (r.get("guideRating") != null) o.put("guideRating", r.get("guideRating"));
+        if (r.get("guideComment") != null) o.put("guideComment", r.get("guideComment"));
         if (safeImage(r.get("image"))) o.put("image", r.get("image"));
+        if (r.get("images") instanceof List<?> images) {
+            List<String> safe = new ArrayList<>();
+            for (Object image : images) if (safeImage(image)) safe.add(String.valueOf(image));
+            if (!safe.isEmpty()) o.put("images", safe);
+        }
+        if (r.get("reply") != null) o.put("reply", r.get("reply"));
+        if (r.get("replies") instanceof List<?> replies) {
+            List<Map<String, Object>> publicReplies = new ArrayList<>();
+            for (Object item : replies) {
+                Map<String, Object> reply = Maps.map(item);
+                if (reply == null) continue;
+                Map<String, Object> clean = new LinkedHashMap<>();
+                for (String key : List.of("id", "name", "content", "createdAt", "replyToId"))
+                    if (reply.containsKey(key)) clean.put(key, reply.get(key));
+                if (reply.get("images") instanceof List<?> imgs) {
+                    List<String> safe = new ArrayList<>();
+                    for (Object image : imgs) if (safeImage(image)) safe.add(String.valueOf(image));
+                    if (!safe.isEmpty()) clean.put("images", safe);
+                }
+                publicReplies.add(clean);
+            }
+            o.put("replies", publicReplies);
+        }
+        if (r.get("kind") != null) o.put("kind", r.get("kind"));
         boolean sample = Boolean.TRUE.equals(r.get("sample"));
         if (sample) o.put("sample", true);
-        o.put("source", sample ? "demo" : ("admin".equals(r.get("source")) ? "admin" : "verified"));
+        String src = Maps.str(r, "source");
+        if (src.isEmpty()) src = sample ? "demo" : ("admin".equals(r.get("source")) ? "admin" : "verified");
+        o.put("source", src);
         return o;
     }
 

@@ -11,13 +11,16 @@
 </head>
 <body>
 <div class="toolbar no-print">
-  <button id="btn-pdf" type="button">Tải PDF</button>
+  <button id="btn-pdf" type="button">🖨️ Tải PDF / In</button>
+  <button id="btn-word" type="button">📝 Tải Word (.doc)</button>
+  <button id="btn-excel" type="button">📊 Tải Excel (.xls)</button>
   <span class="hint">Trong hộp thoại in, chọn "Lưu dưới dạng PDF".</span>
 </div>
 <h1 class="a11y-sr">Xác nhận đặt tour</h1>
 <main class="sheet" id="sheet" aria-live="polite">Đang tải…</main>
-<script src="js/format-breakdown.js"></script>
+<script src="shared/data-export-import.js"></script>
+<script src="js/price-breakdown-format.js"></script>
 <script src="js/print-booking.js"></script>
-<script src="js/a11y.js"></script>
+<script src="js/accessibility.js"></script>
 </body>
 </html>

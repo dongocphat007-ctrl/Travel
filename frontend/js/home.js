@@ -45,6 +45,7 @@ var PROVINCE_KEYWORDS = {
 // Các tỉnh mà 1 tour đi qua (tour nhiều điểm đến thuộc nhiều tỉnh); chỉ tính tỉnh nằm trong vùng của tour
 function provincesOf(t) {
   if (t._prov) return t._prov;
+  if (t.adminTour && t.province) return (t._prov = [t.province]);   // tour Admin từ server: tỉnh do Admin chọn
   var dest = (t.dest || t.name || "").toLowerCase();
   var list = REGION_PROVINCES[t.region] || [];
   t._prov = list.filter(function(p){
@@ -93,6 +94,9 @@ function syncAdminTours() {
     return "";
   };
   var RC = { "Miền Bắc": "north", "Miền Trung": "central", "Miền Nam": "south", "Quốc tế": "intl" };
+  // Server (/api/tours) đã trả sẵn tour Admin cho mọi khách; trình duyệt Admin có bản mới nhất ở localStorage nên bản local thay bản server
+  var localIds = {};
+  admin.forEach(function(t){ if (String(t.id).indexOf("tour_") === 0) localIds[String(t.id)] = 1; });
   var extras = admin.filter(function(t){ return String(t.id).indexOf("tour_") === 0 && t.active !== false; })
     .map(function(t){
       var intl = !!t.international;
@@ -105,10 +109,11 @@ function syncAdminTours() {
         duration: t.duration || "", groupSize: t.groupSize || "", difficulty: t.difficulty || "Dễ",
         tags: t.tags || [], highlight: t.highlight || "", itinerary: t.itinerary || [],
         includes: t.includes, excludes: t.excludes, pickup: t.pickup, cancelNote: t.cancelNote, departures: t.departures,
+        isNew: true, badge: "new",
         _prov: t.province ? [t.province] : undefined
       };
     });
-  TOUR_SAMPLES = TOUR_SAMPLES.filter(function(t){ return !t._admin; }).concat(extras);
+  TOUR_SAMPLES = extras.concat(TOUR_SAMPLES.filter(function(t){ return !t._admin && !localIds[String(t.id)]; }));
 }
 
 // Cập nhật số tour ở các nút lọc nhóm (gọi lại khi giao diện trang chủ được nạp sau dữ liệu)
@@ -232,26 +237,40 @@ function getFilteredTours() {
     return text.includes(q) && (srcMode === "all" || t.src === srcMode) && (guideMode === "all" || t.guide === guideMode);
   });
   if (sortMode === "asc")  list.sort(function(a,b){ return a.displayPrice - b.displayPrice; });
-  if (sortMode === "desc") list.sort(function(a,b){ return b.displayPrice - a.displayPrice; });
+  else if (sortMode === "desc") list.sort(function(a,b){ return b.displayPrice - a.displayPrice; });
+  else {
+    list.sort(function(a, b){
+      var aNew = (a.isNew || a.badge === "new" || String(a.id).startsWith("tour_")) ? 1 : 0;
+      var bNew = (b.isNew || b.badge === "new" || String(b.id).startsWith("tour_")) ? 1 : 0;
+      if (aNew !== bNew) return bNew - aNew;
+      return (a.ord || 0) - (b.ord || 0);
+    });
+  }
   return list;
 }
 
 function tourCardHtml(t) {
-  // Mỗi tour là một tấm vé: thân vé (tuyến, tên, mô tả, dữ kiện) + cuống vé (mã, giá, nút). Style trong css/design.css
+  // Mỗi tour là một tấm vé: thân vé (tuyến, tên, mô tả, dữ kiện) + cuống vé (mã, giá, nút).
   var guided = t.guide === "guided";
+  var isNewTour = !!(t.isNew || t.badge === "new" || String(t.id).startsWith("tour_"));
   var facts = [];
+  if (isNewTour) {
+    facts.push('<span class="tc-fact is-new" style="background:#ef4444;color:#fff;font-weight:700">MỚI</span>');
+  }
   if (t.duration) facts.push('<span class="tc-fact">' + escH(t.duration) + "</span>");
   facts.push('<span class="tc-fact' + (guided ? " is-guided" : "") + '">' + (guided ? "Có hướng dẫn viên" : "Tự túc") + "</span>");
   if (t.src === "intl") facts.push('<span class="tc-fact">' + escH(SRC_LABEL.intl) + "</span>");
   if (t._stats) facts.push(t._stats);
   var priceNote = (guideMode === "guided" && guided) ? '<span class="tc-note">Đã gồm hướng dẫn viên (+30%)</span>' : "";
-  var code = /^\d+$/.test(String(t.id)) ? '<span class="tc-code">Mã ' + escH(t.id) + "</span>" : "";
-  return '<article class="tour-card ' + escH(t.rc) + '" data-tour-id="' + escH(t.id) + '">'
+  var code = isNewTour
+    ? '<span class="tc-code" style="background:#ef4444;color:#fff;font-weight:700">MỚI</span>'
+    : (/^\d+$/.test(String(t.id)) ? '<span class="tc-code">Mã ' + escH(t.id) + "</span>" : "");
+  return '<article class="tour-card ' + escH(t.rc) + (isNewTour ? " is-new-tour" : "") + '" data-tour-id="' + escH(t.id) + '">'
     + '<div class="tc-body">'
-    + '<p class="tc-meta">' + escH(t.region) + (t.cat ? " · " + escH(t.cat) : "") + "</p>"
+    + '<p class="tc-meta">' + (isNewTour ? '<span class="badge" style="background:#ef4444;color:#fff;font-weight:700;padding:2px 8px;border-radius:4px;margin-right:6px">MỚI</span>' : '') + escH(t.region) + (t.cat ? " · " + escH(t.cat) : "") + "</p>"
     + '<h3 class="tc-name">' + escH(t.name) + "</h3>"
-    + (t.desc ? '<p class="tc-desc"><span class="tc-desc-label">Điểm nổi bật</span>' + escH(t.desc) + "</p>" : "")
-    + '<p class="tc-facts">' + facts.join("") + "</p></div>"
+    + (t.desc ? '<p class="tc-desc"><span class="tc-desc-label">Điểm nổi bật:</span> ' + escH(t.desc) + "</p>" : "")
+    + '<p class="tc-facts">' + facts.join(" ") + "</p></div>"
     + '<div class="tc-right">' + code + '<span class="tc-price">' + fmtV(t.displayPrice) + " ₫</span>"
     + '<span class="tc-sub">/ người</span>' + priceNote
     + '<button class="btn-detail" type="button" data-tour-id="' + escH(t.id) + '">Xem chi tiết</button></div></article>';
@@ -297,12 +316,13 @@ function renderAdvFilter() {
     + field("Ngân sách", '<select id="af-budget">' + BUDGETS.map(function(b){ return opt(b[0], b[1], advBudget); }).join("") + "</select>")
     + field("Số ngày", '<select id="af-days">' + DAYS.map(function(d){ return opt(d[0], d[1], advDays); }).join("") + "</select>")
     + field("Danh mục", '<select id="af-cat">' + opt("all", "Tất cả danh mục", advCat) + cats.map(function(c){ return opt(c, c, advCat); }).join("") + "</select>")
-    + field("Điểm đến", '<input id="af-dest" type="search" list="af-dest-list" placeholder="VD: Đà Lạt" autocomplete="off" value="' + escH(advDest) + '">'
+    + field("Điểm đến", '<input id="af-dest" type="search" name="af-dest-x7k" list="af-dest-list" placeholder="VD: Đà Lạt" autocomplete="off" data-lpignore="true" data-1p-ignore readonly onfocus="this.removeAttribute(\'readonly\')" value="' + escH(advDest) + '">'
       + '<datalist id="af-dest-list">' + Object.keys(places).sort(function(a,b){ return a.localeCompare(b, "vi"); }).map(function(p){ return '<option value="' + escH(p) + '">'; }).join("") + "</datalist>")
     + '<button type="button" class="af-reset" id="af-reset"' + (n ? "" : " disabled") + ">Xóa bộ lọc" + (n ? " (" + n + ")" : "") + "</button>";
   var onChange = function(id, set, rerender){
     var el = document.getElementById(id);
-    el.addEventListener(id === "af-dest" ? "input" : "change", function(){ set(el.value); if (rerender) renderRegionFilter(); syncResetBtn(); renderTours(); });
+    el.addEventListener(id === "af-dest" ? "input" : "change", function(){ if (id === "af-dest" && document.activeElement !== el) { el.value = advDest; return; }   // trình duyệt tự điền (vd tên đăng nhập đã lưu) → bỏ qua
+      set(el.value); if (rerender) renderRegionFilter(); syncResetBtn(); renderTours(); });
   };
   onChange("af-region", function(v){ regionMode = v; provMode = "all"; }, true);
   onChange("af-budget", function(v){ advBudget = v; });
@@ -399,7 +419,7 @@ function destOf(t) { return t.dest || t.name.replace(/\s*\d+N\d+Đ$/, ""); }
 // Dữ liệu tour -> định dạng modal chi tiết / đặt tour (openTourDetail)
 function tourToModalData(t) {
   return {
-    id: t.id, name: t.name, destination: destOf(t), price: t.price,
+    id: t.id, name: t.name, destination: destOf(t), price: t.price, region: t.region, rc: t.rc,
     coverEmoji: t.emoji, emoji: t.emoji, description: t.desc, category: t.cat,
     duration: t.duration || "3 ngày 2 đêm", groupSize: t.groupSize || "Linh hoạt",
     difficulty: t.difficulty || "Nhẹ nhàng", tags: t.tags || [],
@@ -437,11 +457,48 @@ bindFilterGroup(".src-btn[data-src]", function(b){ srcMode = b.dataset.src; prov
 function renderUnesco() {
   let grid = document.getElementById("unescoGrid");
   if (!grid) return;
+  var TYPE_MAP = {
+    1993: "Di sản Văn hóa",
+    1994: "Di sản Thiên nhiên",
+    1999: "Di sản Văn hóa",
+    2003: "Di sản Thiên nhiên",
+    2010: "Di sản Văn hóa",
+    2011: "Di sản Văn hóa",
+    2014: "Di sản Hỗn hợp"
+  };
   grid.innerHTML = UNESCO_SITES.slice().sort(function(x, y){ return x.year - y.year; }).map(function(u){
-    return '<div class="uc-row" role="listitem"><span class="uc-year">' + u.year + '</span>'
-      + '<h3 class="uc-name">' + escH(u.name) + '</h3><span class="uc-loc">' + escH(u.loc) + "</span></div>";
+    var type = TYPE_MAP[u.year] || "Di sản Thế giới";
+    return '<div class="uc-card" role="listitem" tabindex="0" onclick="filterByUnesco(\'' + escH(u.loc) + '\', \'' + escH(u.name) + '\')">'
+      + '<div class="uc-card-header">'
+      +   '<span class="uc-em" aria-hidden="true">' + (u.emoji || "🏛️") + '</span>'
+      +   '<span class="uc-badge">UNESCO ' + u.year + '</span>'
+      + '</div>'
+      + '<div class="uc-card-body">'
+      +   '<h3 class="uc-name">' + escH(u.name) + '</h3>'
+      +   '<div class="uc-meta">'
+      +     '<span class="uc-loc">📍 ' + escH(u.loc) + '</span>'
+      +     '<span class="uc-type">' + type + '</span>'
+      +   '</div>'
+      + '</div>'
+      + '<div class="uc-card-footer">'
+      +   '<span class="uc-action-text">Xem hành trình tour</span>'
+      +   '<span class="uc-arrow">→</span>'
+      + '</div>'
+      + '</div>';
   }).join("");
 }
+
+window.filterByUnesco = function(loc, name) {
+  var searchInput = document.getElementById("tourSearch") || document.getElementById("tf-search");
+  if (searchInput) {
+    searchInput.value = loc || name;
+    searchInput.dispatchEvent(new Event("input", { bubbles: true }));
+  }
+  var target = document.getElementById("toursContainer") || document.getElementById("sec-tours") || document.getElementById("sec-tim-kiem");
+  if (target) {
+    target.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+};
 
 // CONTINENT / COUNTRIES
 function renderContinents() {

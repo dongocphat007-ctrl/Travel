@@ -1,7 +1,7 @@
 /**
  * trips.js – TripManager
  * CRUD chuyến đi và địa điểm
- * Phụ thuộc: storage.js, utils.js, constants.js
+ * Phụ thuộc: utils.js (gồm StorageManager), constants.js
  */
 
 /**

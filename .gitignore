@@ -1,4 +1,19 @@
 .DS_Store
 Thumbs.db
 *.bak
-frontend/img/banners/
+
+# Bí mật và dữ liệu chạy thật, không commit
+.env
+.env.*
+!.env.example
+backend/.env
+backend/storage/
+
+# Build
+backend/target/
+
+# Logs & Archives
+*.log
+hs_err_*.log
+tools/_archive_cleaned_files/
+

@@ -1,11 +1,16 @@
 package vn.travel.web;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.CacheControl;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import vn.travel.service.LiveHttp;
 import vn.travel.service.Inventory;
 import vn.travel.service.TravelBookings;
 import vn.travel.util.Maps;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
@@ -39,6 +44,26 @@ public class TravelController {
     public Map<String, Object> hotels(@RequestParam(required = false) String dest, @RequestParam(required = false) String checkin, @RequestParam(required = false) String checkout,
                                       @RequestParam(required = false) String guests, @RequestParam(required = false) String stars) {
         return inventory.searchHotels(dest, checkin, checkout, guests, stars);
+    }
+
+    /** Nguồn trực tuyến nào đang bật (không lộ khóa). */
+    @GetMapping("/api/travel/live-status")
+    public Map<String, Object> liveStatus() {
+        return Maps.of("ok", true, "live", inventory.liveStatus());
+    }
+
+    /** Liên kết đặt vé của hãng/đại lý cho chuyến bay trực tuyến (id = ignav_id). */
+    @GetMapping("/api/flights/booking-links")
+    public Map<String, Object> flightLinks(@RequestParam(required = false) String id) {
+        return inventory.flightLinks(id);
+    }
+
+    /** Ảnh khách sạn từ Google Places, tải qua máy chủ để không lộ khóa. */
+    @GetMapping("/api/places/photo")
+    public ResponseEntity<byte[]> photo(@RequestParam(required = false) String name, @RequestParam(required = false, defaultValue = "640") int w) {
+        LiveHttp.Bytes b = inventory.hotelPhoto(name, w);
+        String ct = b.contentType() != null && b.contentType().startsWith("image/") ? b.contentType() : "image/jpeg";
+        return ResponseEntity.ok().contentType(MediaType.parseMediaType(ct)).cacheControl(CacheControl.maxAge(Duration.ofHours(6)).cachePublic()).body(b.data());
     }
 
     @PostMapping("/api/bookings/flight")

@@ -3,6 +3,7 @@ package vn.travel.service;
 import org.springframework.stereotype.Service;
 import vn.travel.config.TravelProperties;
 import vn.travel.store.Db;
+import vn.travel.util.Flow;
 import vn.travel.util.Ids;
 import vn.travel.util.Maps;
 import vn.travel.util.Pricing;
@@ -45,7 +46,7 @@ public class Payments {
         this.noti = noti;
         this.clock = clock;
         this.props = props;
-        this.codePattern = Pattern.compile(Pattern.quote(props.prefix()) + "(\\d{13})");
+        this.codePattern = Pattern.compile(Pattern.quote(props.prefix()) + "(\\d{13})(?:EXT(\\d{1,2}))?");   // 8.10: TRAVEL<số>-EXT<n>
     }
 
     // ───────── thông tin cho khách ─────────
@@ -114,7 +115,9 @@ public class Payments {
         String codeField = Maps.str(body, "code");
         String normalized = (codeField + " " + content).toUpperCase().replaceAll("[^A-Z0-9]", "");
         Matcher m = codePattern.matcher(normalized);
-        String payCode = m.find() ? props.prefix() + m.group(1) : "";
+        boolean found = m.find();
+        String payCode = found ? props.prefix() + m.group(1) : "";
+        int extNo = found && m.group(2) != null ? Integer.parseInt(m.group(2)) : 0;
 
         String tx = txId, cnt = content, pc = payCode;
         Map<String, Object>[] out = new Map[1];
@@ -129,7 +132,7 @@ public class Payments {
             for (Map<String, Object> x : db.list("bookings")) if (pc.equalsIgnoreCase(Maps.str(x, "payCode"))) b = x;
             if (b == null) { fail(rec, "unmatched", "Không có đơn nào có mã " + pc); return; }
             rec.put("bookingId", b.get("id"));
-            String[] res = applyAuto(Maps.str(b, "id"), amount);
+            String[] res = extNo > 0 ? applyExtAuto(Maps.str(b, "id"), extNo, amount) : applyAuto(Maps.str(b, "id"), amount);
             if (res[0] == null) { rec.put("status", "matched"); rec.put("kind", res[1]); }
             else fail(rec, "mismatch", res[0]);
         });
@@ -146,36 +149,60 @@ public class Payments {
         rec.put("reason", reason);
     }
 
+    /** 8.10: khớp tiền gia hạn theo mã TRAVEL<số>-EXT<n>; không lẫn với đơn gốc. */
+    private String[] applyExtAuto(String bookingId, int no, long amount) {
+        String[] result = {null, "ext"};
+        bookings.mutate(bookingId, b -> {
+            try { vn.travel.service.Extensions.markPaid(b, no, amount, "bank", "", "Ngân hàng", "SYSTEM", "Khớp mã chuyển khoản", clock.millis()); }
+            catch (HttpError e) { result[0] = e.getMessage(); return; }
+            noti.add(Maps.str(b, "userId"), "booking", "✅ Gia hạn thành công", "Đơn " + b.get("payCode") + ": đã nhận tiền gia hạn, ngày kết thúc mới đã được cập nhật.", "profile", "exok-" + b.get("id") + "-" + no);
+        });
+        return result;
+    }
+
     /** {lỗi|null, loại}: lỗi null = đã ghi nhận; ngược lại là lý do lệch (để Admin xử lý tay). */
     private String[] applyAuto(String bookingId, long amount) {
         String[] result = {null, ""};
         bookings.mutate(bookingId, b -> {
-            if ("cancelled".equals(b.get("status"))) { result[0] = "Đơn đã hủy"; return; }
+            if (Flow.inactive(b.get("status"))) { result[0] = "Đơn đã hủy"; return; }
             long total = Maps.lng(b, "price"), deposit = Maps.lng(b, "deposit");
             if (!Maps.bool(b, "depositPaid")) {
-                if (amount >= total) { markDeposit(b, true); result[1] = "full"; }
-                else if (amount >= deposit) { markDeposit(b, false); result[1] = "deposit"; }
+                if (amount >= total) { markDeposit(b, true, total, "bank"); result[1] = "full"; }
+                else if (amount >= deposit) { markDeposit(b, false, deposit, "bank"); result[1] = "deposit"; }
                 else result[0] = "Thiếu tiền cọc: nhận " + amount + ", cần " + deposit;
             } else if (!Maps.bool(b, "finalPaid") && !Maps.bool(b, "fullPaid")) {
                 long due = amountDue(b);
-                if (amount >= due) { markFinal(b); result[1] = "final"; }
+                if (amount >= due) { markFinal(b, due, "bank"); result[1] = "final"; }
                 else result[0] = "Thiếu tiền phần còn lại: nhận " + amount + ", cần " + due;
             } else result[0] = "Đơn đã thanh toán đủ";
         });
         return result;
     }
 
-    private void markDeposit(Map<String, Object> b, boolean full) {
+    /**
+     * Ghi nhận tiền cọc / thanh toán đủ. Đơn TOUR đi theo vòng đời mới: chờ thanh toán → đã nhận cọc / đã nhận đủ (chờ admin duyệt);
+     * đơn vé máy bay / khách sạn (không có tourId) không qua admin nên vẫn sang "confirmed".
+     */
+    void markDeposit(Map<String, Object> b, boolean full, long amount, String source) {
+        String before = Flow.norm(b.get("status"));
         b.put("depositPaid", true);
         b.put("depositPaidAt", Times.iso(clock.millis()));
         if (full) b.put("fullPaid", true);
-        if ("pending".equals(b.get("status"))) b.put("status", "confirmed");
-        noti.add(Maps.str(b, "userId"), "booking", "💰 Đã nhận tiền cọc", "Đơn " + b.get("id") + " – " + b.get("tourName") + " đã được xác nhận.", "profile", "paid-" + b.get("id"));
+        Flow.addPayment(b, full ? "full" : "deposit", amount, source, "", "Ngân hàng", "SYSTEM", "Khớp mã chuyển khoản", clock.millis());
+        boolean tour = !Maps.str(b, "tourId").isEmpty();
+        if (Flow.PENDING_PAYMENT.equals(before)) {
+            String to = !tour ? Flow.CONFIRMED : full ? Flow.PAID_FULL : Flow.PAID_DEPOSIT;
+            b.put("status", to);
+            Flow.addHistory(b, "payment", before, to, "", "Ngân hàng", "SYSTEM", (full ? "Nhận đủ " : "Nhận cọc ") + amount + " qua ngân hàng", clock.millis());
+        }
+        noti.add(Maps.str(b, "userId"), "booking", "💰 Đã nhận tiền cọc", "Đơn " + b.get("id") + " – " + b.get("tourName") + " đã nhận tiền" + (tour ? ", đang chờ Travel xác nhận." : " và được xác nhận."), "profile", "paid-" + b.get("id"));
     }
 
-    private void markFinal(Map<String, Object> b) {
+    void markFinal(Map<String, Object> b, long amount, String source) {
         b.put("finalPaid", true);
         b.put("finalPaidAt", Times.iso(clock.millis()));
+        Flow.addPayment(b, "final", amount, source, "", "Ngân hàng", "SYSTEM", "Thu nốt phần còn lại", clock.millis());
+        Flow.addHistory(b, "payment", Flow.norm(b.get("status")), Flow.norm(b.get("status")), "", "Ngân hàng", "SYSTEM", "Đã thu nốt " + amount, clock.millis());
     }
 
     // ───────── xác nhận tay (E4b) ─────────
@@ -189,10 +216,12 @@ public class Payments {
         String note = Maps.str(body, "note");
         String[] err = {null};
         bookings.mutate(bookingId, b -> {
-            if ("cancelled".equals(b.get("status"))) { err[0] = "Đơn đã hủy"; return; }
+            if (Flow.inactive(b.get("status"))) { err[0] = "Đơn đã hủy"; return; }
             if (kind.equals("final") && !Maps.bool(b, "depositPaid")) { err[0] = "Đơn chưa đặt cọc"; return; }
             if (!kind.equals("final") && Maps.bool(b, "depositPaid")) { err[0] = "Đơn đã ghi nhận đặt cọc"; return; }
-            if (kind.equals("final")) markFinal(b); else markDeposit(b, kind.equals("full"));
+            long due = kind.equals("final") ? amountDue(b) : kind.equals("full") ? Maps.lng(b, "price") : Maps.lng(b, "deposit");
+            long got = amount > 0 ? amount : due;
+            if (kind.equals("final")) markFinal(b, got, "manual"); else markDeposit(b, kind.equals("full"), got, "manual");
         });
         if (err[0] != null) throw HttpError.conflict(err[0], null);
         Map<String, Object>[] out = new Map[1];
@@ -241,7 +270,7 @@ public class Payments {
         }
         long deposited = 0, pending = 0, cancelled = 0;
         for (Map<String, Object> b : db.list("bookings")) {
-            if ("cancelled".equals(b.get("status"))) cancelled++;
+            if (Flow.inactive(b.get("status"))) cancelled++;
             else if (Maps.bool(b, "depositPaid")) deposited++;
             else pending++;
         }

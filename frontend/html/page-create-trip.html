@@ -7,6 +7,65 @@
         <p class="page-sub">Điền thông tin để bắt đầu lên kế hoạch</p>
       </div>
     </div>
+    <!-- AI SMART TRAVEL PLANNER WIDGET -->
+    <div class="card" style="margin-bottom:18px;border:1.5px solid #0284c7;background:linear-gradient(135deg,#f0fdf4 0%,#f0f9ff 100%);border-radius:12px;overflow:hidden">
+      <div class="card-body" style="padding:16px 20px">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:1.05rem;font-weight:700;color:#0369a1">
+              <span>✨ Trợ lý AI Lên Kế Hoạch Chuyến Đi</span>
+              <span class="badge" style="background:#0284c7;color:#fff;font-size:0.7rem;padding:2px 8px;border-radius:99px">Smart Planner</span>
+            </div>
+            <p style="margin:4px 0 0;font-size:0.85rem;color:#475569">
+              Chỉ cần nhập điểm đến và sở thích, AI sẽ tự động phân bổ lịch trình từng ngày và điền sẵn kế hoạch cho bạn!
+            </p>
+          </div>
+          <button type="button" class="btn btn-accent" id="btn-toggle-ai-planner" style="font-size:0.875rem;padding:8px 16px;white-space:nowrap">
+            ✨ Mở Trợ lý AI
+          </button>
+        </div>
+        <div id="ai-planner-panel" style="display:none;margin-top:14px;padding-top:14px;border-top:1px dashed #93c5fd">
+          <div class="form-row">
+            <div class="form-group" style="flex:2">
+              <label class="form-label" for="ai-p-dest">Điểm đến mong muốn <span class="req">*</span></label>
+              <input type="text" id="ai-p-dest" class="form-input" placeholder="VD: Đà Lạt, Sa Pa, Phú Quốc, Huế...">
+            </div>
+            <div class="form-group" style="flex:1">
+              <label class="form-label" for="ai-p-days">Thời gian</label>
+              <select id="ai-p-days" class="form-input">
+                <option value="2">2 ngày 1 đêm</option>
+                <option value="3" selected>3 ngày 2 đêm</option>
+                <option value="4">4 ngày 3 đêm</option>
+                <option value="5">5 ngày 4 đêm</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group" style="flex:2">
+              <label class="form-label" for="ai-p-style">Phong cách chuyến đi</label>
+              <select id="ai-p-style" class="form-input">
+                <option value="nghỉ dưỡng biển, chụp ảnh check-in sống ảo">🏖️ Nghỉ dưỡng & Check-in sống ảo</option>
+                <option value="khám phá ẩm thực đặc sản đường phố">🍜 Khám phá ẩm thực 3 miền</option>
+                <option value="văn hóa, di tích lịch sử và danh lam">🏛️ Văn hóa & Di sản lịch sử</option>
+                <option value="trekking, leo núi và phiêu lưu thiên nhiên">🏔️ Trekking & Thiên nhiên</option>
+                <option value="du lịch tự túc tiết kiệm chi phí">💰 Du lịch tự túc & Tiết kiệm</option>
+              </select>
+            </div>
+            <div class="form-group" style="flex:1">
+              <label class="form-label" for="ai-p-pax">Số người</label>
+              <input type="number" id="ai-p-pax" class="form-input" value="2" min="1" max="50">
+            </div>
+          </div>
+          <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:10px">
+            <button type="button" class="btn" id="btn-close-ai-planner" style="font-size:0.85rem">Đóng</button>
+            <button type="button" class="btn btn-accent" id="btn-run-ai-planner" style="font-size:0.85rem;display:flex;align-items:center;gap:6px">
+              🚀 AI Lên lịch trình ngay
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="card"><div class="card-body">
       <form id="form-trip" novalidate>
         <div class="form-group">

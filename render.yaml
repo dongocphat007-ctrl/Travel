@@ -1,0 +1,38 @@
+services:
+  - type: web
+    name: travel-project
+    runtime: docker
+    plan: starter
+    region: singapore
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /
+    disk:
+      name: travel-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: PORT
+        value: 8080
+      - key: WEB_ROOT
+        value: /var/data/site
+      - key: DB_DIR
+        value: /var/data/db
+      - key: SAMPLE_DATA
+        value: "false"
+      - key: OTP_DEV_LOG
+        value: "false"
+      - key: TRUST_PROXY
+        value: "true"
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: SITE_URL
+        sync: false
+      - key: EMAIL_USER
+        sync: false
+      - key: EMAIL_PASS
+        sync: false

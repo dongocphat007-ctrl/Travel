@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -13,6 +14,7 @@ import java.util.function.UnaryOperator;
 @Component
 public class Db {
     public static final TypeReference<List<Map<String, Object>>> LIST = new TypeReference<>() { };
+    public static final TypeReference<Map<String, Object>> OBJ = new TypeReference<>() { };
 
     private final JsonStore store;
 
@@ -36,6 +38,19 @@ public class Db {
         return update(name, l -> {
             change.accept(l);
             return l;
+        });
+    }
+
+    /** Tài liệu JSON dạng một đối tượng (cấu hình, bộ đếm...). */
+    public Map<String, Object> obj(String name) {
+        return store.read(name, OBJ, new LinkedHashMap<>());
+    }
+
+    /** Đọc – sửa – ghi một đối tượng JSON trong cùng một khóa. */
+    public Map<String, Object> editObj(String name, Consumer<Map<String, Object>> change) {
+        return store.update(name, OBJ, new LinkedHashMap<>(), m -> {
+            change.accept(m);
+            return m;
         });
     }
 }

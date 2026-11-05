@@ -1,6 +1,64 @@
   <!-- PAGE: HOME -->
   <section class="page active" id="page-home">
 
+    <!-- TOUR BÁN CHẠY NHẤT & ĐƯỢC YÊU THÍCH: carousel các tour bán chạy nhất do admin đẩy lên + bảng xếp hạng -->
+    <section class="hm-top" id="sec-top" aria-labelledby="hm-top-title">
+      <section class="bn-wrap" id="bannerCarousel" aria-roledescription="carousel" aria-label="Tour bán chạy nhất &amp; được yêu thích nhất">
+        <div class="bn-track">
+          <article class="bn-slide" data-tour="112" role="group" aria-roledescription="slide" style="background:linear-gradient(135deg,#0f172a,#1e3a8a)">
+            <div class="bn-inner">
+              <span class="badge" style="display:inline-block;background:rgba(234,179,8,0.25);color:#fde047;border:1px solid rgba(234,179,8,0.5);margin-bottom:8px;padding:3px 10px;font-size:12px;font-weight:700;border-radius:999px">🏆 TOP 1 BÁN CHẠY NHẤT</span>
+              <h2>Singapore – Malaysia 5N4Đ: Đẳng cấp quốc tế</h2>
+              <p>Khám phá Gardens by the Bay, Marina Bay Sands và Tháp đôi Petronas hùng vĩ.</p>
+              <button type="button" class="bn-cta" data-link="#/tour/112">Xem chi tiết &amp; Đặt ngay →</button>
+            </div>
+          </article>
+          <article class="bn-slide" data-tour="111" role="group" aria-roledescription="slide" style="background:linear-gradient(135deg,#1e1b4b,#4338ca)">
+            <div class="bn-inner">
+              <span class="badge" style="display:inline-block;background:rgba(239,68,68,0.25);color:#fca5a5;border:1px solid rgba(239,68,68,0.5);margin-bottom:8px;padding:3px 10px;font-size:12px;font-weight:700;border-radius:999px">🔥 TOP 2 DOANH THU</span>
+              <h2>Thái Lan – Bangkok – Pattaya 5N4Đ</h2>
+              <p>Chiêm ngưỡng Cung điện Hoàng Gia, tắm biển đảo San Hô Coral và Chợ nổi 4 miền.</p>
+              <button type="button" class="bn-cta" data-link="#/tour/111">Xem chi tiết &amp; Đặt ngay →</button>
+            </div>
+          </article>
+          <article class="bn-slide" data-tour="105" role="group" aria-roledescription="slide" style="background:linear-gradient(90deg,rgba(7,22,39,.82),rgba(7,22,39,.3)),url('img/tours_mau/mien-trung/da-nang/da-nang-cau-vang.jpg') center/cover">
+            <div class="bn-inner">
+              <span class="badge" style="display:inline-block;background:rgba(16,185,129,0.25);color:#6ee7b7;border:1px solid rgba(16,185,129,0.5);margin-bottom:8px;padding:3px 10px;font-size:12px;font-weight:700;border-radius:999px">⭐ TOP 1 LƯỢT ĐẶT (2.500+ KHÁCH)</span>
+              <h2>Đà Nẵng – Hội An – Bà Nà Hills 4N3Đ</h2>
+              <p>Check-in Cầu Vàng lừng danh thế giới, thả đèn hoa đăng lung linh phố cổ Hội An.</p>
+              <button type="button" class="bn-cta" data-link="#/tour/105">Xem chi tiết &amp; Đặt ngay →</button>
+            </div>
+          </article>
+          <article class="bn-slide" data-tour="101" role="group" aria-roledescription="slide" style="background:linear-gradient(135deg,#064e3b,#047857)">
+            <div class="bn-inner">
+              <span class="badge" style="display:inline-block;background:rgba(56,189,248,0.25);color:#7dd3fc;border:1px solid rgba(56,189,248,0.5);margin-bottom:8px;padding:3px 10px;font-size:12px;font-weight:700;border-radius:999px">⛵ KỲ QUAN THẾ GIỚI</span>
+              <h2>Hà Nội – Vịnh Hạ Long 3N2Đ</h2>
+              <p>Kỳ quan thiên nhiên thế giới, du thuyền tiện nghi sang trọng, thăm Đảo Titop &amp; Hang Sửng Sốt.</p>
+              <button type="button" class="bn-cta" data-link="#/tour/101">Xem chi tiết &amp; Đặt ngay →</button>
+            </div>
+          </article>
+          <article class="bn-slide" data-tour="108" role="group" aria-roledescription="slide" style="background:linear-gradient(135deg,#701a75,#a21caf)">
+            <div class="bn-inner">
+              <span class="badge" style="display:inline-block;background:rgba(244,114,182,0.25);color:#fbcfe8;border:1px solid rgba(244,114,182,0.5);margin-bottom:8px;padding:3px 10px;font-size:12px;font-weight:700;border-radius:999px">🌴 THIÊN ĐƯỜNG NGHỈ DƯỠNG</span>
+              <h2>Phú Quốc – Sunset Sanato 3N2Đ</h2>
+              <p>Trải nghiệm cáp treo Hòn Thơm vượt biển, tắm biển Bãi Sao và ngắm hoàng hôn Sunset Sanato.</p>
+              <button type="button" class="bn-cta" data-link="#/tour/108">Xem chi tiết &amp; Đặt ngay →</button>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <div class="hm-sec-head" style="margin-top:16px;margin-bottom:12px">
+        <h2 id="hm-top-title">🔥 Tour bán chạy nhất &amp; Được yêu thích</h2>
+        <p>Xếp theo doanh thu và lượt dùng thực tế từ hệ thống. Đơn mới được cập nhật tự động theo thời gian thực.</p>
+      </div>
+
+      <!-- TOUR NỔI BẬT: đếm từ đơn đặt thật (js/banner.js) -->
+      <div class="ft-wrap" id="featuredWrap" hidden>
+        <div class="ft-list" id="featuredList"></div>
+      </div>
+    </section>
+
     <!-- HERO: lời khẳng định + bản đồ "Tuyến Bắc–Nam" (mỗi chấm là một tỉnh, to nhỏ theo số tour; bấm để lọc) – js/route-map.js -->
     <section class="hm-hero" aria-labelledby="hm-title">
       <div class="hm-hero-text">
@@ -27,38 +85,6 @@
     <p id="trips-count" style="display:none"></p>
     <button id="btn-new-trip"  style="display:none"></button>
     <div id="trips-grid"       style="display:none"></div>
-
-    <!-- ĐƯỢC YÊU THÍCH NHẤT: carousel 5 banner ảnh (Top 07–11, thứ tự theo xếp hạng – js/banner.js) + bảng xếp hạng (js/featured.js) -->
-    <section class="hm-top" id="sec-top" aria-labelledby="hm-top-title">
-      <div class="hm-sec-head">
-        <h2 id="hm-top-title">Được yêu thích nhất</h2>
-        <p>Xếp theo lượt dùng tour. Đơn mới làm tour tự lên hạng, đơn đã hủy không tính.</p>
-      </div>
-      <section class="bn-wrap" id="bannerCarousel" aria-roledescription="carousel" aria-label="Tour được yêu thích nhất">
-        <div class="bn-track">
-          <article class="bn-slide bn-img" data-tour="hot07" role="group" aria-roledescription="slide">
-            <a class="bn-cover" href="#/tour/hot07" aria-label="Xem tour: Ninh Bình – Tuyệt tác sơn thủy giữa lòng di sản"><img src="img/banners/top-07-ninh-binh.png" alt="Ninh Bình – Tuyệt tác sơn thủy giữa lòng di sản" width="1024" height="338"></a>
-          </article>
-          <article class="bn-slide bn-img" data-tour="hot08" role="group" aria-roledescription="slide">
-            <a class="bn-cover" href="#/tour/hot08" aria-label="Xem tour: Cố đô Huế – Dấu ấn vàng son"><img src="img/banners/top-08-hue.png" alt="Cố đô Huế – Dấu ấn vàng son" width="1024" height="338" loading="lazy"></a>
-          </article>
-          <article class="bn-slide bn-img" data-tour="hot09" role="group" aria-roledescription="slide">
-            <a class="bn-cover" href="#/tour/hot09" aria-label="Xem tour: Đà Nẵng – Thành phố của những kỳ quan"><img src="img/banners/top-09-da-nang.png" alt="Đà Nẵng – Thành phố của những kỳ quan" width="1024" height="338" loading="lazy"></a>
-          </article>
-          <article class="bn-slide bn-img" data-tour="hot10" role="group" aria-roledescription="slide">
-            <a class="bn-cover" href="#/tour/hot10" aria-label="Xem tour: Sapa – Nơi gặp gỡ đất trời"><img src="img/banners/top-10-sapa.png" alt="Sapa – Nơi gặp gỡ đất trời" width="1024" height="338" loading="lazy"></a>
-          </article>
-          <article class="bn-slide bn-img" data-tour="hot11" role="group" aria-roledescription="slide">
-            <a class="bn-cover" href="#/tour/hot11" aria-label="Xem tour: Quảng Bình – Chinh phục kỳ quan hang động"><img src="img/banners/top-11-quang-binh.png" alt="Quảng Bình – Chinh phục kỳ quan hang động" width="1024" height="338" loading="lazy"></a>
-          </article>
-        </div>
-      </section>
-
-      <!-- TOUR NỔI BẬT: đếm từ đơn đặt thật (js/featured.js) -->
-      <div class="ft-wrap" id="featuredWrap" hidden>
-        <div class="ft-list" id="featuredList"></div>
-      </div>
-    </section>
 
     <!-- TẤT CẢ HÀNH TRÌNH -->
     <section id="sec-tours" class="hm-tours" aria-labelledby="hm-tours-title">
@@ -95,15 +121,25 @@
 
     <!-- UNESCO -->
     <section id="sec-bai-viet" class="hm-unesco" aria-labelledby="hm-unesco-title">
-      <div class="uc-layout">
-        <div class="hm-sec-head">
-          <h2 id="hm-unesco-title">Tám di sản thế giới</h2>
-          <p>Việt Nam có tám địa danh được UNESCO công nhận. Năm ghi bên trái là năm được công nhận.</p>
+      <div class="uc-container">
+        <div class="hm-sec-head uc-header">
+          <div class="uc-pill">🏛️ Di sản thế giới UNESCO tại Việt Nam</div>
+          <h2 id="hm-unesco-title" class="uc-title">8 di sản thế giới được UNESCO vinh danh</h2>
+          <p class="uc-desc">Khám phá các di sản văn hóa và kỳ quan thiên nhiên tuyệt mỹ của Việt Nam. Chọn di sản bất kỳ để xem ngay các tour du lịch phù hợp.</p>
         </div>
         <div class="unesco-grid" id="unescoGrid" role="list"></div>
       </div>
     </section>
 
-    <!-- Tab Layout (Chuyến đi của tôi) -->
-    <div id="mainTabContainer" class="my-trips"></div>
+    <!-- CHUYẾN ĐI CÁ NHÂN / QUẢN LÝ HÀNH TRÌNH -->
+    <section class="hm-personal-trips" id="sec-personal-trips" aria-labelledby="hm-trips-title">
+      <div class="pt-container">
+        <div class="hm-sec-head pt-header">
+          <div class="pt-pill">🧳 Hành trình của bạn</div>
+          <h2 id="hm-trips-title" class="pt-title">Quản lý & lưu trữ chuyến đi</h2>
+          <p class="pt-desc">Xem lại các chuyến đi bạn đã tự tạo hoặc tour mẫu đã đăng ký, dễ dàng chỉnh sửa, in ấn và chuẩn bị cho chuyến khởi hành.</p>
+        </div>
+        <div id="mainTabContainer" class="my-trips"></div>
+      </div>
+    </section>
   </section>

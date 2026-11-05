@@ -2,6 +2,7 @@ package vn.travel.web;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.*;
+import vn.travel.security.Permission;
 import vn.travel.service.Payments;
 import vn.travel.util.Maps;
 
@@ -42,21 +43,15 @@ public class PaymentController {
         return out;
     }
 
-    @PostMapping("/api/admin/payments/manual")
-    public Map<String, Object> manual(@RequestBody(required = false) Map<String, Object> body, HttpServletRequest req) {
-        Map<String, Object> admin = current.requireAdmin(req);
-        return Maps.of("ok", true, "payment", payments.manual(admin, body == null ? Map.of() : body));
-    }
-
     @GetMapping("/api/admin/payments")
     public Map<String, Object> list(HttpServletRequest req) {
-        current.requireAdmin(req);
+        current.requirePermission(req, Permission.PAYMENT_VIEW);
         return Maps.of("ok", true, "payments", payments.list());
     }
 
     @GetMapping("/api/admin/payments/stats")
     public Map<String, Object> stats(HttpServletRequest req) {
-        current.requireAdmin(req);
+        current.requirePermission(req, Permission.PAYMENT_VIEW);
         return payments.stats();
     }
 }

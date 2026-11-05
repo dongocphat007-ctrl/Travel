@@ -4,6 +4,19 @@
       <h1 class="guides-title">Hướng dẫn viên</h1>
       <p class="guides-sub" id="guideSummary">Bấm vào một người để xem chi tiết.</p>
 
+      <!-- Bộ lọc (lọc ngay trên trình duyệt) -->
+      <div class="guide-filters" id="guideFilters">
+        <label>Khu vực
+          <select id="gf-region"><option value="">Tất cả</option><option>Miền Bắc</option><option>Miền Trung</option><option>Miền Nam</option><option>Quốc tế</option></select>
+        </label>
+        <label>Ngôn ngữ
+          <select id="gf-lang"><option value="">Tất cả</option></select>
+        </label>
+        <label>Trạng thái
+          <select id="gf-status"><option value="">Tất cả</option><option value="active">Đang nhận tour</option></select>
+        </label>
+      </div>
+
       <!-- Loading -->
       <div id="guideLoading" class="guide-state hidden">
         <div class="guide-spinner"></div>

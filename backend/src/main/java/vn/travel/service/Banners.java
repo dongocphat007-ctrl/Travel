@@ -39,7 +39,7 @@ public class Banners {
     @Autowired
     public Banners(Db db, Stats stats, Clock clock, TravelProperties props) {
         this(db, stats, clock, Paths.get(props.webRoot(), "img", "banners"));
-        seedIfMissing();
+        if (props.showSample()) seedIfMissing();   // banner mẫu trỏ tới tour mẫu → bỏ khi SAMPLE_DATA=false
     }
 
     public Banners(Db db, Stats stats, Clock clock, Path imgDir) {

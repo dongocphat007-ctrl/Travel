@@ -94,6 +94,7 @@ class ContentTest {
         assertEquals(false, f.reviews.eligible(u, "101").get("eligible"));       // chưa đi xong
         assertEquals(403, assertThrows(HttpError.class, () -> f.reviews.create(u, Map.of("tourId", "101", "rating", 5, "content", "Rất tuyệt vời"))).status());
         f.clock.plusDays(20);                                                    // tour 10–12/11 đã kết thúc
+        f.dbs.edit("bookings", all -> all.forEach(x -> x.put("status", "completed")));   // HDV bấm "Kết thúc chuyến"
         assertEquals(true, f.reviews.eligible(u, "101").get("eligible"));
         assertEquals(false, f.reviews.eligible(other, "101").get("eligible"));
         assertEquals("rating", assertThrows(HttpError.class, () -> f.reviews.create(u, Map.of("tourId", "101", "rating", 4.5, "content", "Rất tuyệt vời"))).field());
@@ -136,5 +137,13 @@ class ContentTest {
         f.banners.seedIfMissing();   // chạy lại không nhân đôi
         assertEquals(5, f.banners.adminList().size());
         assertEquals(5, ((List<?>) f.banners.active().get("banners")).size());
+    }
+
+    @Test void rankingGivesPopupNumbersForEveryTourWithStats(@TempDir Path tmp) throws Exception {   // NEW-13: GET /api/tours/stats
+        Fixture f = new Fixture(tmp);
+        Map<String, Object> row = f.stats.ranking().stream().filter(r -> "101".equals(r.get("tourId"))).findFirst().orElseThrow();
+        assertEquals(100L, ((Number) row.get("used")).longValue());
+        assertTrue(row.get("rating") instanceof Number && row.get("reviews") instanceof Number);
+        assertNull(row.get("userId"), "chỉ trả số, không lộ thông tin khách");
     }
 }

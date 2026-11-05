@@ -1,6 +1,6 @@
 /**
  * contact-fab.js – Nút liên hệ nhanh nổi: Zalo · Messenger · Gọi điện.
- * Số điện thoại / Zalo / Messenger lấy từ BUSINESS trong js/business-info.js (sửa một chỗ).
+ * Số điện thoại / Zalo / Messenger lấy từ BUSINESS trong js/constants.js (sửa một chỗ).
  */
 (function () {
   const B = window.BUSINESS || {};

@@ -1,5 +1,8 @@
 package vn.travel.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import vn.travel.store.Db;
 import vn.travel.util.Maps;
@@ -22,12 +25,37 @@ import java.util.*;
 @Service
 public class Inventory {
     public static final Set<String> COLLECTIONS = Set.of("airports", "flights", "hotels");
+    private static final Logger log = LoggerFactory.getLogger(Inventory.class);
     private final Db db;
     private final Clock clock;
+    private final LiveTravel live;   // null (hoặc chưa có khóa) → luôn dùng danh mục có sẵn
 
     public Inventory(Db db, Clock clock) {
+        this(db, clock, null);
+    }
+
+    @Autowired
+    public Inventory(Db db, Clock clock, LiveTravel live) {
         this.db = db;
         this.clock = clock;
+        this.live = live;
+    }
+
+    public Map<String, Object> liveStatus() {
+        return live == null ? Maps.of("flights", false, "hotelPlaces", false, "hotelPrices", false) : live.status();
+    }
+
+    /** Liên kết đặt vé của hãng/đại lý cho một chuyến bay trực tuyến (ignav_id). */
+    public Map<String, Object> flightLinks(String ignavId) {
+        if (live == null || !live.flightsEnabled()) throw HttpError.notFound("Chưa bật nguồn chuyến bay trực tuyến");
+        try { return live.flightLinks(ignavId); }
+        catch (LiveException e) { throw new HttpError(e.status() == 400 ? 400 : 502, e.getMessage()); }
+    }
+
+    public LiveHttp.Bytes hotelPhoto(String name, int width) {
+        if (live == null || !live.hotelsEnabled()) throw HttpError.notFound("Chưa bật ảnh khách sạn");
+        try { return live.photo(name, width); }
+        catch (LiveException e) { throw new HttpError(e.status() == 400 ? 400 : 404, e.getMessage()); }
     }
 
     private synchronized List<Map<String, Object>> coll(String name) {
@@ -56,16 +84,21 @@ public class Inventory {
     // ───────── tìm kiếm ─────────
     public Map<String, Object> searchFlights(String from, String to, String date, Object pax, Object cabin) {
         List<Map<String, Object>> ap = airports();
-        String f = TravelInventory.airportCode(ap, from), t = TravelInventory.airportCode(ap, to);
+        String f = code(ap, from), t = code(ap, to);
         if (f == null) throw HttpError.bad("Không tìm thấy sân bay khởi hành \"" + (from == null ? "" : from) + "\"", "from");
         if (t == null) throw HttpError.bad("Không tìm thấy sân bay đến \"" + (to == null ? "" : to) + "\"", "to");
         if (f.equals(t)) throw HttpError.bad("Điểm đi và điểm đến phải khác nhau", "to");
         LocalDate d = checkDate(date, 0, "date", "Vui lòng chọn ngày đi");
         int p = TravelInventory.intIn(pax, 1, 1, TravelInventory.MAX_PAX);
         String c = TravelInventory.cabin(cabin);
+        String liveNote = "";
+        if (live != null && live.flightsEnabled()) {
+            try { return live.searchFlights(f, t, d, p, c, iata -> cityOf(ap, iata)); }
+            catch (LiveException e) { log.warn("Ignav loi: {}", e.getMessage()); liveNote = "Nguon gia truc tuyen tam loi (" + e.getMessage() + "), dang hien thi gia niem yet cua Travel. "; }
+        }
         List<Map<String, Object>> list = TravelInventory.searchFlights(ap, flights(), f, t, d, p, c, today());
         return Maps.of("ok", true, "from", f, "to", t, "date", d.toString(), "pax", p, "cabin", c, "flights", list,
-                "source", "catalog", "note", "Giá niêm yết theo danh mục của Travel (đã gồm thuế phí); chỗ ngồi được xác nhận sau khi thanh toán.");
+                "source", "catalog", "note", liveNote + "Giá niêm yết theo danh mục của Travel (đã gồm thuế phí); chỗ ngồi được xác nhận sau khi thanh toán.");
     }
 
     public Map<String, Object> searchHotels(String dest, String checkin, String checkout, Object guests, Object stars) {
@@ -73,9 +106,15 @@ public class Inventory {
         checkStay(in, out);
         int g = TravelInventory.intIn(guests, 2, 1, 20);
         int s = "any".equals(String.valueOf(stars)) ? 0 : TravelInventory.intIn(stars, 0, 0, 5);
+        String liveNote = "";
+        if (live != null && live.hotelsEnabled()) {
+            if (dest == null || dest.isBlank()) throw HttpError.bad("Vui lòng nhập điểm đến", "dest");
+            try { return live.searchHotels(dest.trim(), in, out, g, s); }
+            catch (LiveException e) { log.warn("Nguon khach san loi: {}", e.getMessage()); liveNote = "Nguon gia truc tuyen tam loi (" + e.getMessage() + "), dang hien thi danh muc cua Travel. "; }
+        }
         List<Map<String, Object>> list = TravelInventory.searchHotels(hotels(), dest, in, out, g, s);
         return Maps.of("ok", true, "dest", dest == null ? "" : dest, "checkin", in.toString(), "checkout", out.toString(), "guests", g, "hotels", list,
-                "source", "catalog", "note", "Giá phòng niêm yết theo danh mục của Travel; đêm thứ Sáu/Bảy phụ thu 15%.");
+                "source", "catalog", "note", liveNote + "Giá phòng niêm yết theo danh mục của Travel; đêm thứ Sáu/Bảy phụ thu 15%.");
     }
 
     // ───────── định giá cho đặt chỗ (server tính, không tin client) ─────────
@@ -96,6 +135,18 @@ public class Inventory {
         Map<String, Object> q = TravelInventory.roomQuote(h, roomType, in, out, TravelInventory.intIn(guests, 2, 1, 20), TravelInventory.intIn(rooms, 1, 1, 10));
         if (q == null) throw HttpError.bad("Loại phòng không tồn tại", "roomType");
         return Maps.of("hotel", h, "quote", q, "checkin", in.toString(), "checkout", out.toString());
+    }
+
+    /** Danh mục trước; nếu người dùng gõ thẳng mã IATA 3 chữ (vd "ICN") thì dùng luôn để tìm trực tuyến. */
+    private static String code(List<Map<String, Object>> airports, String q) {
+        String c = TravelInventory.airportCode(airports, q);
+        if (c == null && q != null && q.trim().matches("[A-Za-z]{3}")) c = q.trim().toUpperCase();
+        return c;
+    }
+
+    private static String cityOf(List<Map<String, Object>> airports, String iata) {
+        for (Map<String, Object> a : airports) if (Maps.str(a, "code").equalsIgnoreCase(iata)) return Maps.str(a, "city");
+        return iata;
     }
 
     private static Map<String, Object> find(List<Map<String, Object>> l, String id) {

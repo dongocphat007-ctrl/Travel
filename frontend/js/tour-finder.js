@@ -3,7 +3,7 @@
  *   Việc của file này: gọi TourSearch.find → vẽ thẻ tour THẬT + marker bản đồ + bộ lọc/sắp xếp trên kết quả,
  *   và nút "Hỏi chatbot để tinh chỉnh" (Chatbot.continueFrom).
  *   Không tự gọi AI, không tự chọn tour.
- * Phụ thuộc: tour-search.js, tour-map.js (TourMap), home.js (BUDGETS, DAYS, daysMatch, daysOf), chatbot.js, utils.js (showToast).
+ * Phụ thuộc: tour-search.js, tour-finder-map.js (TourMap), home.js (BUDGETS, DAYS, daysMatch, daysOf), chatbot.js, utils.js (showToast).
  */
 const TourFinder = (() => {
   const $ = (id) => document.getElementById(id);
@@ -19,8 +19,8 @@ const TourFinder = (() => {
   async function loadLocations() {
     if (locs) return locs;
     let list = [];
-    try { const r = await fetch("/api/locations"); if (r.ok) list = (await r.json()).locations || []; } catch (e) { /* thử file */ }
-    if (!list.length) { try { list = (await (await fetch("data/locations.json")).json()).locations || []; } catch (e) { list = []; } }
+    try { list = (await (await fetch("data/locations.json")).json()).locations || []; } catch (e) { /* file không đọc được → hỏi server */ }
+    if (!list.length) { try { const r = await fetch("/api/locations"); if (r.ok) list = (await r.json()).locations || []; } catch (e) { list = []; } }
     locs = new Map(list.map((l) => [String(l.tourId), l]));
     return locs;
   }

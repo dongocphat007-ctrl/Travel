@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240">
+  <defs>
+    <linearGradient id="bg_mn04" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#b45309"/>
+      <stop offset="50%" stop-color="#d97706"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+    <linearGradient id="skin_mn04" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fee7d6"/>
+      <stop offset="100%" stop-color="#f7c8a6"/>
+    </linearGradient>
+    <linearGradient id="shirt_mn04" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+  </defs>
+  <rect width="240" height="240" rx="120" fill="url(#bg_mn04)"/>
+  <circle cx="120" cy="120" r="108" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+  
+  <!-- Long Hair Behind -->
+  <path d="M68 116c0 48 16 80 24 100h56c8-20 24-52 24-100 0-38-22-62-52-62s-52 24-52 62z" fill="#18181b"/>
+  
+  <!-- Shoulders & Uniform -->
+  <path d="M50 240c0-38 30-62 70-62s70 24 70 62z" fill="url(#shirt_mn04)"/>
+  <!-- Gold trim collar -->
+  <path d="M106 142h28v22h-28z" fill="#f7c8a6"/>
+  <path d="M98 174l22 22 22-22-10-6-12 10-12-10z" fill="#fbbf24"/>
+  
+  <!-- Head & Ears -->
+  <ellipse cx="80" cy="120" rx="6" ry="10" fill="#f7c8a6"/>
+  <ellipse cx="160" cy="120" rx="6" ry="10" fill="#f7c8a6"/>
+  <!-- Pearl Earrings -->
+  <circle cx="78" cy="126" r="3" fill="#ffffff" stroke="#cbd5e1" stroke-width="0.5"/>
+  <circle cx="162" cy="126" r="3" fill="#ffffff" stroke="#cbd5e1" stroke-width="0.5"/>
+  <ellipse cx="120" cy="118" rx="38" ry="46" fill="url(#skin_mn04)"/>
+  
+  <!-- Front Hair -->
+  <path d="M82 104c0-24 16-44 38-44 24 0 38 20 38 44-6-10-18-16-38-16s-32 6-38 16z" fill="#18181b"/>
+  <path d="M80 110c4-12 14-20 28-22 14-2 26 2 34 8 8-10 18-12 28-8-8 16-16 26-28 28-16 2-46-2-62-6z" fill="#18181b"/>
+  
+  <!-- Eyebrows -->
+  <path d="M94 100c5-3 14-2 18 1" stroke="#27272a" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+  <path d="M128 101c4-3 13-4 18-1" stroke="#27272a" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+  
+  <!-- Eyes -->
+  <ellipse cx="103" cy="110" rx="4.5" ry="4.5" fill="#18181b"/>
+  <circle cx="105" cy="108" r="1.5" fill="#fff"/>
+  <ellipse cx="137" cy="110" rx="4.5" ry="4.5" fill="#18181b"/>
+  <circle cx="139" cy="108" r="1.5" fill="#fff"/>
+  
+  <!-- Blush -->
+  <circle cx="94" cy="122" r="7" fill="rgba(244,63,94,0.2)"/>
+  <circle cx="146" cy="122" r="7" fill="rgba(244,63,94,0.2)"/>
+  
+  <!-- Nose & Smile -->
+  <path d="M120 114v8l3 1.5" stroke="#d99566" stroke-width="2" stroke-linecap="round" fill="none"/>
+  <path d="M107 134c6 7 20 7 26 0" stroke="#be123c" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+  <path d="M109 134c4 4 18 4 22 0" fill="#fff"/>
+  
+  <!-- Guide Pin Badge -->
+  <rect x="146" y="202" width="16" height="10" rx="2" fill="#fbbf24"/>
+</svg>

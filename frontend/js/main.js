@@ -17,6 +17,8 @@ async function loadAppData() {
 }
 
 // Auth UI
+const STAFF_HOME = { admin: "admin.html", cashier: "cashier.html", operator: "operator.html", support: "support.html", content: "content.html", guide: "guide.html" };
+function staffHomeUrl(user) { return user && STAFF_HOME[user.role] ? "/staff/" + STAFF_HOME[user.role] : null; }
 function updateNavAuth() {
   try { window.Chatbot?.refresh?.(); } catch (e) { console.warn("Chatbot.refresh:", e); } // đổi tài khoản → nạp đoạn chat tương ứng
   const user    = Auth.getUser();
@@ -25,8 +27,9 @@ function updateNavAuth() {
   const dashBtn = $id("nav-dash");
 
   if (user) {
-    const avatarHTML = user.picture
-      ? `<div class="user-avatar" style="background:${user.bg};padding:0;overflow:hidden"><img loading="lazy" decoding="async" src="${user.picture}" alt="${esc(user.initials)}" referrerpolicy="no-referrer"></div>`
+    const userPic = user.picture || user.avatar;
+    const avatarHTML = userPic
+      ? `<div class="user-avatar" style="background:${user.bg};padding:0;overflow:hidden"><img loading="lazy" decoding="async" src="${userPic}" alt="${esc(user.initials)}" referrerpolicy="no-referrer"></div>`
       : `<div class="user-avatar" style="background:${user.bg}">${user.initials}</div>`;
     area.innerHTML = `
       <div class="user-chip" id="user-chip-btn">
@@ -38,9 +41,16 @@ function updateNavAuth() {
     const profBtn = $id("nav-profile");
     if (profBtn) profBtn.style.display = "none"; // Gộp vào user-chip, không hiện nút riêng
     if (banner)  banner.style.display  = "none";
-    // Hiện nút Admin nếu user có role='admin'
+    // Hiện nút Admin nếu user có role='admin' hoặc nhân viên có trang làm việc
+    // Khách hàng thông thường KHÔNG thấy nút này
     const adminBtn = $id("nav-admin");
-    if (adminBtn) adminBtn.style.display = user.role === "admin" ? "flex" : "none";
+    const home = staffHomeUrl(user);
+    if (adminBtn) {
+      adminBtn.style.display = home ? "flex" : "none";
+      adminBtn.textContent = user.role === "admin" ? "Quản trị" : "Trang làm việc";
+      adminBtn.title = user.role === "admin" ? "Mở Dashboard Quản Trị" : "Trang làm việc";
+    }
+    if (home && dashBtn) dashBtn.style.display = "none";
   } else {
     area.innerHTML = `<button class="nav-btn nav-btn-login" id="nav-login-btn">Đăng nhập</button>`;
     $id("nav-login-btn")?.addEventListener("click", () => showLoginModal());
@@ -173,7 +183,7 @@ function initProfileActions() {
     if (file.size > 5 * 1024 * 1024)                      { setAvatarErr("Ảnh quá lớn (tối đa 5MB)"); return; }
     try {
       const dataUrl = await fileToAvatarDataUrl(file);
-      const r = Auth.updateAvatar(dataUrl);
+      const r = await Auth.updateAvatar(dataUrl);
       if (!r.ok) { setAvatarErr(r.msg); return; }
       updateNavAuth();
       renderProfile();
@@ -183,9 +193,9 @@ function initProfileActions() {
     }
   });
 
-  $id("pf-avatar-remove")?.addEventListener("click", () => {
+  $id("pf-avatar-remove")?.addEventListener("click", async () => {
     setAvatarErr("");
-    const r = Auth.updateAvatar(null);
+    const r = await Auth.updateAvatar(null);
     if (!r.ok) { setAvatarErr(r.msg); return; }
     updateNavAuth();
     renderProfile();
@@ -307,15 +317,21 @@ function openAvatarViewer() {
 // Chuyển tab Đăng nhập ↔ Đăng ký trong modal
 function switchAuthTab(tab) {
   const isLogin = tab === "login";
-  $id("tab-login-btn").classList.toggle("active", isLogin);
-  $id("tab-register-btn").classList.toggle("active", !isLogin);
-  $id("panel-login").style.display    = isLogin ? "block" : "none";
-  $id("panel-register").style.display = isLogin ? "none"  : "block";
+  $id("tab-login-btn")?.classList.toggle("active", isLogin);
+  $id("tab-register-btn")?.classList.toggle("active", !isLogin);
+  const authTabs = document.querySelector(".auth-tabs");
+  if (authTabs) authTabs.style.display = "flex";
+  if ($id("panel-login")) $id("panel-login").style.display    = isLogin ? "block" : "none";
+  if ($id("panel-register")) $id("panel-register").style.display = isLogin ? "none"  : "block";
   // Reset OTP nếu đang ở bước 2
   if ($id("panel-otp")) { $id("panel-otp").style.display = "none"; OTPService.cancel(); clearInterval(_cdTimer); }
+  // Reset các panel quên mật khẩu
+  if ($id("panel-forgot")) $id("panel-forgot").style.display = "none";
+  if ($id("panel-forgot-reset")) { $id("panel-forgot-reset").style.display = "none"; clearInterval(_fpCdTimer); }
   // Reset lỗi khi đổi tab
   ["err-li-email","err-li-pass","err-li-general",
-   "err-reg-name","err-reg-email","err-reg-pass","err-reg-pass2","err-reg-general"].forEach(id => {
+   "err-reg-name","err-reg-email","err-reg-birthday","err-reg-pass","err-reg-pass2","err-reg-general",
+   "err-fp-email","err-fp-general","err-fp-otp","err-fp-new-pass","err-fp-new-pass2","err-fp-reset-general"].forEach(id => {
     const el = $id(id);
     if (el) { el.textContent = ""; el.classList.remove("show"); }
   });
@@ -352,6 +368,11 @@ async function handleGoogleCredential(response) {
   updateNavAuth();
   showToast(`Chào mừng, ${user.name.split(" ").pop()}! 👋`, "success");
   window.AccountExtras?.onLoggedIn();   // xác thực hồ sơ + tải thông báo
+  const staffUrl = staffHomeUrl(user);
+  if (user.role === "admin" || (staffUrl && !afterLoginCallback)) {
+    location.href = staffUrl;
+    return;
+  }
   if (afterLoginCallback) { afterLoginCallback(); afterLoginCallback = null; }
   else renderHome();
 }
@@ -423,6 +444,25 @@ async function doEmailLogin() {
   updateNavAuth();
   showToast(`Chào mừng, ${result.user.name.split(" ").pop()}! 👋`, "success");
   window.AccountExtras?.onLoggedIn();   // xác thực hồ sơ + tải thông báo
+
+  // Đăng nhập 1 nơi duy nhất:
+  // Nếu là Admin -> Vào ngay Dashboard Quản trị (/staff/admin.html)
+  // Nếu là Nhân viên -> Vào trang làm việc tương ứng (/staff/...)
+  // Nếu là Khách hàng -> Dùng giao diện như thường (renderHome hoặc sau callback)
+  const qParams = new URLSearchParams(location.search);
+  const redirectUrl = qParams.get("redirect");
+  const staffUrl = staffHomeUrl(result.user);
+
+  if (result.user.role === "admin" || (staffUrl && !afterLoginCallback)) {
+    const target = (redirectUrl && (result.user.role === "admin" || !redirectUrl.startsWith("/staff/admin"))) ? redirectUrl : staffUrl;
+    location.href = target;
+    return;
+  }
+  if (redirectUrl && !redirectUrl.startsWith("/staff/")) {
+    location.href = redirectUrl;
+    return;
+  }
+
   if (afterLoginCallback) { afterLoginCallback(); afterLoginCallback = null; }
   else renderHome();
 }
@@ -432,15 +472,16 @@ async function doEmailLogin() {
 async function doRegister() {
   const name  = ($id("reg-name")?.value  || "").trim();
   const email = ($id("reg-email")?.value || "").trim();
+  const birthday = ($id("reg-birthday")?.value || "").trim();
   const pass  = ($id("reg-pass")?.value  || "");
   const pass2 = ($id("reg-pass2")?.value || "");
 
   // Xóa lỗi cũ
-  ["err-reg-name","err-reg-email","err-reg-pass","err-reg-pass2","err-reg-general"].forEach(id => {
+  ["err-reg-name","err-reg-email","err-reg-birthday","err-reg-pass","err-reg-pass2","err-reg-general"].forEach(id => {
     const el = $id(id);
     if (el) { el.textContent = ""; el.classList.remove("show"); }
   });
-  ["reg-name","reg-email","reg-pass","reg-pass2"].forEach(id => $id(id)?.classList.remove("err"));
+  ["reg-name","reg-email","reg-birthday","reg-pass","reg-pass2"].forEach(id => $id(id)?.classList.remove("err"));
 
   // Validate phía client trước khi gửi email
   if (!name || name.length < 2) {
@@ -449,15 +490,24 @@ async function doRegister() {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     showRegErr("reg-email", "err-reg-email", "Email không đúng định dạng"); return;
   }
-  if (pass.length < 6) {
-    showRegErr("reg-pass", "err-reg-pass", "Mật khẩu ít nhất 6 ký tự"); return;
+  if (!birthday) {
+    showRegErr("reg-birthday", "err-reg-birthday", "Vui lòng nhập ngày sinh"); return;
+  }
+  const bDate = new Date(birthday);
+  const now = new Date();
+  if (isNaN(bDate.getTime()) || bDate > now || bDate.getFullYear() < 1900) {
+    showRegErr("reg-birthday", "err-reg-birthday", "Ngày sinh không hợp lệ"); return;
+  }
+  const passErr = Auth.checkPassword ? Auth.checkPassword(pass) : (pass.length < 8 ? "Mật khẩu phải có ít nhất 8 ký tự" : null);
+  if (passErr) {
+    showRegErr("reg-pass", "err-reg-pass", passErr); return;
   }
   if (pass !== pass2) {
     showRegErr("reg-pass2", "err-reg-pass2", "Mật khẩu xác nhận không khớp"); return;
   }
 
   // Kiểm tra email đã đăng ký chưa
-  const preCheck = await Auth.register({ name, email, password: pass, dryRun: true });
+  const preCheck = await Auth.register({ name, email, password: pass, birthday, dryRun: true });
   if (preCheck && !preCheck.ok) {
     const errEl = $id("err-" + preCheck.field);
     if (errEl) { errEl.textContent = preCheck.msg; errEl.classList.add("show"); }
@@ -549,6 +599,7 @@ async function verifyOtpAndRegister() {
   const code  = ($id("otp-input")?.value || "").trim();
   const email = ($id("reg-email")?.value || "").trim();
   const name  = ($id("reg-name")?.value  || "").trim();
+  const birthday = ($id("reg-birthday")?.value || "").trim();
   const pass  = ($id("reg-pass")?.value  || "");
 
   // Xóa lỗi cũ
@@ -573,7 +624,7 @@ async function verifyOtpAndRegister() {
   }
 
   // OTP đúng → thực sự tạo tài khoản
-  const result = await Auth.register({ name, email, password: pass });
+  const result = await Auth.register({ name, email, password: pass, birthday });
   if (!result.ok) {
     const el = $id("err-otp-general");
     if (el) { el.textContent = result.msg; el.classList.add("show"); }
@@ -596,15 +647,204 @@ function resetRegisterPanel() {
   clearInterval(_cdTimer);
   $id("panel-otp").style.display      = "none";
   $id("panel-register").style.display = "block";
-  ["reg-name","reg-email","reg-pass","reg-pass2","otp-input"].forEach(id => {
+  ["reg-name","reg-email","reg-birthday","reg-pass","reg-pass2","otp-input"].forEach(id => {
     const el = $id(id);
     if (el) { el.value = ""; el.classList.remove("err"); }
   });
-  ["err-reg-name","err-reg-email","err-reg-pass","err-reg-pass2",
+  ["err-reg-name","err-reg-email","err-reg-birthday","err-reg-pass","err-reg-pass2",
    "err-reg-general","err-otp","err-otp-general"].forEach(id => {
     const el = $id(id);
     if (el) { el.textContent = ""; el.classList.remove("show"); }
   });
+}
+
+// ─────────────────────────────────────────────────────────────
+// QUÊN MẬT KHẨU (FORGOT PASSWORD)
+// ─────────────────────────────────────────────────────────────
+let _fpCdTimer = null;
+
+function openForgotPanel() {
+  const authTabs = document.querySelector(".auth-tabs");
+  if (authTabs) authTabs.style.display = "none";
+  if ($id("panel-login")) $id("panel-login").style.display = "none";
+  if ($id("panel-register")) $id("panel-register").style.display = "none";
+  if ($id("panel-otp")) $id("panel-otp").style.display = "none";
+  if ($id("panel-forgot-reset")) $id("panel-forgot-reset").style.display = "none";
+  if ($id("panel-forgot")) $id("panel-forgot").style.display = "block";
+
+  // Điền email từ ô login nếu đã nhập
+  const emailInput = $id("fp-email");
+  const loginEmail = ($id("li-email")?.value || "").trim();
+  if (emailInput) {
+    if (loginEmail && loginEmail.includes("@")) emailInput.value = loginEmail;
+    emailInput.classList.remove("err");
+    emailInput.focus();
+  }
+  ["err-fp-email","err-fp-general"].forEach(id => {
+    const el = $id(id);
+    if (el) { el.textContent = ""; el.classList.remove("show"); }
+  });
+}
+
+function startFpOtpCountdown(seconds = 60) {
+  const btn = $id("btn-fp-resend-otp");
+  const span = $id("fp-otp-countdown");
+  if (!btn || !span) return;
+  btn.disabled = true;
+  let s = seconds;
+  span.textContent = s;
+  clearInterval(_fpCdTimer);
+  _fpCdTimer = setInterval(() => {
+    s--;
+    span.textContent = s;
+    if (s <= 0) {
+      clearInterval(_fpCdTimer);
+      btn.disabled = false;
+      btn.textContent = "Gửi lại";
+    }
+  }, 1000);
+}
+
+async function doSendForgotOtp() {
+  const email = ($id("fp-email")?.value || "").trim().toLowerCase();
+  ["err-fp-email","err-fp-general"].forEach(id => {
+    const el = $id(id);
+    if (el) { el.textContent = ""; el.classList.remove("show"); }
+  });
+  $id("fp-email")?.classList.remove("err");
+
+  if (!email) {
+    showFpErr("fp-email", "err-fp-email", "Vui lòng nhập email");
+    return;
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    showFpErr("fp-email", "err-fp-email", "Email không đúng định dạng");
+    return;
+  }
+
+  const btn = $id("btn-fp-send-otp");
+  btn.dataset.loading = "true";
+  btn.textContent = "⏳ Đang gửi mã...";
+
+  const res = await Auth.sendForgotOtp(email);
+
+  btn.dataset.loading = "false";
+  btn.innerHTML = "📧 Gửi mã xác nhận";
+
+  if (!res.ok) {
+    if (res.field && $id("err-" + res.field)) {
+      showFpErr(res.field, "err-" + res.field, res.msg);
+    } else {
+      const gen = $id("err-fp-general");
+      if (gen) { gen.textContent = res.msg; gen.classList.add("show"); }
+    }
+    return;
+  }
+
+  // Chuyển sang bước 2: nhập OTP và mật khẩu mới
+  if ($id("panel-forgot")) $id("panel-forgot").style.display = "none";
+  const pReset = $id("panel-forgot-reset");
+  if (pReset) pReset.style.display = "block";
+  const disp = $id("fp-email-display");
+  if (disp) disp.textContent = email;
+  const otpInput = $id("fp-otp-input");
+  if (otpInput) { otpInput.value = ""; otpInput.focus(); }
+  if ($id("fp-new-pass")) $id("fp-new-pass").value = "";
+  if ($id("fp-new-pass2")) $id("fp-new-pass2").value = "";
+
+  startFpOtpCountdown();
+}
+
+async function resendForgotOtp() {
+  const email = ($id("fp-email-display")?.textContent || "").trim();
+  const btn = $id("btn-fp-resend-otp");
+  if (!email || !btn) return;
+
+  btn.disabled = true;
+  btn.textContent = "⏳ Đang gửi...";
+
+  const res = await Auth.sendForgotOtp(email);
+  if (!res.ok) {
+    const el = $id("err-fp-reset-general");
+    if (el) { el.textContent = res.msg; el.classList.add("show"); }
+    btn.disabled = false;
+    btn.textContent = "Gửi lại";
+    return;
+  }
+  showToast("Đã gửi lại mã OTP đặt lại mật khẩu 📬", "success", 3000);
+  const otpInput = $id("fp-otp-input");
+  if (otpInput) { otpInput.value = ""; otpInput.focus(); }
+  startFpOtpCountdown();
+}
+
+async function doResetPassword() {
+  const email = ($id("fp-email-display")?.textContent || "").trim();
+  const code = ($id("fp-otp-input")?.value || "").trim();
+  const pass = ($id("fp-new-pass")?.value || "");
+  const pass2 = ($id("fp-new-pass2")?.value || "");
+
+  ["err-fp-otp","err-fp-new-pass","err-fp-new-pass2","err-fp-reset-general"].forEach(id => {
+    const el = $id(id);
+    if (el) { el.textContent = ""; el.classList.remove("show"); }
+  });
+  ["fp-otp-input","fp-new-pass","fp-new-pass2"].forEach(id => $id(id)?.classList.remove("err"));
+
+  if (!code || code.length !== 6) {
+    showFpErr("fp-otp-input", "err-fp-otp", "Vui lòng nhập đủ 6 chữ số OTP");
+    return;
+  }
+  const passErr = Auth.checkPassword ? Auth.checkPassword(pass) : (pass.length < 8 ? "Mật khẩu mới phải có ít nhất 8 ký tự" : null);
+  if (passErr) {
+    showFpErr("fp-new-pass", "err-fp-new-pass", passErr);
+    return;
+  }
+  if (pass !== pass2) {
+    showFpErr("fp-new-pass2", "err-fp-new-pass2", "Mật khẩu xác nhận không khớp");
+    return;
+  }
+
+  const btn = $id("btn-fp-do-reset");
+  btn.dataset.loading = "true";
+  btn.textContent = "⏳ Đang xử lý...";
+
+  // Xác minh OTP để nhận ticket
+  const verifyRes = await OTPService.verify(code, email);
+  if (!verifyRes.ok) {
+    btn.dataset.loading = "false";
+    btn.innerHTML = "🔒 Đặt lại mật khẩu";
+    showFpErr("fp-otp-input", "err-fp-otp", verifyRes.msg || "Mã OTP không đúng");
+    return;
+  }
+
+  const ticket = OTPService.ticketFor(email);
+  const resetRes = await Auth.resetPassword({ email, otpTicket: ticket, newPassword: pass });
+
+  btn.dataset.loading = "false";
+  btn.innerHTML = "🔒 Đặt lại mật khẩu";
+
+  if (!resetRes.ok) {
+    if (resetRes.field && $id("err-" + resetRes.field)) {
+      showFpErr(resetRes.field, "err-" + resetRes.field, resetRes.msg);
+    } else {
+      const gen = $id("err-fp-reset-general");
+      if (gen) { gen.textContent = resetRes.msg; gen.classList.add("show"); }
+    }
+    return;
+  }
+
+  // Đặt lại mật khẩu thành công!
+  clearInterval(_fpCdTimer);
+  showToast("Đặt lại mật khẩu thành công! Vui lòng đăng nhập với mật khẩu mới 🎉", "success", 4000);
+  switchAuthTab("login");
+  const liEmail = $id("li-email");
+  if (liEmail) liEmail.value = email;
+  $id("li-pass")?.focus();
+}
+
+function showFpErr(fieldId, errId, msg) {
+  const errEl = $id(errId);
+  if (errEl) { errEl.textContent = msg; errEl.classList.add("show"); }
+  $id(fieldId)?.classList.add("err");
 }
 
 // Guard: yêu cầu đăng nhập trước khi thực hiện thao tác
@@ -615,6 +855,11 @@ function requireAuth(callback) {
 
 // ROUTER – Điều hướng trang
 function navigate(page, opts = {}) { // Default parameter (ES6+)
+  const staffLanding = staffHomeUrl(Auth.getUser());
+  if (staffLanding) {
+    location.replace(staffLanding);
+    return;
+  }
   PAGES.forEach(p => $id(`page-${p}`)?.classList.toggle("active", p === page));
 
   // forEach() – cập nhật nav active
@@ -642,7 +887,19 @@ function navigate(page, opts = {}) { // Default parameter (ES6+)
   if (page === "dashboard")   renderDashboard();
   if (page === "profile")     renderProfile();
   if (page === "food" && !document.getElementById("food-root").innerHTML) FoodModule.render("food-root");
-  if (page === "admin") Admin.render();
+  if (page === "admin") {
+    const u = Auth.getUser();
+    if (u && u.role === "admin") {
+      location.href = "/staff/admin.html";
+      return;
+    }
+    const home = staffHomeUrl(u);
+    if (home) { location.href = home; return; }
+    // Chưa đăng nhập -> hiển thị modal đăng nhập
+    showLoginModal();
+    navigate("home");
+    return;
+  }
   if (page === "guides" && typeof GuidesPage !== "undefined") GuidesPage.render();
   if (page === "policy") PolicyPage.render(opts.tab);
   if (page === "about") {
@@ -1056,8 +1313,17 @@ function seedAdminAccount() {
   const USERS_KEY = "travel_users_v1";
   try {
     const users = JSON.parse(localStorage.getItem(USERS_KEY)) || [];
-    const clean = users.filter(u => u.id !== "admin_default" || u.provider !== "local" || u.passHash !== "-g10hvh");
+    const clean = users.filter(u => u.id !== "admin_default" && u.email !== "phatinformationtechnology@gmail.com" && !(u.role === "admin" && u.id !== "ad001"));
     if (clean.length !== users.length) localStorage.setItem(USERS_KEY, JSON.stringify(clean));
+    ["travel_session_v1", "travel_auth_v1"].forEach(k => {
+      try {
+        const sess = JSON.parse(localStorage.getItem(k));
+        if (sess && (sess.id === "admin_default" || sess.email === "phatinformationtechnology@gmail.com" || (sess.role === "admin" && sess.id !== "ad001"))) {
+          localStorage.removeItem(k);
+        }
+      } catch (err) {}
+    });
+    localStorage.removeItem("travel_old_admin");
   } catch (e) { /* không cản init app */ }
 }
 
@@ -1254,6 +1520,20 @@ document.addEventListener("DOMContentLoaded", () => {
   updateNavAuth();
   initCoverUpload();  // Task 3.1
 
+  // Tự động mở modal đăng nhập khi có tham số ?login=1 hoặc ?login=admin
+  try {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get("login") && !Auth.isLoggedIn()) {
+      setTimeout(() => {
+        showLoginModal();
+        if (urlParams.get("login") === "admin") {
+          const emailInput = $id("li-email");
+          if (emailInput && !emailInput.value) emailInput.value = "admin@travel.vn";
+        }
+      }, 250);
+    }
+  } catch (e) { /* không cản init */ }
+
   // ---- TASK 5.1: Khởi tạo TabLayout ----
   TabLayout.init({
     container:      "#mainTabContainer",
@@ -1301,6 +1581,106 @@ document.addEventListener("DOMContentLoaded", () => {
   ["f-guide", "f-guide-hours", "f-start", "f-end"].forEach(id => $id(id)?.addEventListener("change", updateGuideCost));
   $id("back-from-form").addEventListener("click",   () => navigate("home"));
   $id("cancel-trip-form").addEventListener("click", () => navigate("home"));
+
+  // AI Smart Travel Planner (Trợ lý AI lên lịch trình tự động)
+  $id("btn-toggle-ai-planner")?.addEventListener("click", () => {
+    const p = $id("ai-planner-panel");
+    if (!p) return;
+    p.style.display = p.style.display === "none" ? "block" : "none";
+    if (p.style.display === "block") $id("ai-p-dest")?.focus();
+  });
+  $id("btn-close-ai-planner")?.addEventListener("click", () => {
+    const p = $id("ai-planner-panel");
+    if (p) p.style.display = "none";
+  });
+  $id("btn-run-ai-planner")?.addEventListener("click", async () => {
+    const dest = $id("ai-p-dest")?.value.trim();
+    if (!dest) {
+      showToast("Vui lòng nhập điểm đến mong muốn (VD: Đà Lạt, Sa Pa, Phú Quốc...)", "warn");
+      $id("ai-p-dest")?.focus();
+      return;
+    }
+    const days = parseInt($id("ai-p-days")?.value, 10) || 3;
+    const style = $id("ai-p-style")?.value || "nghỉ dưỡng";
+    const pax = parseInt($id("ai-p-pax")?.value, 10) || 2;
+    const btn = $id("btn-run-ai-planner");
+    const oldHtml = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = "⏳ AI đang lên kế hoạch...";
+
+    try {
+      let plan = null;
+      if (typeof GeminiAI !== "undefined" && GeminiAI.hasKey()) {
+        const prompt = `Bạn là chuyên gia du lịch. Lập lịch trình cho chuyến đi ${dest} kéo dài ${days} ngày cho ${pax} người theo phong cách ${style}.
+Trả về duy nhất định dạng JSON chuẩn:
+{"name":"Tên chuyến đi hấp dẫn kèm số ngày", "icon":"🏖️", "budget": 6000000, "desc":"Mô tả điểm nhấn và trải nghiệm", "days":[{"day":1, "title":"...", "items":[{"time":"08:00","desc":"..."},{"time":"12:00","desc":"..."},{"time":"18:00","desc":"..."}]}]}`;
+        const res = await GeminiAI.generate(prompt, { json: true, maxTokens: 1200 });
+        try { plan = JSON.parse(res); } catch (e) {
+          const match = res.match(/\{[\s\S]*\}/);
+          if (match) plan = JSON.parse(match[0]);
+        }
+      }
+      if (!plan || !plan.name) {
+        const dCap = dest.charAt(0).toUpperCase() + dest.slice(1);
+        plan = {
+          name: `${dCap} ${days}N${days - 1}Đ (${style.split(" ")[0]})`,
+          icon: dest.toLowerCase().includes("biển") || dest.toLowerCase().includes("phú quốc") ? "🏖️" : (dest.toLowerCase().includes("sapa") || dest.toLowerCase().includes("núi") ? "🏔️" : "✈️"),
+          budget: pax * days * 1200000,
+          desc: `Chuyến đi ${days} ngày khám phá ${dCap} theo phong cách ${style}. Lịch trình được AI tối ưu hóa thời gian và trải nghiệm cho đoàn ${pax} người.`,
+          days: Array.from({ length: days }, (_, i) => ({
+            day: i + 1,
+            title: `Ngày ${i + 1}: Khám phá danh lam thắng cảnh tại ${dCap}`,
+            items: [
+              { time: "08:00", desc: `Khởi hành, ăn sáng đặc sản tại ${dCap}` },
+              { time: "11:30", desc: "Nghỉ trưa, thưởng thức ẩm thực địa phương" },
+              { time: "14:30", desc: `Tham quan các điểm check-in và di tích nổi tiếng tại ${dCap}` },
+              { time: "18:30", desc: "Dạo phố đêm, thưởng thức ẩm thực đường phố và ngắm cảnh" }
+            ]
+          }))
+        };
+      }
+
+      $id("f-name").value = plan.name;
+      $id("f-dest").value = dest;
+      if ($id("f-budget")) $id("f-budget").value = new Intl.NumberFormat("vi-VN").format(plan.budget || (pax * days * 1200000));
+      if ($id("f-members")) $id("f-members").value = pax;
+
+      const start = new Date(Date.now() + 7 * 86400000);
+      const end = new Date(start.getTime() + (days - 1) * 86400000);
+      $id("f-start").value = start.toISOString().slice(0, 10);
+      $id("f-end").value = end.toISOString().slice(0, 10);
+
+      if (plan.icon) {
+        AppState.emoji = plan.icon;
+        $id("f-emoji").value = plan.icon;
+        document.querySelectorAll(".emoji-opt").forEach(el => el.classList.toggle("sel", el.dataset.emoji === plan.icon));
+      }
+
+      let descText = plan.desc || "";
+      if (plan.days && Array.isArray(plan.days)) {
+        descText += "\n\n📅 LỊCH TRÌNH CHI TIẾT TỪNG NGÀY:\n";
+        plan.days.forEach(d => {
+          descText += `\n• Ngày ${d.day} (${d.title || ""}):\n`;
+          if (Array.isArray(d.items)) {
+            d.items.forEach(it => {
+              descText += `  - ${it.time || ""}: ${it.desc || ""}\n`;
+            });
+          }
+        });
+      }
+      $id("f-desc").value = descText.trim();
+
+      $id("ai-planner-panel").style.display = "none";
+      showToast("✨ AI đã lên lịch trình chi tiết xong! Hãy kiểm tra và bấm 'Tạo chuyến đi'.", "success");
+      $id("form-trip").scrollIntoView({ behavior: "smooth", block: "start" });
+    } catch (err) {
+      console.warn("AI planner error:", err);
+      showToast("Lỗi khi kết nối AI, vui lòng thử lại.", "error");
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = oldHtml;
+    }
+  });
 
   // FIX 2: Sync ngày kết thúc min khi thay đổi ngày khởi hành
   $id("f-start").addEventListener("change", e => {
@@ -1404,6 +1784,21 @@ document.addEventListener("DOMContentLoaded", () => {
   $id("otp-input")?.addEventListener("input", e => {
     e.target.value = e.target.value.replace(/\D/g, "").slice(0, 6);
   });
+
+  // Quên mật khẩu
+  $id("btn-show-forgot")?.addEventListener("click", openForgotPanel);
+  $id("btn-fp-back")?.addEventListener("click", () => switchAuthTab("login"));
+  $id("btn-fp-back-step1")?.addEventListener("click", openForgotPanel);
+  $id("btn-fp-send-otp")?.addEventListener("click", doSendForgotOtp);
+  $id("btn-fp-resend-otp")?.addEventListener("click", resendForgotOtp);
+  $id("btn-fp-do-reset")?.addEventListener("click", doResetPassword);
+  $id("fp-email")?.addEventListener("keydown", e => { if (e.key === "Enter") doSendForgotOtp(); });
+  $id("fp-otp-input")?.addEventListener("input", e => {
+    e.target.value = e.target.value.replace(/\D/g, "").slice(0, 6);
+  });
+  ["fp-otp-input","fp-new-pass","fp-new-pass2"].forEach(id =>
+    $id(id)?.addEventListener("keydown", e => { if (e.key === "Enter") doResetPassword(); })
+  );
 
   // Enter trong form đăng nhập
   ["li-email","li-pass"].forEach(id =>
@@ -1548,17 +1943,18 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!document.getElementById("food-root").innerHTML) FoodModule.render("food-root");
   });
 
-  $id("nav-admin")?.addEventListener("click", () => navigate("admin"));
+  $id("nav-admin")?.addEventListener("click", () => { const h = staffHomeUrl(Auth.getUser()); if (h) location.href = h; });
 
-  // Sync tour data từ localStorage về SAMPLE_TOURS runtime khi app khởi động
-  Admin.ensureToursSeeded();
-  Admin._syncToursRuntime();
-  // Tour mẫu mặc định lấy từ data/tours/*.json → khi nạp xong thì gộp vào và vẽ lại tab Tour mẫu
-  Admin.toursReady.then(() => {
-    Admin.ensureToursSeeded();
-    Admin._syncToursRuntime();
-    if (typeof TabLayout !== "undefined") TabLayout.refresh({});
-  });
+  // Sync tour data an toàn nếu có module Admin runtime
+  if (typeof Admin !== "undefined") {
+    Admin.ensureToursSeeded?.();
+    Admin._syncToursRuntime?.();
+    Admin.toursReady?.then?.(() => {
+      Admin.ensureToursSeeded?.();
+      Admin._syncToursRuntime?.();
+      if (typeof TabLayout !== "undefined") TabLayout.refresh({});
+    });
+  }
 
   // TOUR FINDER events: do js/tour-finder.js (TourFinder) đảm nhiệm, gọi TourSearch.find
 
@@ -1696,13 +2092,13 @@ function ensureTdmStyles() {
       .tdm-close { position:absolute;top:16px;right:16px;background:#e9e5dc;border:1px solid rgba(13,33,55,.24);color:#0d2137;font-size:1rem;width:36px;height:36px;border-radius:2px;cursor:pointer;display:flex;align-items:center;justify-content:center; }
       .tdm-header { display:flex;gap:16px;align-items:flex-start;margin-bottom:20px;padding-bottom:18px;border-bottom:1px dotted rgba(13,33,55,.35); }
       .tdm-emoji { font-size:3rem;line-height:1; }
-      .tdm-dest { font-size:.78rem;color:#596575;font-weight:700;letter-spacing:.5px;text-transform:uppercase; }
+      .tdm-dest { font-size:.8rem;color:#596575;font-weight:700;letter-spacing:.5px; }
       .tdm-name { font-size:1.3rem;font-weight:700;color:#0d2137;margin:4px 0 8px; }
       .tdm-meta { display:flex;flex-wrap:wrap;gap:10px;font-size:.8rem;color:#435267; }
       .tdm-tags { display:flex;flex-wrap:wrap;gap:6px;margin-top:8px; }
       .tdm-tag { background:#e4e8eb;color:#0d2137;font-size:.72rem;padding:3px 8px;border-radius:2px;border:1px solid rgba(13,33,55,.18); }
       .tdm-section { margin-bottom:18px; }
-      .tdm-section-title { font-size:.78rem;font-weight:700;color:#596575;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px; }
+      .tdm-section-title { font-size:.84rem;font-weight:700;color:#34414f;letter-spacing:.3px;margin-bottom:8px; }
       .tdm-highlight { font-size:.9rem;color:#26384d;line-height:1.6; }
       .tdm-itinerary { display:flex;flex-direction:column;gap:8px; }
       .tdm-itin-toggle-wrap { margin:18px 0 0;padding-top:16px;border-top:1px dotted rgba(13,33,55,.35); }
@@ -1723,18 +2119,30 @@ function ensureTdmStyles() {
       .tdm-price-label { font-size:.78rem;color:#596575; }
       .tdm-price-value { font-size:1.5rem;font-weight:800;color:#0d2137; }
       .tdm-price-unit { font-size:.78rem;color:#596575; }
-      .tdm-btn-book { background:#0d2137;color:#f5f3ee;border:1px solid #0d2137;padding:12px 28px;border-radius:2px;font-size:.95rem;font-weight:700;cursor:pointer; }
-      .tdm-btn-book:hover { background:#26384d; }
-      .tdm-booking-form { background:#efede6;border:1px solid rgba(13,33,55,.18);border-top:3px dotted rgba(13,33,55,.3);border-radius:2px;padding:20px;margin-top:18px; }
-      .tdm-form-row { display:flex;flex-direction:column;gap:5px;margin-bottom:14px; }
-      .tdm-form-row label { font-size:.8rem;color:#435267;font-weight:600; }
-      .tdm-input { background:#fbfaf6;border:1px solid rgba(13,33,55,.28);border-radius:2px;padding:9px 12px;color:#0d2137;font-size:.9rem;outline:none; }
-      .tdm-input:focus { border-color:#0d2137;box-shadow:0 0 0 2px rgba(13,33,55,.1); }
+      .tdm-btn-book { background:#0d2137;color:#f5f3ee;border:1px solid #0d2137;padding:12px 28px;border-radius:6px;font-size:.95rem;font-weight:700;cursor:pointer;transition:all .2s ease; }
+      .tdm-btn-book:hover { background:#26384d;transform:translateY(-1px);box-shadow:0 4px 12px rgba(13,33,55,.2); }
+      .tdm-booking-form { background:linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);border:1px solid #cbd5e1;border-top:3px solid #0284c7;border-radius:12px;padding:22px;margin-top:20px;box-shadow:0 10px 25px -5px rgba(15,23,42,.08),0 8px 10px -6px rgba(15,23,42,.04);animation:tdmFadeIn .3s ease-out; }
+      @keyframes tdmFadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+      .tdm-form-row { display:flex;flex-direction:column;gap:6px;margin-bottom:15px; }
+      .tdm-form-row label { font-size:.82rem;color:#334155;font-weight:700;display:flex;align-items:center; }
+      .tdm-input { background:#ffffff;border:1px solid #cbd5e1;border-radius:8px;padding:10px 14px;color:#0f172a;font-size:.9rem;outline:none;transition:all .2s ease;box-shadow:0 1px 2px rgba(0,0,0,.03); }
+      .tdm-input:focus { border-color:#0284c7;box-shadow:0 0 0 3px rgba(2,132,199,.18);background:#ffffff; }
       .tdm-textarea { resize:vertical;min-height:70px; }
-      .tdm-booking-actions { display:flex;gap:10px;justify-content:flex-end;margin-top:8px; }
-      .tdm-btn-cancel { background:transparent;color:#26384d;border:1px solid rgba(13,33,55,.28);padding:10px 20px;border-radius:2px;cursor:pointer;font-size:.88rem; }
-      .tdm-btn-confirm { background:#b3261e;color:#fff;border:1px solid #b3261e;padding:10px 24px;border-radius:2px;font-size:.88rem;font-weight:700;cursor:pointer; }
-      .tdm-btn-confirm:hover { background:#921d18; }
+      .tdm-seat { font-size:.84rem;margin-top:4px;display:flex;gap:8px;align-items:center;flex-wrap:wrap; }
+      .tdm-seat--ok { color:#166534; } .tdm-seat--low { color:#b45309; } .tdm-seat--bad { color:#991b1b; }
+      .tdm-pax-row { background:#ffffff;border:1px solid #e2e8f0;border-radius:10px;padding:12px 14px;margin-bottom:12px;display:flex;flex-direction:column;gap:9px;box-shadow:0 1px 3px rgba(0,0,0,.04);transition:border-color .2s; }
+      .tdm-pax-row:hover { border-color:#94a3b8; }
+      .tdm-pax-head { display:flex;justify-content:space-between;gap:8px;align-items:baseline;font-size:.84rem; }
+      .tdm-pax-tag { font-size:.74rem;color:#596575; } .tdm-pax-tag--bad { color:#991b1b;font-weight:700; }
+      .tdm-pax-grid { display:grid;grid-template-columns:1fr 1fr;gap:8px; }
+      .tdm-pax-grid label { display:flex;flex-direction:column;gap:4px;font-size:.78rem;color:#435267;font-weight:600; }
+      .tdm-booking-actions { display:flex;gap:10px;justify-content:flex-end;margin-top:12px; }
+      .tdm-btn-cancel { background:#ffffff;color:#475569;border:1px solid #cbd5e1;padding:10px 20px;border-radius:8px;cursor:pointer;font-size:.88rem;font-weight:600;transition:all .2s; }
+      .tdm-btn-cancel:hover { background:#f1f5f9;color:#0f172a;border-color:#94a3b8; }
+      .tdm-btn-confirm { background:linear-gradient(135deg, #0284c7 0%, #0369a1 100%);color:#fff;border:none;padding:12px 28px;border-radius:8px;font-size:.92rem;font-weight:700;cursor:pointer;transition:all .2s cubic-bezier(.4,0,.2,1);box-shadow:0 4px 14px rgba(2,132,199,.3); }
+      .tdm-btn-confirm:hover { transform:translateY(-2px);box-shadow:0 8px 22px rgba(2,132,199,.45);filter:brightness(1.06); }
+      .tdm-btn-confirm:active { transform:translateY(0);box-shadow:0 2px 6px rgba(2,132,199,.25); }
+      .req-star { color:#ef4444!important;font-weight:800;margin-left:3px;display:inline-block; }
       /* Rich itinerary for self tours */
       .tdm-itin-day--rich { background:#efede6;border-left:2px dotted rgba(13,33,55,.4);border-radius:2px;padding:12px 14px;margin-bottom:8px; }
       .tdm-itin-day-title { font-size:.85rem;font-weight:700;color:#0d2137;margin-bottom:8px; }
@@ -1853,7 +2261,6 @@ function openTourDetail(tour, opts) {
                  <span class="tdm-price-value" style="color:#10b981">${fmt(tour.price)}</span>
                  <span class="tdm-price-unit">/người</span>
                </div>
-               <div class="tdm-guide-fee-hint">🧑‍✈️ Thuê HDV nội địa: <b style="color:#f59e0b">${fmt(GUIDE_DAY_FEE)}</b>/ngày (8 tiếng), thêm giờ phụ thu</div>
              </div>`
           : `<div class="tdm-price-block">
                <span class="tdm-price-label">Giá từ</span>
@@ -1873,11 +2280,11 @@ function openTourDetail(tour, opts) {
       <div class="tdm-booking-form" id="tdm-booking-form" style="display:none">
         <div class="tdm-section-title" style="margin-bottom:12px">📋 Thông tin đặt tour</div>
         <div class="tdm-form-row">
-          <label>Họ và tên *</label>
+          <label>Họ và tên <span class="req-star">*</span></label>
           <input id="tdm-f-name" type="text" placeholder="Nguyễn Văn An" class="tdm-input">
         </div>
         <div class="tdm-form-row">
-          <label>Số điện thoại *</label>
+          <label>Số điện thoại <span class="req-star">*</span></label>
           <input id="tdm-f-phone" type="tel" placeholder="0901 234 567" maxlength="13" inputmode="tel" class="tdm-input">
         </div>
         <div class="tdm-form-row">
@@ -1885,9 +2292,35 @@ function openTourDetail(tour, opts) {
           <input id="tdm-f-email" type="email" placeholder="tenban@gmail.com" class="tdm-input">
         </div>
         <div class="tdm-form-row">
-          <label>Ngày khởi hành *</label>
+          <label>Ngày khởi hành <span class="req-star">*</span></label>
           <input id="tdm-f-date" type="date" class="tdm-input" min="${ngaySomNhatDangKy()}">
           <span style="font-size:.74rem;color:#94a3b8">Phải đăng ký trước ngày đi ít nhất ${BOOKING_MIN_DAYS} ngày (từ ${ngaySomNhatDangKy().split("-").reverse().join("/")} trở đi)</span>
+          <div class="tdm-seat" id="tdm-seat-info" aria-live="polite"></div>
+        </div>
+        <!-- Yêu cầu dành cho người chưa thành niên (< 18 tuổi) -->
+        <div id="tdm-guardian-box" style="display:none;background:#fffbeb;border:1px solid #fde68a;border-left:4px solid #f59e0b;padding:12px 14px;border-radius:4px;margin-bottom:14px;">
+          <div style="font-weight:700;color:#92400e;display:flex;align-items:center;gap:6px;margin-bottom:6px;font-size:.9rem;">
+            ⚠️ Yêu cầu dành cho khách hàng dưới 18 tuổi (chưa thành niên)
+          </div>
+          <div id="tdm-guardian-msg" style="font-size:.82rem;color:#78350f;line-height:1.45;margin-bottom:10px;">
+            Theo quy định an toàn du lịch, khách hàng dưới 18 tuổi cần có sự đồng ý của cha mẹ / người giám hộ hợp pháp hoặc có người lớn đi cùng. Vui lòng cung cấp thông tin người đại diện:
+          </div>
+          <div class="tdm-form-row" style="margin-bottom:8px;">
+            <label style="font-size:.8rem;font-weight:600;color:#78350f;">Họ và tên người đại diện / giám hộ <span class="req-star">*</span></label>
+            <input id="tdm-f-guardian-name" type="text" placeholder="VD: Nguyễn Văn Ba (Bố/Mẹ/Giám hộ)" class="tdm-input">
+          </div>
+          <div class="tdm-form-row" style="margin-bottom:8px;">
+            <label style="font-size:.8rem;font-weight:600;color:#78350f;">Số điện thoại người đại diện <span class="req-star">*</span></label>
+            <input id="tdm-f-guardian-phone" type="tel" placeholder="0901 234 567" maxlength="13" inputmode="tel" class="tdm-input">
+          </div>
+          <div class="tdm-form-row" style="margin-bottom:2px;">
+            <label style="font-size:.8rem;font-weight:600;color:#78350f;">Mối quan hệ với người đặt <span class="req-star">*</span></label>
+            <select id="tdm-f-guardian-relation" class="tdm-input">
+              <option value="Cha/Mẹ">Cha / Mẹ</option>
+              <option value="Người giám hộ hợp pháp">Người giám hộ hợp pháp</option>
+              <option value="Người thân trong gia đình">Người thân trong gia đình (Cô, Dì, Chú, Bác, Anh, Chị)</option>
+            </select>
+          </div>
         </div>
         <div class="tdm-form-row">
           <label>Số người lớn (từ ${CHILD_HALF_UNDER} tuổi)</label>
@@ -1902,21 +2335,15 @@ function openTourDetail(tour, opts) {
           <input id="tdm-f-infants" type="number" min="0" max="50" value="0" class="tdm-input">
           <span style="font-size:.74rem;color:#94a3b8">Miễn phí tối đa 1 bé/người lớn. Bé thứ 2 trở lên của cùng người lớn tính như trẻ ${CHILD_FREE_UNDER}–${CHILD_HALF_UNDER - 1} tuổi.</span>
         </div>
-        ${tour.type === "self" ? `
-        <div class="tdm-form-row">
-          <label class="tdm-hdv-box" style="display:flex;gap:8px;align-items:center;cursor:pointer">
-            <input type="checkbox" id="tdm-f-hdv"> 🧑‍✈️ Thuê HDV nội địa (1.500.000 ₫/ngày – 8 tiếng)
-          </label>
-          <select id="tdm-f-hdv-hours" class="tdm-input" style="display:none">
-            <option value="8">8 tiếng/ngày (giá chuẩn)</option><option value="9">9 tiếng/ngày (+200.000 ₫/ngày)</option>
-            <option value="10">10 tiếng/ngày (+400.000 ₫/ngày)</option><option value="11">11 tiếng/ngày (+600.000 ₫/ngày)</option>
-            <option value="12">12 tiếng/ngày (+800.000 ₫/ngày)</option>
-          </select>
-        </div>` : ""}
         <div class="tdm-form-row" id="tdm-guide-row" style="display:none">
           <label for="tdm-f-guide">🧑‍✈️ Chọn hướng dẫn viên</label>
           <select id="tdm-f-guide" class="tdm-input"><option value="">— Để công ty sắp xếp giúp —</option></select>
           <span id="tdm-guide-msg" style="font-size:.74rem;color:#94a3b8"></span>
+        </div>
+        <div class="tdm-form-row" id="tdm-passengers-wrap">
+          <label>👥 Danh sách hành khách <span class="req-star">*</span></label>
+          <span style="font-size:.74rem;color:#94a3b8">Khai đúng họ tên và ngày sinh như giấy tờ: độ tuổi tính theo ngày khởi hành và quyết định giá vé trẻ em / em bé.</span>
+          <div id="tdm-passengers"></div>
         </div>
         <div class="tdm-form-row" id="tdm-voucher-row">
           <label>🎟️ Mã giảm giá (voucher)</label>
@@ -1929,8 +2356,16 @@ function openTourDetail(tour, opts) {
         </div>
         <div class="tdm-summary" id="tdm-summary"></div>
         <div class="tdm-form-row">
+          <label>Yêu cầu đặc biệt</label>
+          <textarea id="tdm-f-special" class="tdm-input tdm-textarea" maxlength="500" placeholder="Ăn chay, dị ứng hải sản, có người lớn tuổi / khó đi lại, xe đẩy em bé..."></textarea>
+        </div>
+        <div class="tdm-form-row">
+          <label>Điểm đón mong muốn</label>
+          <input id="tdm-f-pickup" type="text" maxlength="300" class="tdm-input" placeholder="Số nhà, đường, khách sạn... (điều hành sẽ xác nhận lại)">
+        </div>
+        <div class="tdm-form-row">
           <label>Ghi chú thêm</label>
-          <textarea id="tdm-f-note" class="tdm-input tdm-textarea" placeholder="Yêu cầu đặc biệt, dị ứng thức ăn..."></textarea>
+          <textarea id="tdm-f-note" class="tdm-input tdm-textarea" placeholder="Ghi chú khác cho công ty..."></textarea>
         </div>
         <div class="tdm-booking-actions">
           <button class="tdm-btn-cancel" id="tdm-btn-cancel-booking">Huỷ</button>
@@ -1969,10 +2404,11 @@ function openTourDetail(tour, opts) {
 
   // Tính tiền: giá tour × số người (+ HDV nếu thuê) và tiền đặt cọc (DEPOSIT_PCT%)
   const tourDays = parseInt(tour.duration) || 1;
+  const isSelfTour = tour.type === "self" || tour.guide === "self";
   let appliedVoucher = null;                                // voucher đã áp (kết quả /api/vouchers/validate)
   const calcBooking = () => {
     const adultsIn = $id("tdm-f-pax")?.value, kidsIn = $id("tdm-f-kids")?.value, infIn = $id("tdm-f-infants")?.value;
-    const hdvOn = !!$id("tdm-f-hdv")?.checked;
+    const hdvOn = isSelfTour ? false : !!$id("tdm-f-hdv")?.checked;
     const hours = +($id("tdm-f-hdv-hours")?.value) || GUIDE_DAY_HOURS;
     // Công thức giá nằm ở shared/pricing.js — cùng file server dùng để tính giá thật khi tạo đơn
     const r = Pricing.compute({ price: tour.price, adults: adultsIn, kids: kidsIn, infants: infIn, hdvOn, hdvHours: hours, days: tourDays, voucher: appliedVoucher });
@@ -1993,13 +2429,156 @@ function openTourDetail(tour, opts) {
     refreshSummary();
   }));
   refreshSummary();
-  // Dropdown Guide (5.8): hiện khi tour có HDV (hoặc tour tự túc đã bật thuê HDV); khoá guide không rảnh đủ tourDays ngày từ ngày đi
+
+  // ───── 9.4, 9.5: danh sách hành khách — mỗi người một dòng, độ tuổi tính theo NGÀY KHỞI HÀNH (cùng quy tắc với server) ─────
+  const ageOn = (dob, on) => {
+    const d = new Date(dob + "T00:00:00"), t = new Date(on + "T00:00:00");
+    if (!dob || !on || isNaN(d) || isNaN(t) || d > t) return null;
+    let a = t.getFullYear() - d.getFullYear();
+    if (t.getMonth() < d.getMonth() || (t.getMonth() === d.getMonth() && t.getDate() < d.getDate())) a--;
+    return a;
+  };
+  const catOfAge = a => (a < CHILD_FREE_UNDER ? "infant" : a < CHILD_HALF_UNDER ? "kid" : "adult");
+  const CAT_LABEL = { adult: "Người lớn", kid: `Trẻ em (${CHILD_HALF_RATE * 100}% giá)`, infant: "Em bé (miễn phí)" };
+  const paxRows = () => Array.from(document.querySelectorAll("#tdm-passengers .tdm-pax-row"));
+  const readPassengers = () => paxRows().map(r => {
+    const g = f => r.querySelector(`[data-f="${f}"]`).value.trim();
+    return { name: g("name"), dob: g("dob"), gender: g("gender"), idNumber: g("idNumber") };
+  });
+  // Số người theo nhóm tuổi, áp quy tắc giống Pricing.compute: mỗi người lớn dắt tối đa 1 bé miễn phí, bé thứ hai tính như trẻ em
+  const countsByAge = (list, date) => {
+    let adults = 0, kids = 0, inf = 0;
+    list.forEach(p => { const a = ageOn(p.dob, date); if (a == null) return; const c = catOfAge(a); if (c === "adult") adults++; else if (c === "kid") kids++; else inf++; });
+    const free = Math.min(inf, adults);
+    return { adults, kids: kids + (inf - free), infants: free };
+  };
+  const updateMinorGuardianVisibility = () => {
+    const u = Auth.getUser();
+    const box = $id("tdm-guardian-box");
+    if (!box) return false;
+    const dateVal = $id("tdm-f-date")?.value;
+    const p1Dob = paxRows()[0]?.querySelector('[data-f="dob"]')?.value;
+    const bday = (u && u.birthday) ? u.birthday : p1Dob;
+    if (!bday) {
+      box.style.display = "none";
+      return false;
+    }
+    const a = ageOn(bday, dateVal || new Date().toISOString().slice(0, 10));
+    if (a != null && a >= 0 && a < 18) {
+      box.style.display = "block";
+      const msg = $id("tdm-guardian-msg");
+      if (msg) {
+        msg.innerHTML = `Khách hàng hiện <b>${a} tuổi</b> (sinh ngày ${bday.split("-").reverse().join("/")}). Theo quy định du lịch, khách hàng dưới 18 tuổi cần có sự đồng ý của cha mẹ / người giám hộ hợp pháp. Vui lòng cung cấp thông tin người đại diện:`;
+      }
+      return true;
+    } else {
+      box.style.display = "none";
+      return false;
+    }
+  };
+  const refreshPaxTags = () => {
+    const date = $id("tdm-f-date")?.value;
+    paxRows().forEach(r => {
+      const tag = r.querySelector("[data-tag]"), dob = r.querySelector('[data-f="dob"]').value;
+      tag.classList.remove("tdm-pax-tag--bad");
+      if (!dob) { tag.textContent = ""; return; }
+      if (!date) { tag.textContent = "Chọn ngày khởi hành để tính độ tuổi"; return; }
+      const a = ageOn(dob, date);
+      if (a == null) { tag.textContent = "Ngày sinh phải trước ngày khởi hành"; tag.classList.add("tdm-pax-tag--bad"); return; }
+      tag.textContent = `${a} tuổi · ${CAT_LABEL[catOfAge(a)]}`;
+    });
+  };
+  const renderPassengers = () => {
+    const box = $id("tdm-passengers");
+    if (!box) return;
+    const c = calcBooking(), keep = readPassengers();
+    box.innerHTML = Array.from({ length: c.pax }, (_, i) => `
+      <div class="tdm-pax-row">
+        <div class="tdm-pax-head"><b>Hành khách ${i + 1}</b><span class="tdm-pax-tag" data-tag></span></div>
+        <input class="tdm-input" data-f="name" type="text" maxlength="100" autocomplete="off" placeholder="Họ và tên (đúng giấy tờ)" aria-label="Họ tên hành khách ${i + 1}">
+        <div class="tdm-pax-grid">
+          <label>Ngày sinh<input class="tdm-input" data-f="dob" type="date" max="${new Date().toISOString().slice(0, 10)}"></label>
+          <label>Giới tính<select class="tdm-input" data-f="gender"><option value="">—</option><option value="male">Nam</option><option value="female">Nữ</option><option value="other">Khác</option></select></label>
+        </div>
+        <input class="tdm-input" data-f="idNumber" type="text" maxlength="20" autocomplete="off" placeholder="CCCD / hộ chiếu (không bắt buộc)" aria-label="CCCD hoặc hộ chiếu hành khách ${i + 1}">
+      </div>`).join("");
+    paxRows().forEach((r, i) => {
+      const old = keep[i];
+      if (old) {
+        Object.keys(old).forEach(k => { r.querySelector(`[data-f="${k}"]`).value = old[k]; });
+      } else if (i === 0) {
+        const u = Auth.getUser();
+        if (u) {
+          if (u.name && !r.querySelector('[data-f="name"]').value) r.querySelector('[data-f="name"]').value = u.name;
+          if (u.birthday && !r.querySelector('[data-f="dob"]').value) r.querySelector('[data-f="dob"]').value = u.birthday;
+        }
+      }
+      r.querySelector('[data-f="dob"]').addEventListener("input", () => {
+        refreshPaxTags();
+        if (i === 0) updateMinorGuardianVisibility();
+      });
+    });
+    refreshPaxTags();
+    updateMinorGuardianVisibility();
+  };
+
+  // ───── 9.1, 9.7: chỗ còn lại của ngày đã chọn; hết chỗ thì mời vào danh sách chờ ─────
+  let seatInfo = null;
+  const renderSeats = () => {
+    const box = $id("tdm-seat-info");
+    if (!box) return;
+    box.innerHTML = "";
+    if (!seatInfo) return;
+    const need = calcBooking().pax, left = seatInfo.left;
+    const line = (cls, text) => { const sp = document.createElement("span"); sp.className = cls; sp.textContent = text; box.appendChild(sp); };
+    if (seatInfo.status === "cancelled") { line("tdm-seat--bad", "⛔ Chuyến ngày này đã bị hủy, vui lòng chọn ngày khác."); return; }
+    if (seatInfo.status === "closed") { line("tdm-seat--bad", "⛔ Chuyến ngày này đã đóng đặt chỗ, vui lòng chọn ngày khác hoặc vào danh sách chờ."); }
+    else if (left >= need) { line(left <= 3 ? "tdm-seat--low" : "tdm-seat--ok", `✅ Còn ${left} chỗ`); return; }
+    else if (left > 0) line("tdm-seat--low", `⚠️ Ngày này chỉ còn ${left} chỗ, bạn cần ${need} chỗ.`);
+    else line("tdm-seat--bad", "⚠️ Ngày này đã hết chỗ.");
+    const btn = document.createElement("button");
+    btn.type = "button"; btn.className = "tdm-btn-cancel"; btn.textContent = "⏳ Vào danh sách chờ";
+    btn.addEventListener("click", async () => {
+      const date = $id("tdm-f-date")?.value, phone = $id("tdm-f-phone")?.value.trim();
+      if (!isValidVNPhone(phone)) { showToast("⚠️ Nhập số điện thoại trước để chúng tôi liên hệ khi có chỗ", "warn"); return; }
+      btn.disabled = true;
+      try {
+        const r = await Api.post("/api/waitlist", { tourId: tour.id, date, pax: need, phone });
+        if (r.ok) showToast("✅ Đã ghi tên bạn vào danh sách chờ. Chúng tôi sẽ báo ngay khi có chỗ trống.", "ok");
+        else if (r.status === 401) { showToast("⚠️ Vui lòng đăng nhập để vào danh sách chờ", "warn"); if (typeof showLoginModal === "function") showLoginModal(); }
+        else showToast("⚠️ " + (r.data.msg || "Không vào được danh sách chờ"), "warn");
+      } catch (e) { showToast("⚠️ Không kết nối được máy chủ, vui lòng thử lại", "warn"); }
+      btn.disabled = false;
+    });
+    box.appendChild(btn);
+  };
+  const refreshSeats = async () => {
+    const date = $id("tdm-f-date")?.value;
+    seatInfo = null;
+    renderSeats();
+    if (!date) return;
+    try {
+      const r = await Api.get(`/api/tours/${encodeURIComponent(tour.id)}/availability?date=${encodeURIComponent(date)}`);
+      if (date !== $id("tdm-f-date")?.value) return;   // người dùng đã đổi ngày trong lúc chờ
+      if (r.ok && r.data.availability) { seatInfo = r.data.availability; renderSeats(); }
+    } catch (e) { /* không có thông tin chỗ: server vẫn kiểm tra lại lúc đặt */ }
+  };
+  ["tdm-f-pax", "tdm-f-kids", "tdm-f-infants"].forEach(id => $id(id)?.addEventListener("input", () => { renderPassengers(); renderSeats(); }));
+  $id("tdm-f-date")?.addEventListener("change", () => { refreshPaxTags(); refreshSeats(); });
+  renderPassengers();
+
+  // Dropdown Guide (5.8): hiện khi tour có HDV (tour tự túc không cần HDV); khoá guide không rảnh đủ tourDays ngày từ ngày đi
   const guidePicker = GuidePicker.attach({
     select: $id("tdm-f-guide"), row: $id("tdm-guide-row"), msg: $id("tdm-guide-msg"),
     getDate: () => $id("tdm-f-date")?.value, getDays: () => tourDays,
-    isNeeded: () => tour.type !== "self" || !!$id("tdm-f-hdv")?.checked
+    getRegion: () => tour.region || ({ north: "Miền Bắc", central: "Miền Trung", south: "Miền Nam", intl: "Quốc tế" })[tour.rc] || (tour.international ? "Quốc tế" : ""),
+    isNeeded: () => !isSelfTour
   });
-  ["tdm-f-date", "tdm-f-hdv"].forEach(id => $id(id)?.addEventListener("change", () => guidePicker.refresh()));
+  ["tdm-f-date"].forEach(id => $id(id)?.addEventListener("change", () => {
+    guidePicker.refresh();
+    updateMinorGuardianVisibility();
+  }));
+  $id("tdm-f-date")?.addEventListener("input", updateMinorGuardianVisibility);
   guidePicker.refresh(true);   // mở form = tải lại lịch guide từ server (đơn mới đặt / vừa hủy đều được tính)
   // Voucher: nhập mã / chọn trong "Voucher của tôi" → server kiểm tra (đúng tài khoản, còn hạn, chưa dùng)
   if (window.VoucherUI) VoucherUI.attach({
@@ -2011,14 +2590,20 @@ function openTourDetail(tour, opts) {
   });
 
   $id("tdm-btn-open-booking").addEventListener("click", () => {
+    const u = Auth.getUser();
+    if (u && Auth.isStaff && Auth.isStaff()) {
+      const roleName = (u.role || "").toUpperCase();
+      showToast(`⚠️ Tài khoản nhân viên nội bộ (${roleName}) không được phép đặt tour. Tính năng đặt tour chỉ dành riêng cho khách hàng. Vui lòng đăng xuất hoặc đăng nhập tài khoản khách hàng để đặt tour.`, "warn");
+      return;
+    }
     $id("tdm-booking-form").style.display = "";
     $id("tdm-btn-open-booking").style.display = "none";
     // Điền sẵn thông tin user
-    const u = Auth.getUser();
     if (u) {
       const nameEl = $id("tdm-f-name"); if (nameEl && !nameEl.value) nameEl.value = u.name || "";
       const emailEl = $id("tdm-f-email"); if (emailEl && !emailEl.value) emailEl.value = u.email || "";
     }
+    updateMinorGuardianVisibility();
   });
 
   $id("tdm-btn-cancel-booking").addEventListener("click", () => {
@@ -2027,6 +2612,11 @@ function openTourDetail(tour, opts) {
   });
 
   $id("tdm-btn-confirm-booking").addEventListener("click", async () => {
+    const u = Auth.getUser();
+    if (u && Auth.isStaff && Auth.isStaff()) {
+      showToast("⚠️ Tài khoản nhân viên nội bộ không được phép đặt tour. Tính năng đặt tour chỉ dành riêng cho khách hàng.", "warn");
+      return;
+    }
     const name  = $id("tdm-f-name")?.value.trim();
     const phone = $id("tdm-f-phone")?.value.trim();
     if (!name) { showToast("⚠️ Vui lòng nhập họ tên", "warn"); return; }
@@ -2035,7 +2625,6 @@ function openTourDetail(tour, opts) {
     if (!isValidVNPhone(phone)) { showToast("⚠️ Số điện thoại không hợp lệ: cần 10 số, bắt đầu bằng 0 (hoặc +84), VD 0901234567", "warn"); return; }
 
     const calc = calcBooking();
-    const pax  = calc.pax;
     const date = $id("tdm-f-date")?.value;
     const note = $id("tdm-f-note")?.value.trim();
 
@@ -2043,6 +2632,20 @@ function openTourDetail(tour, opts) {
     if (!date) { showToast("⚠️ Vui lòng chọn ngày khởi hành", "warn"); return; }
     if (soNgayConLai(date) < BOOKING_MIN_DAYS) {
       showToast(`⚠️ Phải đăng ký trước ngày đi ít nhất ${BOOKING_MIN_DAYS} ngày (chọn từ ${ngaySomNhatDangKy().split("-").reverse().join("/")} trở đi)`, "warn");
+      return;
+    }
+
+    // 9.4–9.5: hành khách khai đủ họ tên + ngày sinh, độ tuổi theo ngày đi phải khớp số người lớn / trẻ em / em bé (server kiểm tra lại)
+    const passengers = readPassengers();
+    for (let i = 0; i < passengers.length; i++) {
+      if (passengers[i].name.length < 2) { showToast(`⚠️ Nhập họ tên hành khách ${i + 1}`, "warn"); paxRows()[i].querySelector('[data-f="name"]').focus(); return; }
+      if (!passengers[i].dob) { showToast(`⚠️ Nhập ngày sinh của hành khách ${i + 1}`, "warn"); paxRows()[i].querySelector('[data-f="dob"]').focus(); return; }
+      if (ageOn(passengers[i].dob, date) == null) { showToast(`⚠️ Ngày sinh của hành khách ${i + 1} phải trước ngày khởi hành`, "warn"); return; }
+    }
+    const byAge = countsByAge(passengers, date);
+    if (byAge.adults < 1) { showToast(`⚠️ Cần ít nhất 1 hành khách từ ${CHILD_HALF_UNDER} tuổi trở lên (tính theo ngày khởi hành)`, "warn"); return; }
+    if (byAge.adults !== calc.adults || byAge.kids !== calc.kids || byAge.infants !== calc.infants) {
+      showToast(`⚠️ Theo ngày sinh: ${byAge.adults} người lớn, ${byAge.kids} trẻ em, ${byAge.infants} em bé. Hãy chỉnh số lượng ở trên cho khớp để giá tính đúng.`, "warn");
       return;
     }
 
@@ -2057,51 +2660,73 @@ function openTourDetail(tour, opts) {
       }
     }
 
-    // Gửi lên SERVER: server tự tính giá (giá gốc → voucher → giá cuối → cọc 20%) và đánh dấu voucher đã dùng
+    // Kiểm tra yêu cầu người đại diện cho khách dưới 18 tuổi
+    const isMinor = updateMinorGuardianVisibility();
+    let guardian = null;
+    if (isMinor) {
+      const gName = $id("tdm-f-guardian-name")?.value.trim();
+      const gPhone = $id("tdm-f-guardian-phone")?.value.trim();
+      const gRel = $id("tdm-f-guardian-relation")?.value;
+      if (!gName || gName.length < 2) {
+        showToast("⚠️ Khách dưới 18 tuổi: Vui lòng nhập họ tên người đại diện / giám hộ", "warn");
+        $id("tdm-f-guardian-name")?.focus();
+        return;
+      }
+      if (!isValidVNPhone(gPhone)) {
+        showToast("⚠️ Số điện thoại người đại diện không hợp lệ (cần 10 số)", "warn");
+        $id("tdm-f-guardian-phone")?.focus();
+        return;
+      }
+      guardian = { name: gName, phone: gPhone, relation: gRel };
+    }
+
+    // Gửi lên SERVER: server tự tính giá (giá gốc → voucher → giá cuối → cọc 20%) và đánh dấu voucher đã dùng.
+    // Không có chế độ dự phòng: server không phản hồi thì KHÔNG tạo đơn cục bộ, chỉ báo lỗi và cho thử lại.
     const confirmBtn = $id("tdm-btn-confirm-booking");
     const payPrefix = window.Payment ? Payment.config.prefix : "TRAVEL";
-    let newBooking = null, viaServer = false;
+    const serverDown = () => {
+      confirmBtn.disabled = false;
+      let box = $id("tdm-server-err");
+      if (!box) {
+        box = document.createElement("div");
+        box.id = "tdm-server-err";
+        box.setAttribute("role", "alert");
+        box.style.cssText = "margin:10px 0;padding:10px 12px;border:1px solid #ef4444;background:#fee2e2;color:#991b1b;font-size:.86rem;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap";
+        confirmBtn.parentNode.insertBefore(box, confirmBtn);
+      }
+      box.innerHTML = '<span>Máy chủ chưa sẵn sàng, vui lòng thử lại. Đơn của bạn chưa được tạo.</span><button type="button" class="btn" id="tdm-server-retry" style="min-height:44px">Thử lại</button>';
+      box.querySelector("#tdm-server-retry").addEventListener("click", () => { box.remove(); confirmBtn.click(); });
+    };
+    let newBooking = null;
     confirmBtn.disabled = true;
+    $id("tdm-server-err")?.remove();
     try {
       const r = await Api.post("/api/bookings", {
-        tourId: tour.id, customerName: name, phone, email: emailVal, date, note, payPrefix,
+        tourId: tour.id, customerName: name, phone, email: emailVal, date, note, payPrefix, passengers, guardian,
+        specialRequest: $id("tdm-f-special")?.value.trim() || "", pickup: $id("tdm-f-pickup")?.value.trim() || "",
         adults: calc.adults, kids: calc.kids, infants: calc.infants, hdvOn: calc.hdvOn, hdvHours: calc.hours, guideId,
         voucherCode: appliedVoucher ? appliedVoucher.code : ""
       });
-      if (r.ok) { newBooking = r.data.booking; viaServer = true; }
+      if (r.ok && r.data.booking) { newBooking = r.data.booking; }
       else if (r.status === 401) {
         confirmBtn.disabled = false;
         showToast("⚠️ Phiên đăng nhập trên máy chủ đã hết — vui lòng đăng nhập lại để đặt tour", "warn");
         if (typeof showLoginModal === "function") showLoginModal();
         return;
+      } else if (r.status >= 500 || (r.ok && !r.data.booking)) {
+        serverDown();
+        return;
       } else {
         confirmBtn.disabled = false;
         showToast("⚠️ " + (r.data.msg || "Không đặt được tour"), "warn");
         if (r.data.field === "voucher") { appliedVoucher = null; refreshSummary(); }
+        if (r.data.field === "date") refreshSeats();   // hết chỗ / chuyến đóng: cập nhật số chỗ và nút danh sách chờ
         if (r.data.field === "guide") { GuidePicker.load(true).then(() => guidePicker.refresh()); }   // lịch guide vừa đổi → tải lại
         return;
       }
-    } catch (e) { /* không có server → chế độ localStorage cũ bên dưới */ }
+    } catch (e) { serverDown(); return; }
 
-    if (viaServer) {
-      Api.cacheBooking(newBooking);
-    } else {
-      // Chế độ dự phòng (mở bằng máy chủ tĩnh): tính giá ở client, voucher không áp dụng được
-      const bookings = JSON.parse(localStorage.getItem("travel_bookings") || "[]");
-      const bkId = "bk_" + Date.now();
-      newBooking = {
-        id: bkId, payCode: payPrefix + bkId.replace(/\D/g, ""), depositPaid: false,
-        tourId: tour.id, tourName: tour.name, tourDest: tour.destination,
-        userId: Auth.getUser()?.id || "", userEmail: Auth.getUser()?.email || "", guideId: guideId || null,
-        customerName: name, phone, date: date || "", pax, adults: calc.adults, children: calc.kids, infants: calc.infants, note,
-        price: calc.total, deposit: calc.deposit, depositPercent: DEPOSIT_PCT, priceBreakdown: calc.bd,
-        guideHire: calc.hdvOn ? { enabled: true, hoursPerDay: calc.hours, days: tourDays, cost: calc.hdv } : { enabled: false },
-        itinerary: tour.itinerary || [], tourDuration: tour.duration || "", tourHighlight: tour.highlight || "", guideType: tour.type || "",
-        status: "pending", createdAt: new Date().toISOString()
-      };
-      bookings.push(newBooking);
-      localStorage.setItem("travel_bookings", JSON.stringify(bookings));
-    }
+    Api.cacheBooking(newBooking);
     window.OrderStats?.autoWrite(false);   // cập nhật file orders.json (nếu đã liên kết). khoản chuyển chỉ được ghi nhận khi webhook ngân hàng khớp hoặc Admin xác nhận
     window.VoucherUI?.invalidate();        // danh sách "Voucher của tôi" phải tải lại (mã vừa dùng)
 
@@ -2114,11 +2739,17 @@ function openTourDetail(tour, opts) {
     if (AppState.page === "dashboard") renderDashboard();
   });
 
-  // Mở thẳng form đặt tour (dùng từ trang riêng của tour)
+  // Mở thẳng form đặt tour (dùng từ trang riêng của tour hoặc từ AI Chatbot)
   if (opts && opts.openBooking) {
-    $id("tdm-btn-open-booking").click();
-    if (opts.date && $id("tdm-f-date")) { $id("tdm-f-date").value = opts.date; guidePicker.refresh(); }
-    setTimeout(() => $id("tdm-booking-form")?.scrollIntoView({ block: "start", behavior: "smooth" }), 50);
+    const u = Auth.getUser();
+    if (u && Auth.isStaff && Auth.isStaff()) {
+      showToast("⚠️ Tài khoản nhân viên nội bộ không được phép đặt tour. Vui lòng sử dụng tài khoản khách hàng.", "warn");
+    } else {
+      $id("tdm-btn-open-booking").click();
+      if (opts.adults && $id("tdm-f-pax")) { $id("tdm-f-pax").value = opts.adults; refreshSummary(); }
+      if (opts.date && $id("tdm-f-date")) { $id("tdm-f-date").value = opts.date; guidePicker.refresh(); refreshPaxTags(); refreshSeats(); }
+      setTimeout(() => $id("tdm-booking-form")?.scrollIntoView({ block: "start", behavior: "smooth" }), 50);
+    }
   }
 }
 
@@ -2197,3 +2828,28 @@ function openBookingItinerary(bookingId) {
   modal.querySelector(".tdm-backdrop").addEventListener("click", () => modal.remove());
   modal.querySelector(".tdm-close").addEventListener("click", () => modal.remove());
 }
+
+;
+// PATCH: Override navigate() để render home section
+(function(){
+  let _origNav = window.navigate;
+  window.navigate = function(page, opts){
+    if (typeof _origNav === "function") _origNav(page, opts);
+    if (page === "home" && window._initHomeSection) {
+      setTimeout(window._initHomeSection, 50);
+    }
+  };
+  // Also patch nav-home to go to page-home showing the hero
+  let navHome = document.getElementById("nav-home");
+  if (navHome) {
+    var _origClick = navHome.onclick;
+    navHome.addEventListener("click", function(){
+      if (window._initHomeSection) setTimeout(window._initHomeSection, 80);
+    });
+  }
+})();
+
+// Initial render of home section
+setTimeout(function(){
+  if (window._initHomeSection) window._initHomeSection();
+}, 300);

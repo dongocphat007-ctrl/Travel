@@ -74,13 +74,19 @@
   function toPublic(r) {
     var created = String(r.createdAt || "");
     var o = {
-      id: r.id, tourId: String(r.tourId), name: r.name || "Khách", rating: r.rating, content: r.content,
+      id: r.id, tourId: r.tourId ? String(r.tourId) : "", name: r.name || "Khách", rating: r.rating,
+      content: r.content != null ? r.content : (r.comment || ""),
       date: r.date || created.slice(0, 10), createdAt: r.createdAt
     };
+    if (r.tourName) o.tourName = r.tourName;
+    if (r.targetType) o.targetType = r.targetType;
+    if (r.foodName) o.foodName = r.foodName;
     if (r.criteria) o.criteria = r.criteria;
     if (r.image && safeImage(r.image)) o.image = r.image;
+    if (r.reply) o.reply = r.reply;
     if (r.sample) o.sample = true;
-    o.source = r.sample ? "demo" : (r.source === "admin" ? "admin" : "verified");
+    var src = r.source || (r.sample ? "demo" : "verified");
+    o.source = src;
     return o;
   }
 

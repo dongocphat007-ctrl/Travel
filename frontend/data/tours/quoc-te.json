@@ -1281,7 +1281,7 @@
       "dest": "Bali, Indonesia",
       "cat": "Nghỉ dưỡng",
       "emoji": "🌺",
-      "desc": "Hành trình Bali, Indonesia: Ubud, Tanah Lot, Ruộng bậc thang Tegalalang.",
+      "desc": "Hành trình Bali, Indonesia: Ubud, Tanah Lot, ruộng bậc thang Tegalalang.",
       "rc": "intl",
       "guide": "guided",
       "duration": "5 ngày 4 đêm",
@@ -1363,11 +1363,11 @@
         },
         {
           "day": 4,
-          "title": "Bali: Ruộng bậc thang Tegalalang",
+          "title": "Bali: ruộng bậc thang Tegalalang",
           "items": [
             {
               "time": "Sáng",
-              "desc": "Tham quan Ruộng bậc thang Tegalalang – HDV thuyết minh"
+              "desc": "Tham quan ruộng bậc thang Tegalalang – HDV thuyết minh"
             },
             {
               "time": "Trưa",
@@ -5591,7 +5591,7 @@
       "dest": "Cairo · Luxor, Ai Cập",
       "cat": "Văn hóa",
       "emoji": "🏛️",
-      "desc": "Hành trình Cairo · Luxor, Ai Cập: Kim tự tháp Giza, Thung lũng các vua, Du thuyền sông Nile.",
+      "desc": "Hành trình Cairo · Luxor, Ai Cập: Kim tự tháp Giza, thung lũng các vua, Du thuyền sông Nile.",
       "rc": "intl",
       "guide": "guided",
       "duration": "8 ngày 7 đêm",
@@ -5673,7 +5673,7 @@
         },
         {
           "day": 4,
-          "title": "Cairo – Luxor: Thung lũng các vua",
+          "title": "Cairo – Luxor: thung lũng các vua",
           "items": [
             {
               "time": "Sáng",
@@ -5685,7 +5685,7 @@
             },
             {
               "time": "Chiều",
-              "desc": "Tham quan Thung lũng các vua – HDV thuyết minh"
+              "desc": "Tham quan thung lũng các vua – HDV thuyết minh"
             },
             {
               "time": "Tối",
@@ -17908,7 +17908,7 @@
       "dest": "Lima · Cusco · Machu Picchu, Peru",
       "cat": "Văn hóa",
       "emoji": "🦙",
-      "desc": "Hành trình Lima · Cusco · Machu Picchu, Peru: Machu Picchu, Thung lũng Linh Thiêng, Phố cổ Cusco, Núi Cầu Vồng Vinicunca.",
+      "desc": "Hành trình Lima · Cusco · Machu Picchu, Peru: Machu Picchu, thung lũng Linh Thiêng, Phố cổ Cusco, Núi Cầu Vồng Vinicunca.",
       "rc": "intl",
       "guide": "guided",
       "duration": "9 ngày 8 đêm",
@@ -17968,7 +17968,7 @@
         },
         {
           "day": 3,
-          "title": "Lima – Cusco: Thung lũng Linh Thiêng",
+          "title": "Lima – Cusco: thung lũng Linh Thiêng",
           "items": [
             {
               "time": "Sáng",
@@ -17980,7 +17980,7 @@
             },
             {
               "time": "Chiều",
-              "desc": "Tham quan Thung lũng Linh Thiêng – HDV thuyết minh"
+              "desc": "Tham quan thung lũng Linh Thiêng – HDV thuyết minh"
             },
             {
               "time": "Tối",

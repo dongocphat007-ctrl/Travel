@@ -9,7 +9,6 @@ public record TravelProperties(
         String dbDir,
         String adminEmail,
         String adminPassword,
-        String superAdminEmail,
         String sessionSecret,
         String siteUrl,
         String googleClientId,
@@ -25,12 +24,23 @@ public record TravelProperties(
         String paymentAccountName,
         String paymentPrefix,
         String googleMapsApiKey,
-        boolean trustProxy) {
+        boolean trustProxy,
+        boolean sampleData,
+        boolean hideSampleReviews,
+        String langfusePublicKey,
+        String langfuseSecretKey,
+        String langfuseBaseUrl) {
 
     public String prefix() {
         String p = paymentPrefix == null ? "" : paymentPrefix.replaceAll("[^A-Za-z0-9]", "");
         return p.isEmpty() ? "TRAVEL" : p.toUpperCase();
     }
+
+    /** Có hiển thị dữ liệu MẪU (tour mẫu, lượt dùng/đánh giá mẫu, HDV demo, banner mẫu) cùng dữ liệu thật không. SAMPLE_DATA=false → chỉ dữ liệu thật. */
+    public boolean showSample() { return sampleData; }
+
+    /** Có ẩn review mẫu không (SAMPLE_DATA=false hoặc HIDE_SAMPLE_REVIEWS=true/1). */
+    public boolean hideSampleReviewsEffective() { return !sampleData || hideSampleReviews; }
 
     public static boolean blank(String s) {
         return s == null || s.isBlank();

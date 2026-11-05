@@ -374,3 +374,16 @@
     animation-duration: 2s;
   }
 }
+
+/* ===== Thông tin mở rộng của HDV (đánh giá, chuyên môn, chứng chỉ) + bộ lọc ===== */
+.guide-rating { display: block; font-size: 0.84rem; color: var(--muted, #6b7280); }
+.guide-rating b { color: var(--status-warn, #b45309); }
+.fact-item.fact-wide { grid-column: 1 / -1; }
+.guide-tags { display: flex; flex-wrap: wrap; gap: 6px; font-weight: 500; }
+.guide-tag { font-size: 0.78rem; padding: 2px 10px; border-radius: 999px; background: var(--status-off-bg, rgba(107,114,128,.16)); }
+.guide-tag--spec { background: var(--status-ok-bg, rgba(5,150,105,.13)); color: var(--status-ok, #047857); }
+.guide-tag--cert { background: var(--status-warn-bg, rgba(217,119,6,.15)); color: var(--status-warn, #b45309); }
+.guide-demo-note { margin: 0 0 12px; font-size: 0.78rem; color: var(--muted, #6b7280); font-style: italic; }
+.guide-filters { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 16px; }
+.guide-filters label { display: flex; flex-direction: column; gap: 4px; font-size: 0.78rem; color: var(--muted, #6b7280); }
+.guide-filters select { min-height: 40px; padding: 0 10px; border-radius: 10px; border: 1px solid var(--border, #d1d9e6); background: var(--surface, #fff); color: inherit; font: inherit; }

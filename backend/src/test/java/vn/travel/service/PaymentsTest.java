@@ -42,7 +42,8 @@ class PaymentsTest {
         assertEquals("matched", Maps.map(r.get("payment")).get("status"));
         Map<String, Object> nb = f.bookings.find(Maps.str(b, "id"));
         assertEquals(true, nb.get("depositPaid"));
-        assertEquals("confirmed", nb.get("status"));
+        assertEquals("paid_deposit", nb.get("status"));
+        assertEquals(1, ((List<?>) nb.get("payments")).size());   // sổ thanh toán có đúng 1 dòng
         // gửi lại cùng mã giao dịch → không ghi trùng
         Map<String, Object> dup = f.payments.webhook(tx("T1", 1_000_000, code));
         assertEquals(true, dup.get("duplicate"));

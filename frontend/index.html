@@ -34,6 +34,7 @@
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <link rel="stylesheet" href="css/theme.css">
   <link rel="stylesheet" href="css/tour-page.css">
+  <link rel="stylesheet" href="css/review-community.css">
   <link rel="stylesheet" href="css/contact-fab.css">
   <link rel="stylesheet" href="css/tour-filters.css">
   <link rel="stylesheet" href="css/mobile-fixes.css">
@@ -43,21 +44,19 @@
   <link rel="stylesheet" href="css/a11y.css">
   <link rel="stylesheet" href="css/p13.css">
   <link rel="stylesheet" href="css/tour-finder.css">
-  <!-- Lớp thiết kế: luôn nạp CUỐI để ghi đè các file css ở trên -->
-  <link rel="stylesheet" href="css/design.css">
+  <link rel="stylesheet" href="css/tour-popup.css">
   <!-- axios (bản lưu sẵn trong lib/ để chạy được cả khi không có mạng) – dùng cho trang Hướng dẫn viên -->
   <script type="importmap">
     { "imports": { "axios": "./lib/axios.min.js" } }
   </script>
   <!-- Nạp các mảnh HTML trong thư mục html/ -->
   <!-- Đổi tên dự án: chuyển dữ liệu localStorage cũ (tripcraft_*, travel_vn_*) sang tiền tố travel_* — phải chạy TRƯỚC mọi script khác -->
-  <script src="js/brand-migrate.js"></script>
+  <script src="js/brand-rename-migration.js"></script>
   <!-- Giai đoạn 13 (B): ảnh lỗi → ảnh thay thế, lazy-load, debounce ô tìm kiếm, apiFetch/cache/renderInBatches — nạp SỚM, trước include.js -->
-  <script src="js/p13-utils.js"></script>
+  <script src="js/safe-helpers.js"></script>
   <script src="js/include.js"></script>
 </head>
 <body>
-<a class="skip-link" href="#main">Bỏ qua điều hướng</a>
 <noscript><p style="padding:16px;text-align:center">Trang cần bật JavaScript để hoạt động.</p></noscript>
 
 <script>includeHtml('html/navbar.html')</script>
@@ -78,8 +77,6 @@
   <script>includeHtml('html/page-food.html')</script>
   <script>includeHtml('html/page-policy.html')</script>
   <script>includeHtml('html/page-profile.html')</script>
-  <script>includeHtml('html/page-admin.html')</script>
-
 </main>
 
 <script>includeHtml('html/modal-login.html')</script>
@@ -97,52 +94,50 @@
 
 <!-- JS MODULES -->
 <script src="js/utils.js"></script>
-<script src="js/storage.js"></script>
 <!-- Giá dùng chung với server + cầu nối API (phải nạp trước auth.js) -->
 <script src="shared/pricing.js"></script>
 <script src="shared/guide-availability.js"></script>
 <script src="shared/review-schema.js"></script>
-<script src="js/data-api.js"></script>
+<script src="shared/roles-permissions.js"></script>
+<script src="js/api-client.js"></script>
+<script src="js/review-community.js"></script>
 
-<script src="js/otp.js"></script>
-<script src="js/business-info.js"></script>
 <script src="js/constants.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/trips.js"></script>
 <script src="js/qrcode-lib.js"></script>
 <script src="js/payment.js"></script>
-<script src="js/policy.js"></script>
+<script src="js/policy-page.js"></script>
 <script src="js/validator.js"></script>
-<script src="js/render.js"></script>
+<script src="js/trip-views.js"></script>
 <script src="js/lazy-libs.js"></script>
-<script src="js/export-module.js"></script>
+<script src="js/export-trip-docx-pdf.js"></script>
 <script src="js/booking-pdf.js"></script>
-<script src="js/gemini.js"></script>
-<script src="js/import-module.js"></script>
+<script src="js/ai-client.js"></script>
+<script src="js/import-trip-from-file.js"></script>
 <script src="js/rag.js"></script>
 <script src="js/tour-search.js"></script>
 <script src="js/chat-log.js"></script>
-<script src="js/admin-chat.js"></script>
 <script src="js/chatbot.js"></script>
 <!-- 11.1–11.8 (B): Yêu thích (♡) + So sánh (tối đa 3 tour) + Chia sẻ ?tour=ID; trang #/favorites, #/compare -->
 <script src="js/favorites.js"></script>
 <script src="js/map-basemap.js"></script>
-<script src="js/tour-map.js"></script>
+<script src="js/tour-popup.js"></script>
+<script src="js/tour-finder-map.js"></script>
 <script src="js/world-map.js"></script>
 <script src="js/world-tours.js"></script>
 <script src="js/hotel-flight-search.js"></script>
-<script src="js/food-module.js"></script>
+<script src="js/food-page.js"></script>
 <script src="js/tour-images.js"></script>
-<script src="js/tab-layout.js"></script>
+<script src="shared/data-export-import.js"></script>
+<script src="js/wallet-client.js"></script>
+<script src="js/profile-tabs.js"></script>
 <script src="js/order-stats.js"></script>
-<script src="js/admin.js"></script>
-<script src="js/admin-p0.js"></script>
 <script src="js/main.js"></script>
 <script src="js/tour-finder.js"></script>
 <script src="js/tour-page.js"></script>
 <script src="js/contact-fab.js"></script>
 
-<script src="js/home-patch.js"></script>
 
 <!-- P0: voucher, banner động, tour nổi bật -->
 <script src="js/voucher-ui.js"></script>
@@ -150,21 +145,20 @@
 <script src="js/weather.js"></script>
 <script src="js/tour-location-map.js"></script>
 <script src="js/banner.js"></script>
-<script src="js/featured.js"></script>
 <!-- Hero trang chủ: bản đồ Tuyến Bắc–Nam (dùng bộ lọc của home.js) -->
 <script src="js/route-map.js"></script>
 
 <!-- Hướng dẫn viên: danh sách accordion (#/guides) -->
-<script type="module" src="js/guides.js"></script>
+<script type="module" src="js/guides-page.js"></script>
 
 <!-- Thông báo theo tài khoản + xác thực hồ sơ (tên, email, giới tính, ngày sinh) -->
 <script src="js/account-extras.js"></script>
 
 <!-- 12.1–12.4 (B): alt ảnh, label input, aria-label nút icon, điều hướng bàn phím. Console: TravelA11y.audit() -->
-<script src="js/a11y.js"></script>
+<script src="js/accessibility.js"></script>
 <!-- 12.7 / 12.9 (B): title, description, Open Graph, canonical theo route -->
 <script src="js/seo.js"></script>
 <!-- Keo nối A+B: khớp cấu hình các module B với markup/router của A -->
-<script src="js/merge-glue.js"></script>
+<script src="js/module-config.js"></script>
 </body>
 </html>

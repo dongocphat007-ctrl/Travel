@@ -13,6 +13,7 @@
  *   • Món ăn              data/foods.json (mặc định) GỘP với bản Admin đã lưu (không bỏ sót món nào)
  *   • UNESCO_SITES        data/unesco.json
  *   • DESTINATIONS        lịch trình / ẩm thực / chi phí gợi ý theo điểm đến (truyền từ chatbot.js)
+ *   • Hướng dẫn viên      data/guides-seed.json (đọc ở frontend; chỉ hỏi /api/guides khi file không đọc được) — nạp bằng RAG.loadGuides()
  *   • Chuyến đi (TripManager) + tour đã đăng ký (BookingManager) của người dùng đang đăng nhập
  *
  * Kiểm tra nhanh trong Console trình duyệt:  RAG.stats()
@@ -42,6 +43,35 @@ const RAG = (() => {
   const REGION_LABEL = { north: "Miền Bắc", center: "Miền Trung", south: "Miền Nam" };
 
   // ───────────────────────── 1) Thu thập dữ liệu ─────────────────────────
+
+  // Hướng dẫn viên: đọc file ở frontend trước, server chỉ là dự phòng. Gọi 1 lần (kết quả được nhớ).
+  let guides = [], guidesPromise = null;
+  function loadGuides() {
+    if (guidesPromise) return guidesPromise;
+    guidesPromise = (async () => {
+      let list = null;
+      try { const r = await fetch("data/guides-seed.json"); if (r.ok) { const j = await r.json(); if (Array.isArray(j)) list = j; } } catch (e) { /* hỏi server */ }
+      if (!list) { try { const r = await fetch("/api/guides"); if (r.ok) list = (await r.json()).guides; } catch (e) { /* không có server */ } }
+      guides = Array.isArray(list) ? list : [];
+      return guides;
+    })();
+    return guidesPromise;
+  }
+  const GUIDE_STATUS = { active: "đang nhận tour", busy: "đang bận", off: "tạm nghỉ" };
+  function guideText(g) {
+    const upcoming = (g.busyDates || []).filter((d) => /^\d{4}-\d{2}-\d{2}$/.test(d)).sort().slice(0, 8).map((d) => d.split("-").reverse().join("/"));
+    return (
+      `Hướng dẫn viên ${g.name}${g.title ? " (" + g.title + ")" : ""} | Khu vực: ${(g.regions || []).join(", ")}` +
+      ((g.provinces || []).length ? ` | Địa bàn: ${g.provinces.join(", ")}` : "") +
+      ` | Ngôn ngữ: ${(g.languages || []).join(", ")} | Kinh nghiệm: ${g.experience || 0} năm` +
+      (g.rating ? ` | Đánh giá: ${Number(g.rating).toFixed(1)}/5 (${g.reviewCount || 0} lượt), ${g.toursLed || 0} tour đã dẫn` : "") +
+      ((g.specialties || []).length ? ` | Chuyên môn: ${g.specialties.join(", ")}` : "") +
+      ((g.certifications || []).length ? ` | Chứng chỉ: ${g.certifications.join(", ")}` : "") +
+      ` | Trạng thái: ${GUIDE_STATUS[g.status] || g.status}` +
+      (upcoming.length ? ` | Ngày bận sắp tới (tham khảo, lịch thật xem khi đặt tour): ${upcoming.join(", ")}` : "") +
+      (g.bio ? ` | Giới thiệu: ${g.bio}` : "")
+    );
+  }
 
   // Toàn bộ tour: trang chủ (JSON) + tab Tour mẫu (SAMPLE_TOURS). Trùng tên → chỉ giữ 1 bản.
   function collectTours() {
@@ -119,22 +149,37 @@ const RAG = (() => {
     const docs = [];
 
     collectTours().forEach(({ t, group }) =>
-      docs.push({ type: "Tour", title: t.name, place: t.dest || t.destination || "", text: tourText(t, group), tour: t }));
+      docs.push({
+        type: "Tour",
+        id: t.id,
+        title: t.name,
+        place: t.dest || t.destination || "",
+        text: `Tour #${t.id}: ${t.name} (Điểm đến: ${t.dest || t.destination || ""}, Vùng: ${group || t.region || ""}, Giá: ${money(t.price)}/người, Mã tour: #${t.id}, Xem chi tiết: #/tour/${t.id}). ${tourText(t, group)}`,
+        tour: t
+      }));
 
     collectFoods().forEach(({ f, label }) =>
       docs.push({
         type: "Ẩm thực",
         title: f.name,
         text:
-          `Món ${f.name} (${[f.region, label].filter(Boolean).join(", ")}): ${f.desc || ""}` +
+          `Đặc sản món ${f.name} (Vùng: ${[f.region, label].filter(Boolean).join(", ")}, Xem tại: #/food): ${f.desc || ""}` +
           (f.tags?.length ? ` Thẻ: ${f.tags.join(", ")}.` : ""),
+      }));
+
+    guides.forEach((g) =>
+      docs.push({
+        type: "Hướng dẫn viên",
+        title: `HDV ${g.name}`,
+        place: [...(g.regions || []), ...(g.provinces || [])].join(" "),
+        text: `Hướng dẫn viên ${g.name} (Mã: ${g.id}, Vùng: ${[...(g.regions || []), ...(g.provinces || [])].join(", ")}, Xem hồ sơ: guide.html?id=${g.id}). ${guideText(g)}`
       }));
 
     unescoList().forEach((s) =>
       docs.push({
         type: "UNESCO",
         title: s.name,
-        text: `Di sản UNESCO "${s.name}" tại ${s.loc || "Việt Nam"}${s.year ? `, được công nhận năm ${s.year}` : ""}.`,
+        text: `Di sản UNESCO "${s.name}" tại ${s.loc || "Việt Nam"}${s.year ? `, công nhận năm ${s.year}` : ""} (Xem tại #/about).`,
       }));
 
     const LABEL = { "lịch_trình": "Lịch trình gợi ý", "ẩm_thực": "Ẩm thực", chiphí: "Chi phí tham khảo" };
@@ -204,6 +249,10 @@ const RAG = (() => {
       Object.entries(byLabel).forEach(([label, list]) =>
         lines.push(`• ${label} (${list.length}): ${list.join(", ")}`));
     }
+    if (guides.length) {
+      lines.push(`\nDANH SÁCH HƯỚNG DẪN VIÊN (${guides.length} người — tên | khu vực | ngôn ngữ | trạng thái):`);
+      guides.forEach((g) => lines.push(`• ${g.name} | ${(g.regions || []).join(", ")} | ${(g.languages || []).join("/")} | ${GUIDE_STATUS[g.status] || g.status}`));
+    }
     const un = unescoList();
     if (un.length) lines.push(`\nDI SẢN UNESCO (${un.length}): ` + un.map((s) => s.name).join("; "));
     return lines.join("\n");
@@ -270,6 +319,7 @@ const RAG = (() => {
   // ───────────────────────── Cổng phạm vi: câu hỏi có thuộc dữ liệu Travel không? ─────────────────────────
 
   const TOPIC_RE = /\b(tour|du lich|lich trinh|chuyen di|dang ky|dat tour|booking|gia|chi phi|bao nhieu|am thuc|mon an|mon|dac san|di san|unesco|diem den|huong dan vien|hdv|tu tuc|quoc te|mien bac|mien trung|mien nam|trong nuoc|nuoc ngoai|dat coc|thanh toan|ngay di)\b/;
+  const CATALOG_RE = /\b(bao nhieu|may|tong so|tat ca|danh sach|co nhung|cac)\s+(tour|chuyen di|mon an|dac san|hdv|huong dan vien|diem den)\b|\bco\s+tour\s+gi\b|\bdi\s+(dau|duoc nhung dau)\b|\b(travel|ben ban|website)\s+(co|co nhung)\s+(gi|tour|dich vu)\b/;
   const hasPhrase = (nq, phrase) => phrase.length >= 3 && new RegExp("(^|[^a-z0-9])" + phrase.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "([^a-z0-9]|$)").test(nq);
 
   /**
@@ -280,11 +330,13 @@ const RAG = (() => {
   function inScope(query, opts = {}) {
     const nq = norm(query);
     if (!nq.trim()) return false;
+    if (CATALOG_RE.test(nq)) return true;
     const names = new Set();
     const addName = (txt) => String(txt || "").split(/\s[–—-]\s|[,()]/).forEach((seg) => { const n = norm(seg).trim(); if (n.length >= 3) names.add(n); });
     collectTours().forEach(({ t }) => { addName(t.name); addName(t.dest || t.destination); if (t.country) addName(t.country); });
     collectFoods().forEach(({ f }) => addName(f.name));
     unescoList().forEach((s) => addName(s.name));
+    guides.forEach((g) => addName(g.name));
     Object.keys((opts.extra && opts.extra.destinations) || {}).forEach(addName);
     const ENTITY_STOP = new Set(["tour", "mien bac", "mien trung", "mien nam", "quoc te", "tu tuc", "mon an"]);
     for (const n of names) if (!ENTITY_STOP.has(n) && hasPhrase(nq, n)) return true;
@@ -304,6 +356,7 @@ const RAG = (() => {
       "\n\nDỮ LIỆU THAM KHẢO TỪ TRAVEL (nguồn đáng tin, ưu tiên dùng):\n" + catalog + detail +
       "\n\nQUY TẮC: Danh mục ở trên là TOÀN BỘ tour và món ăn hiện có trên Travel — tour/món nào không có trong danh mục thì Travel chưa có. " +
       "Khi cần giá, lịch trình, mô tả thì lấy ở phần CHI TIẾT; nếu tour có trong danh mục nhưng chưa có chi tiết, chỉ nêu tên và giá trong danh mục. " +
+      "Hướng dẫn viên cũng chỉ lấy từ danh sách trên; ngày bận chỉ để tham khảo, lịch rảnh chính xác hiển thị khi đặt tour. " +
       "Giá và tên tour phải đúng như dữ liệu, không tự bịa."
     );
   }
@@ -316,6 +369,6 @@ const RAG = (() => {
     return { tong: docs.length, ...byType, catalogChars: buildCatalog().length };
   }
 
-  return { search, tourCandidates, inScope, buildContext, buildCatalog, stats, collectTours };
+  return { search, tourCandidates, inScope, buildContext, buildCatalog, stats, collectTours, loadGuides };
 })();
 if (typeof window !== "undefined") window.RAG = RAG;

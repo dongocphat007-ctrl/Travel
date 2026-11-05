@@ -9,9 +9,11 @@
     <div class="tf-layout">
       <div class="tf-sidebar">
         <div class="tf-search-box">
-          <input class="tf-search-input" id="tf-search" aria-label="Mô tả tour bạn muốn tìm" placeholder="VD: 5 ngày Nhật Bản, tour Hội An...">
-          <button class="tf-search-btn" id="tf-search-btn">Tìm hành trình</button>
-          <p class="tf-search-hint">Bạn có thể viết tự nhiên, chẳng hạn: “4 ngày ở Huế, ngân sách 6 triệu, thích di sản và món địa phương”.</p>
+          <div class="tf-search-row">
+            <input class="tf-search-input" id="tf-search" aria-label="Mô tả tour bạn muốn tìm" placeholder="VD: 5 ngày Nhật Bản, tour Hội An, 4 ngày Đà Nẵng...">
+            <button class="tf-search-btn" id="tf-search-btn">🔍 Tìm hành trình</button>
+          </div>
+          <p class="tf-search-hint">💡 <em>Gợi ý:</em> Bạn có thể viết tự nhiên, chẳng hạn: <span>“4 ngày ở Huế, ngân sách 6 triệu, thích di sản và món địa phương”</span>.</p>
         </div>
         <div class="tf-quick-searches">
           <button class="tf-quick" onclick="document.getElementById('tf-search').value=this.textContent;document.getElementById('tf-search-btn').click()">🇯🇵 Nhật Bản 7 ngày</button>
