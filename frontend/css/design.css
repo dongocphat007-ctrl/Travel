@@ -1372,7 +1372,8 @@ html body .pg-btn.active {
 .tours-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 18px;
+  margin-bottom: 28px;
 }
 html body .tour-card {
   --stub: 250px;
