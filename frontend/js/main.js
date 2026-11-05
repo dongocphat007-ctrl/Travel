@@ -1308,7 +1308,7 @@ function seedAdminAccount() {
   const USERS_KEY = "travel_users_v1";
   try {
     const users = JSON.parse(localStorage.getItem(USERS_KEY)) || [];
-    const clean = users.filter(u => u.id !== "admin_default" && u.email !== "phatinformationtechnology@gmail.com" && !(u.role === "admin" && u.id !== "ad001"));
+    const clean = users.filter(u => u.id !== "admin_default" && u.email !== "phatinformationtechnology@gmail.com" && !(u.email === "admin@travel.vn" && !u.passHash) && !(u.role === "admin" && u.id !== "ad001"));
     if (clean.length !== users.length) localStorage.setItem(USERS_KEY, JSON.stringify(clean));
     ["travel_session_v1", "travel_auth_v1"].forEach(k => {
       try {
