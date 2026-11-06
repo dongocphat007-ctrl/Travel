@@ -168,6 +168,25 @@ public class Refunds {
         });
         core.audit.log(cashier.id(), cashier.name(), cashier.role(), "refund.pay", Maps.str(rf, "payCode"), amount + " ₫");
         core.notifyUser(Maps.str(rf, "userId"), "💸 Đã hoàn tiền", "Đơn " + rf.get("payCode") + ": đã hoàn " + amount + " ₫ về tài khoản của bạn.", "profile", "rfpd-" + refundId);
+
+        // Hoàn tiền vào ví khách hàng (nếu khách có tài khoản)
+        String uid = Maps.str(rf, "userId");
+        if (uid.isEmpty()) {
+            Map<String, Object> b = core.find(Maps.str(rf, "bookingId"));
+            if (b != null) uid = Maps.str(b, "userId");
+        }
+        if (uid != null && !uid.isBlank()) {
+            final String targetUid = uid;
+            db.edit("accounts", all -> {
+                for (Map<String, Object> a : all) {
+                    if (targetUid.equals(Maps.str(a, "id"))) {
+                        long curBal = Maps.lng(a, "balance");
+                        a.put("balance", curBal + amount);
+                        break;
+                    }
+                }
+            });
+        }
         return out[0];
     }
 }

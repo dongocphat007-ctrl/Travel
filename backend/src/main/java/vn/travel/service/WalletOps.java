@@ -312,6 +312,25 @@ public class WalletOps {
             updateAccount(uid, Map.of("totalWithdrawn", Maps.lng(acc, "totalWithdrawn") + amt));
         }
 
+        // Ghi nhận chi trả rút tiền ví vào daily_revenues
+        Map<String, Object> revRow = new LinkedHashMap<>();
+        revRow.put("id", Ids.newId("dr"));
+        revRow.put("date", core.today().toString());
+        revRow.put("amount", -amt);
+        revRow.put("kind", "withdrawal");
+        revRow.put("kindLabel", "Chi rút tiền ví");
+        revRow.put("customerName", Maps.str(w, "userName"));
+        revRow.put("tourName", "Rút tiền về " + Maps.str(w, "bankName"));
+        revRow.put("payCode", Maps.str(w, "id"));
+        revRow.put("note", "Đã duyệt chi rút tiền về " + Maps.str(w, "bankName") + " (" + Maps.str(w, "accountNumber") + ")");
+        revRow.put("source", "withdrawal");
+        revRow.put("by", cashier.id());
+        revRow.put("byName", cashier.name());
+        revRow.put("byRole", cashier.role());
+        revRow.put("createdAt", Times.iso(core.now()));
+        revRow.put("at", Times.iso(core.now()));
+        db.edit("daily_revenues", all -> all.add(revRow));
+
         core.audit.log(cashier.id(), cashier.name(), cashier.role(), "wallet.withdraw.approve", withdrawalId,
                 "Đã chi " + amt + " ₫");
         core.notifyUser(uid, "✅ Rút tiền thành công",
@@ -451,6 +470,25 @@ public class WalletOps {
         log.put("at", nowIso);
         db.edit("salary_logs", all -> all.add(log));
 
+        // Trừ tiền khỏi doanh thu & quỹ công ty bằng việc ghi nhận chi lương vào daily_revenues
+        Map<String, Object> revRow = new LinkedHashMap<>();
+        revRow.put("id", Ids.newId("dr"));
+        revRow.put("date", core.today().toString());
+        revRow.put("amount", -payAmt);
+        revRow.put("kind", "salary");
+        revRow.put("kindLabel", "Chi trả lương");
+        revRow.put("customerName", acc.get("name"));
+        revRow.put("tourName", "Lương " + roleDisplayName(role));
+        revRow.put("payCode", "SAL-" + staffUserId);
+        revRow.put("note", note != null && !note.isBlank() ? note.trim() : "Chi trả lương nhân viên");
+        revRow.put("source", "salary");
+        revRow.put("by", admin.id());
+        revRow.put("byName", admin.name());
+        revRow.put("byRole", admin.role());
+        revRow.put("createdAt", nowIso);
+        revRow.put("at", nowIso);
+        db.edit("daily_revenues", all -> all.add(revRow));
+
         core.audit.log(admin.id(), admin.name(), admin.role(), "salary.pay", Maps.str(acc, "name"),
                 String.format("%,d", payAmt) + " ₫");
         core.notifyUser(staffUserId, "💵 Bạn đã được phát lương",
@@ -524,12 +562,50 @@ public class WalletOps {
                 long newEarned = curEarned + amount;
                 updateAccount(staffUserId, Map.of("balance", newBal, "totalEarned", newEarned));
                 actDesc = "Thưởng nóng +" + String.format("%,d", amount) + " ₫ vào Ví";
+
+                // Chi tiền thưởng từ quỹ công ty
+                Map<String, Object> revRow = new LinkedHashMap<>();
+                revRow.put("id", Ids.newId("dr"));
+                revRow.put("date", core.today().toString());
+                revRow.put("amount", -amount);
+                revRow.put("kind", "bonus");
+                revRow.put("kindLabel", "Thưởng nóng");
+                revRow.put("customerName", acc.get("name"));
+                revRow.put("tourName", "Thưởng nóng nhân viên (" + roleDisplayName(role) + ")");
+                revRow.put("payCode", "BON-" + staffUserId);
+                revRow.put("note", reason.trim());
+                revRow.put("source", "bonus");
+                revRow.put("by", admin.id());
+                revRow.put("byName", admin.name());
+                revRow.put("byRole", admin.role());
+                revRow.put("createdAt", nowIso);
+                revRow.put("at", nowIso);
+                db.edit("daily_revenues", all -> all.add(revRow));
             }
             case "fine" -> {
                 // Phạt / trừ trực tiếp khỏi ví
                 long newBal = curBal - amount;
                 updateAccount(staffUserId, Map.of("balance", newBal));
                 actDesc = "Trừ phạt -" + String.format("%,d", amount) + " ₫ từ Ví";
+
+                // Thu phạt vào quỹ công ty
+                Map<String, Object> revRow = new LinkedHashMap<>();
+                revRow.put("id", Ids.newId("dr"));
+                revRow.put("date", core.today().toString());
+                revRow.put("amount", amount);
+                revRow.put("kind", "fine");
+                revRow.put("kindLabel", "Thu phạt vi phạm");
+                revRow.put("customerName", acc.get("name"));
+                revRow.put("tourName", "Phạt vi phạm quy chế");
+                revRow.put("payCode", "FINE-" + staffUserId);
+                revRow.put("note", reason.trim());
+                revRow.put("source", "fine");
+                revRow.put("by", admin.id());
+                revRow.put("byName", admin.name());
+                revRow.put("byRole", admin.role());
+                revRow.put("createdAt", nowIso);
+                revRow.put("at", nowIso);
+                db.edit("daily_revenues", all -> all.add(revRow));
             }
             default -> throw HttpError.bad(
                     "Hành động phải là increase (tăng lương), decrease (trừ lương), bonus (thưởng) hoặc fine (phạt)",

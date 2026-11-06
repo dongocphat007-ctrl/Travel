@@ -94,6 +94,12 @@ public class AdminOpsController {
         return Maps.of("ok", true, "refund", admin.rejectRefund(Api.actor(u), id, Api.s(body, "note")));
     }
 
+    @PostMapping("/api/admin/refunds/{id}/pay")
+    public Map<String, Object> refundPay(@PathVariable String id, @RequestBody(required = false) Map<String, Object> body, HttpServletRequest req) {
+        Map<String, Object> u = current.requirePermission(req, Permission.REFUND_APPROVE);
+        return Maps.of("ok", true, "refund", refunds.pay(Api.actor(u), id, Api.s(body, "note")));
+    }
+
     // ── đóng sổ ──
     @GetMapping("/api/admin/reconcile")
     public Map<String, Object> reconcileList(HttpServletRequest req) {

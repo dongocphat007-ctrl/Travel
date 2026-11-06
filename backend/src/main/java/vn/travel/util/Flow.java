@@ -80,7 +80,7 @@ public final class Flow {
         add(IN_PROGRESS, COMPLETED, GUIDE, SYSTEM);
         add(CONFIRMED, COMPLETED, SYSTEM);                                   // tour tự túc không có HDV: hệ thống đóng đơn sau ngày kết thúc
         // Hoàn tiền
-        add(REFUND_PENDING, REFUNDED, CASHIER);
+        add(REFUND_PENDING, REFUNDED, CASHIER, ADMIN);
     }
 
     public static boolean known(String s) { return ALL.contains(s); }

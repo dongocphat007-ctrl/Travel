@@ -364,7 +364,11 @@ public class CashierOps {
             case "ticket" -> "Bán vé tại quầy";
             case "service" -> "Dịch vụ phát sinh";
             case "imported" -> "Sao kê / Import";
-            case "refund", "customer_cancel_refund", "admin_reject_refund", "company_cancel_refund", "complaint_refund" -> "Hoàn tiền";
+            case "salary" -> "Chi trả lương";
+            case "bonus" -> "Thưởng nóng";
+            case "fine" -> "Thu phạt vi phạm";
+            case "withdrawal" -> "Chi rút tiền ví";
+            case "refund", "customer_cancel_refund", "admin_reject_refund", "company_cancel_refund", "complaint_refund", "ext_refund" -> "Hoàn tiền";
             default -> k;
         };
     }
@@ -387,7 +391,7 @@ public class CashierOps {
         for (Map<String, Object> dr : db.list("daily_revenues")) {
             if (!date.equals(Maps.str(dr, "date"))) continue;
             long amt = Maps.lng(dr, "amount");
-            if ("refund".equals(dr.get("kind")) || amt < 0) out += Math.abs(amt);
+            if ("refund".equals(dr.get("kind")) || "salary".equals(dr.get("kind")) || "bonus".equals(dr.get("kind")) || "withdrawal".equals(dr.get("kind")) || amt < 0) out += Math.abs(amt);
             else in += amt;
             n++;
         }
@@ -432,7 +436,7 @@ public class CashierOps {
         for (Map<String, Object> dr : db.list("daily_revenues")) {
             if (!d.equals(Maps.str(dr, "date"))) continue;
             long amt = Maps.lng(dr, "amount");
-            boolean isRef = "refund".equals(dr.get("kind")) || amt < 0;
+            boolean isRef = "refund".equals(dr.get("kind")) || "salary".equals(dr.get("kind")) || "bonus".equals(dr.get("kind")) || "withdrawal".equals(dr.get("kind")) || amt < 0;
             long absAmt = Math.abs(amt);
             if (isRef) out += absAmt;
             else in += absAmt;

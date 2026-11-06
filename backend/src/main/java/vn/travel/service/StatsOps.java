@@ -105,7 +105,7 @@ public class StatsOps {
             if (ld == null || ld.getYear() != y) continue;
             int m = ld.getMonthValue();
             long amt = Maps.lng(dr, "amount");
-            boolean isRef = "refund".equals(dr.get("kind")) || amt < 0;
+            boolean isRef = "refund".equals(dr.get("kind")) || "salary".equals(dr.get("kind")) || "bonus".equals(dr.get("kind")) || "withdrawal".equals(dr.get("kind")) || amt < 0;
             long absAmt = Math.abs(amt);
             if (isRef) {
                 refunded[m] += absAmt;
