@@ -64,6 +64,7 @@
           <button class="btn sm" id="food-exp-word">📝 Xuất Word</button>
           <button class="btn sm" id="food-exp-pdf">🖨️ In / PDF</button>
           <button class="btn sm" id="food-imp">📥 Nhập Excel/CSV</button>
+          ${list.length === 0 ? '<button class="btn ok sm" id="food-seed-btn">🌱 Nạp 153 món mẫu</button>' : ""}
           <button class="btn primary" id="nf" style="margin-left:auto">+ Thêm món</button>
         </div>` + table([{ t: "Món", html: f => `<b>${esc(f.name)}</b><div class="small muted">${esc(f.description || "")}</div>` }, { t: "Vùng", html: f => esc(REG[f.region] || f.region) }, { t: "Tỉnh", k: "province" }, { t: "Hiển thị", html: f => f.active === false ? pill("Ẩn", "") : pill("Hiện", "ok") },
           { t: "Thao tác", nowrap: true, cls: "actions", html: f => `<div class="act-btns"><button class="btn sm" data-e="${esc(f.id)}">Sửa</button><button class="btn bad sm" data-x="${esc(f.id)}">Xóa</button></div>` }], list, { empty: "Chưa có món nào" });
@@ -75,6 +76,28 @@
         const fePdf = $("#food-exp-pdf", el);
         if (fePdf) fePdf.onclick = () => window.DataExportImport && window.DataExportImport.exportFoodsList(list, "pdf");
         const feImp = $("#food-imp", el);
+        const feSeed = $("#food-seed-btn", el);
+        if (feSeed) {
+          feSeed.onclick = async () => {
+            await act(feSeed, async () => {
+              const res = await fetch("/data/foods.json").then(r => r.json());
+              const regMap = { north: "bac", center: "trung", south: "nam" };
+              for (const [rk, rv] of Object.entries(res)) {
+                const reg = regMap[rk] || "bac";
+                const all = [rv.featured, ...(rv.foods || [])].filter(Boolean);
+                for (const f of all) {
+                  await post("/api/content/foods", {
+                    name: f.name,
+                    region: reg,
+                    province: f.region || rv.label || "",
+                    description: f.desc || f.description || "",
+                    active: true
+                  });
+                }
+              }
+            }, "Đã nạp 153 món đặc sản mẫu thành công.", reload);
+          };
+        }
         if (feImp) feImp.onclick = () => {
           if (!window.DataExportImport) return;
           window.DataExportImport.importData({
