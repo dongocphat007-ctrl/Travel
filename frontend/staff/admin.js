@@ -1022,6 +1022,229 @@
     Customers.section("Khách hàng"),
 
     { id: "staff", label: "Nhân viên", icon: "👥", group: "Nhân sự", perm: "staff:manage", async render(el) {
+      // ── Modal Chi tiết Hồ sơ Nhân viên & Nghiệp vụ Lương, KPI, Xét tăng lương ──
+      async function openStaffProfileModal(staffId, onUpdate) {
+        async function fetchAndRender() {
+          const res = await get(`/api/admin/staff/${encodeURIComponent(staffId)}/salary-profile`);
+          if (!res || !res.profile) {
+            Staff.toast("Không tải được hồ sơ nhân viên", "bad");
+            return;
+          }
+          const p = res.profile;
+          const hist = res.history || [];
+
+          let dueBadge = '';
+          if (p.isDue) {
+            dueBadge = '<span class="badge bad" style="font-size:0.85rem">🔔 Đã đến hạn xét tăng lương</span>';
+          } else if (p.isUpcoming) {
+            dueBadge = `<span class="badge warn" style="font-size:0.85rem">⚠️ Sắp đến hạn xét (${p.daysUntilReview} ngày nữa)</span>`;
+          } else {
+            dueBadge = `<span class="badge info" style="font-size:0.85rem">Còn ${p.daysUntilReview} ngày tới hạn</span>`;
+          }
+
+          const kpiBadge = p.kpiRecent != null
+            ? `<span class="badge ${p.kpiRecent >= 80 ? 'ok' : (p.kpiRecent >= 60 ? 'info' : 'bad')}">${p.kpiRecent}% (${esc(p.kpiRating)})</span>`
+            : '<span class="muted">Chưa đánh giá KPI</span>';
+
+          const statusBadge = p.locked ? pill("Đã khóa", "bad") : pill({ active: "Đang làm việc", probation: "Thử việc", suspended: "Tạm hoãn", resigned: "Đã nghỉ việc" }[p.workingStatus] || "Đang làm việc", "ok");
+
+          const contentHtml = `
+            <div style="min-width:760px;max-width:960px">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding-bottom:12px;border-bottom:1px solid var(--border);margin-bottom:14px;flex-wrap:wrap;gap:10px">
+                <div style="display:flex;align-items:center;gap:12px">
+                  <div style="width:48px;height:48px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.2rem">${esc(p.initials || "NV")}</div>
+                  <div>
+                    <h3 style="margin:0;font-size:1.2rem">${esc(p.name)} <span class="mono muted" style="font-size:0.85rem">(${esc(p.id)})</span></h3>
+                    <div class="muted small">${esc(p.email)} · ${esc(Staff.ROLE_NAME[p.role] || p.role)} · ${statusBadge}</div>
+                  </div>
+                </div>
+                <div>
+                  ${dueBadge}
+                </div>
+              </div>
+
+              <div class="grid g4" style="margin-bottom:16px">
+                <div class="kpi">
+                  <div class="l">Ngày vào làm</div>
+                  <div class="v" style="font-size:1.05rem">${day(p.startDate)}</div>
+                  <div class="s">Hợp đồng lao động</div>
+                </div>
+                <div class="kpi ok">
+                  <div class="l">Lương cơ bản hiện tại</div>
+                  <div class="v" style="font-size:1.15rem;color:var(--ok)">${money(p.baseSalary)}</div>
+                  <div class="s">Chưa gồm phụ cấp & thưởng</div>
+                </div>
+                <div class="kpi ${p.isDue ? 'bad' : (p.isUpcoming ? 'warn' : '')}">
+                  <div class="l">Hạn xét tăng lương</div>
+                  <div class="v" style="font-size:1.05rem">${day(p.nextReviewDate)}</div>
+                  <div class="s">${p.isDue ? 'Đủ 12 tháng – Cần xét ngay' : (p.isUpcoming ? 'Sắp đến hạn xét định kỳ' : 'Chu kỳ xét 12 tháng')}</div>
+                </div>
+                <div class="kpi">
+                  <div class="l">KPI gần nhất</div>
+                  <div class="v" style="font-size:1.05rem">${kpiBadge}</div>
+                  <div class="s">${esc(p.kpiPeriod || "Chưa có kỳ đánh giá")}</div>
+                </div>
+              </div>
+
+              <!-- Thẻ dự báo xét tăng lương -->
+              <div class="card" style="background:var(--bg-subtle, #f8fafc);border:1px solid var(--border);border-radius:8px;padding:14px 18px;margin-bottom:16px">
+                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+                  <div style="flex:1;min-width:300px">
+                    <b style="font-size:0.95rem">📊 Thông tin & Dự kiến xét tăng lương:</b>
+                    <div class="small muted" style="margin-top:4px">
+                      Tỷ lệ tăng lương theo kết quả KPI: <b>+${p.expectedRaisePercent}%</b> 
+                      ${p.kpiRating ? `(Xếp loại: <b>${esc(p.kpiRating)}</b>)` : ''} 
+                      → Lương mới dự kiến: <b style="color:var(--ok);font-size:1rem">${money(p.expectedNewSalary)} / tháng</b>
+                      ${p.expectedRaisePercent > 0 ? ` (+${money(p.expectedNewSalary - p.baseSalary)})` : ''}
+                    </div>
+                  </div>
+                  <div style="display:flex;gap:6px;flex-wrap:wrap">
+                    <button class="btn sm" id="m-kpi-btn" title="Chấm điểm KPI cho nhân viên">📝 Đánh giá KPI</button>
+                    <button class="btn ok sm" id="m-rev-btn" title="Xét tăng lương định kỳ 12 tháng dựa trên KPI">📈 Xét tăng lương</button>
+                    <button class="btn primary sm" id="m-early-btn" title="Tăng lương trước hạn do thăng chức hoặc thành tích">⚡ Tăng trước hạn</button>
+                  </div>
+                </div>
+                ${p.kpiNote ? `<div class="small muted" style="margin-top:8px;font-style:italic">Ghi chú đánh giá KPI: "${esc(p.kpiNote)}"</div>` : ''}
+              </div>
+
+              <!-- Bảng lịch sử thay đổi lương -->
+              <div>
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+                  <h4 style="margin:0">📜 Lịch sử thay đổi lương (${hist.length} bản ghi)</h4>
+                  <span class="small muted">Lưu trữ vĩnh viễn, không ghi đè dữ liệu cũ</span>
+                </div>
+                <div class="tbl-wrap" style="max-height:220px;overflow-y:auto;border:1px solid var(--border);border-radius:6px">
+                  <table style="width:100%;font-size:0.85rem;margin:0">
+                    <thead>
+                      <tr>
+                        <th>Ngày áp dụng</th>
+                        <th>Lương cũ</th>
+                        <th>Lương mới</th>
+                        <th>% Tăng</th>
+                        <th>KPI</th>
+                        <th>Xếp loại</th>
+                        <th>Lý do / Căn cứ</th>
+                        <th>Người duyệt</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      ${hist.length === 0 ? '<tr><td colspan="8" class="muted center" style="padding:16px">Chưa có lịch sử thay đổi lương</td></tr>' : hist.map(h => `
+                        <tr>
+                          <td>${day(h.effectiveDate)}</td>
+                          <td>${h.oldSalary > 0 ? money(h.oldSalary) : '—'}</td>
+                          <td><b>${money(h.newSalary)}</b></td>
+                          <td>${h.increasePercent > 0 ? `<b style="color:var(--ok)">+${h.increasePercent}%</b>` : '<span class="muted">0%</span>'}</td>
+                          <td>${h.kpi != null ? `${h.kpi}%` : '—'}</td>
+                          <td>${h.kpiRating ? `<span class="badge ${h.kpi >= 80 ? 'ok' : 'info'}">${esc(h.kpiRating)}</span>` : '—'}</td>
+                          <td>${esc(h.reason || '—')}</td>
+                          <td>${esc(h.approvedByName || h.approvedBy || 'Admin')}</td>
+                        </tr>
+                      `).join('')}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          `;
+
+          const modal = Staff.modal(`Hồ sơ & Quản lý Lương: ${p.name}`, contentHtml, [
+            { label: "Đóng", kind: "ghost" }
+          ]);
+
+          // Sự kiện Đánh giá KPI
+          const kpiBtn = $("#m-kpi-btn", modal);
+          if (kpiBtn) kpiBtn.onclick = async () => {
+            const v = await ask(`Đánh giá KPI cho ${p.name}`, [
+              { name: "kpi", label: "Điểm KPI (0 - 100%)", type: "number", value: p.kpiRecent != null ? p.kpiRecent : 85, required: true, hint: ">=90%: Xuất sắc (+10%) | 80-89%: Tốt (+7%) | 70-79%: Khá (+5%) | 60-69%: Đạt (+3%) | <60%: Không đạt (0%)" },
+              { name: "period", label: "Kỳ đánh giá", type: "text", value: "Kỳ đánh giá " + new Date().getFullYear(), required: true },
+              { name: "note", label: "Nhận xét / Đánh giá chi tiết", type: "textarea", placeholder: "Ghi nhận đóng góp, hiệu quả công việc và thái độ..." }
+            ], { kind: "ok", submit: "Lưu kết quả KPI" });
+            if (v) {
+              await post(`/api/admin/staff/${p.id}/kpi-evaluate`, { kpi: Number(v.kpi), period: v.period, note: v.note });
+              Staff.toast("Đã lưu kết quả đánh giá KPI thành công.", "ok");
+              modal.close();
+              if (onUpdate) onUpdate();
+              openStaffProfileModal(staffId, onUpdate);
+            }
+          };
+
+          // Sự kiện Xét tăng lương định kỳ
+          const revBtn = $("#m-rev-btn", modal);
+          if (revBtn) revBtn.onclick = async () => {
+            if (p.kpiRecent == null) {
+              Staff.toast("Nhân viên chưa có kết quả đánh giá KPI. Vui lòng bấm 'Đánh giá KPI' trước khi xét tăng lương.", "bad");
+              return;
+            }
+            const confirmMsg = `
+              <div style="font-size:0.95rem;line-height:1.6">
+                <div>Nhân viên: <b>${esc(p.name)}</b> (${esc(p.id)})</div>
+                <div>Lương cơ bản hiện tại: <b>${money(p.baseSalary)}</b></div>
+                <div>Kết quả KPI: <b class="badge ${p.kpiRecent >= 80 ? 'ok' : 'info'}">${p.kpiRecent}% (${esc(p.kpiRating)})</b></div>
+                <div>Tỷ lệ tăng theo quy chế: <b style="color:var(--ok)">+${p.expectedRaisePercent}%</b></div>
+                <div>Mức lương mới sau xét duyệt: <b style="color:var(--ok);font-size:1.1rem">${money(p.expectedNewSalary)} / tháng</b></div>
+                <div class="note info" style="margin-top:10px">Kỳ xét tăng lương tiếp theo sẽ tự động được gia hạn thêm <b>12 tháng</b>.</div>
+              </div>
+            `;
+            const v = await ask("Xác nhận xét tăng lương định kỳ 12 tháng", [
+              { name: "note", label: "Ghi chú phê duyệt", type: "text", value: `Xét định kỳ 12 tháng theo KPI ${p.kpiRecent}% (${p.kpiRating})` }
+            ], {
+              intro: confirmMsg,
+              kind: "ok",
+              submit: "Phê duyệt tăng lương"
+            });
+            if (v) {
+              await post(`/api/admin/staff/${p.id}/salary-review`, { note: v.note });
+              Staff.toast("Đã phê duyệt điều chỉnh lương định kỳ thành công.", "ok");
+              modal.close();
+              if (onUpdate) onUpdate();
+              openStaffProfileModal(staffId, onUpdate);
+            }
+          };
+
+          // Sự kiện Tăng lương trước hạn
+          const earlyBtn = $("#m-early-btn", modal);
+          if (earlyBtn) earlyBtn.onclick = async () => {
+            const v = await ask(`Tăng lương trước hạn cho ${p.name}`, [
+              {
+                name: "reasonType",
+                label: "Lý do tăng trước hạn",
+                type: "select",
+                options: [
+                  ["promotion", "Thăng chức (Áp dụng khung lương chức danh mới)"],
+                  ["outstanding", "Thành tích nổi bật / Dự án xuất sắc"],
+                  ["responsibility", "Đảm nhận thêm phạm vi trách nhiệm mới"],
+                  ["position_adjustment", "Điều chỉnh theo vị trí công việc"],
+                  ["other", "Lý do đặc biệt khác"]
+                ]
+              },
+              { name: "newSalary", label: "Mức lương mới (₫ / tháng)", type: "number", value: Math.round(p.baseSalary * 1.15 / 1000) * 1000, required: true, hint: `Mức lương hiện tại: ${money(p.baseSalary)}. Không bị giới hạn 3–10% khi thăng chức.` },
+              { name: "effectiveDate", label: "Ngày bắt đầu áp dụng", type: "date", value: new Date().toISOString().slice(0, 10), required: true },
+              { name: "reason", label: "Quyết định & Căn cứ chi tiết", type: "textarea", required: true, placeholder: "Mô tả lý do thăng chức, thành tích nổi bật hoặc quyết định bổ nhiệm..." }
+            ], {
+              kind: "ok",
+              submit: "Phê duyệt tăng trước hạn",
+              intro: `<div class="note info">Trường hợp thăng chức hoặc thành tích nổi bật, Ban Giám Đốc có thể chỉ định mức lương mới vượt khung 10% của xét định kỳ. Ngày xét lương tiếp theo sẽ được tính 12 tháng kể từ ngày áp dụng này.</div>`
+            });
+            if (v) {
+              await post(`/api/admin/staff/${p.id}/salary-early-raise`, {
+                newSalary: Number(v.newSalary),
+                reasonType: v.reasonType,
+                reason: v.reason,
+                effectiveDate: v.effectiveDate
+              });
+              Staff.toast("Đã phê duyệt tăng lương trước hạn thành công.", "ok");
+              modal.close();
+              if (onUpdate) onUpdate();
+              openStaffProfileModal(staffId, onUpdate);
+            }
+          };
+        }
+
+        await fetchAndRender();
+      }
+
+      window.__openStaffProfileModal = openStaffProfileModal;
+
       const bar = Parts.search(() => reload(), "Tìm tên, email, mã…", `<select id="sr"><option value="">Mọi vai trò</option></select><select id="ss"><option value="">Mọi trạng thái</option><option value="active">Hoạt động</option><option value="locked">Đã khóa</option></select>
         <div class="row" style="gap:6px">
           <button class="btn sm" id="st-exp-excel" title="Xuất Excel danh sách nhân viên">📊 Xuất Excel</button>
@@ -1072,19 +1295,45 @@
         const r = await get(`/api/admin/staff?q=${encodeURIComponent($("input", bar).value)}&role=${$("#sr", bar).value}&status=${$("#ss", bar).value}`);
         currentStaffList = r.staff || [];
         if (!roles.length) { roles = r.roles; $("#sr", bar).innerHTML += roles.map(x => `<option value="${esc(x.key)}">${esc(x.name)}</option>`).join(""); }
-        body.innerHTML = table([{ t: "Mã", html: s => `<b class="mono">${esc(s.id)}</b>` }, { t: "Họ tên", k: "name" }, { t: "Vai trò", html: s => esc((Staff.ROLE_NAME[s.role] || s.role)) }, { t: "Email / SĐT", html: s => esc(s.email) + `<div class="small muted">${esc(s.phone || "")}</div>` },
-          { t: "Số lỗi", html: s => (s.strikes && s.strikes > 0) ? `<span class="badge bad">${s.strikes} lỗi</span>` : '<span class="muted">0</span>' },
-          { t: "Trạng thái", html: s => s.locked ? pill("Đã khóa", "bad") : pill("Hoạt động", "ok") },
-          { t: "Hành động", nowrap: true, cls: "actions", minWidth: "380px", html: s => `<div class="act-btns">
+        body.innerHTML = table([
+          { t: "Mã", html: s => `<b class="mono">${esc(s.id)}</b>` },
+          { t: "Họ tên", k: "name" },
+          { t: "Vai trò", html: s => esc((Staff.ROLE_NAME[s.role] || s.role)) },
+          { t: "Email / SĐT", html: s => esc(s.email) + `<div class="small muted">${esc(s.phone || "")}</div>` },
+          { t: "Ngày vào làm", html: s => day(s.startDate) },
+          { t: "Lương cơ bản", num: true, html: s => `<b>${money(s.baseSalary)}</b>` },
+          { t: "Hạn xét lương", html: s => {
+            let badge = '';
+            if (s.isDue) badge = '<br><span class="badge bad" style="font-size:0.75rem">🔔 Đến hạn xét</span>';
+            else if (s.isUpcoming) badge = `<br><span class="badge warn" style="font-size:0.75rem">⚠️ Sắp đến hạn (${s.daysUntilReview}d)</span>`;
+            return `<span>${day(s.nextReviewDate)}</span>${badge}`;
+          } },
+          { t: "KPI gần nhất", html: s => s.kpiRecent != null ? `<span class="badge ${s.kpiRecent >= 80 ? 'ok' : (s.kpiRecent >= 60 ? 'info' : 'bad')}">${s.kpiRecent}% (${esc(s.kpiRating)})</span>` : '<span class="muted">Chưa có</span>' },
+          { t: "Trạng thái", html: s => s.locked ? pill("Đã khóa", "bad") : pill({ active: "Đang làm việc", probation: "Thử việc", suspended: "Tạm hoãn", resigned: "Đã nghỉ việc" }[s.workingStatus] || "Đang làm việc", "ok") },
+          { t: "Hành động", nowrap: true, cls: "actions", minWidth: "440px", html: s => `<div class="act-btns">
+            <button class="btn ok sm" data-prof="${esc(s.id)}" title="Xem chi tiết hồ sơ, lịch sử lương, đánh giá KPI và xét tăng lương">👁️ Hồ sơ & Lương</button>
             <button class="btn sm" data-e="${esc(s.id)}">Sửa</button>
             <button class="btn sm" data-l="${esc(s.id)}" data-v="${s.locked ? 0 : 1}">${s.locked ? "Mở khóa" : "Khóa"}</button>
             <button class="btn sm" data-p="${esc(s.id)}">Cấp lại MK</button>
             <button class="btn sm" data-r="${esc(s.id)}">Đổi vai trò</button>
-            ${s.id !== (Staff.user && Staff.user.id) ? `<button class="btn bad sm" data-rem="${esc(s.id)}" title="Ghi 1 lỗi vi phạm & tự động trừ 200k tiền lương">⚠️ Nhắc nhở (-200k)</button>` : ""}
+            ${s.id !== (Staff.user && Staff.user.id) ? `<button class="btn bad sm" data-rem="${esc(s.id)}" title="Ghi 1 lỗi vi phạm & tự động trừ 200k tiền lương">⚠️ Phạt (-200k)</button>` : ""}
             ${s.id !== (Staff.user && Staff.user.id) ? `<button class="btn bad sm" data-x="${esc(s.id)}">Xóa</button>` : ""}
-          </div>` }], r.staff, { empty: "Không có nhân viên" });
+          </div>` }
+        ], r.staff, { empty: "Không có nhân viên" });
         const find = id => r.staff.find(s => s.id === id), ro = roles.map(x => [x.key, x.name]);
-        $$("[data-e]", body).forEach(b => b.onclick = async () => { const s = find(b.dataset.e); const v = await ask("Sửa " + s.id, [{ name: "name", label: "Họ tên", value: s.name, required: true }, { name: "email", label: "Email", value: s.email }, { name: "phone", label: "Điện thoại", value: s.phone }]); if (v) act(null, () => put(`/api/admin/staff/${s.id}`, v), "Đã lưu.", reload); });
+        $$("[data-prof]", body).forEach(b => b.onclick = () => openStaffProfileModal(b.dataset.prof, reload));
+        $$("[data-e]", body).forEach(b => b.onclick = async () => {
+          const s = find(b.dataset.e);
+          const v = await ask("Sửa thông tin nhân viên: " + s.name + " (" + s.id + ")", [
+            { name: "name", label: "Họ tên", value: s.name, required: true },
+            { name: "email", label: "Email", value: s.email },
+            { name: "phone", label: "Điện thoại", value: s.phone },
+            { name: "startDate", label: "Ngày vào làm", type: "date", value: s.startDate || "2025-11-06" },
+            { name: "baseSalary", label: "Lương cơ bản (₫)", type: "number", value: s.baseSalary || 8500000 },
+            { name: "workingStatus", label: "Trạng thái làm việc", type: "select", value: s.workingStatus || "active", options: [["active", "Đang làm việc"], ["probation", "Thử việc"], ["suspended", "Tạm hoãn"], ["resigned", "Đã nghỉ việc"]] }
+          ]);
+          if (v) act(null, () => put(`/api/admin/staff/${s.id}`, { ...v, baseSalary: Number(v.baseSalary) }), "Đã lưu thông tin nhân viên.", reload);
+        });
         $$("[data-l]", body).forEach(b => b.onclick = () => act(b, () => post(`/api/admin/staff/${b.dataset.l}/lock`, { lock: b.dataset.v === "1" }), "Đã cập nhật.", reload));
         $$("[data-p]", body).forEach(b => b.onclick = async () => { const v = await ask("Cấp lại mật khẩu", [{ name: "mode", label: "Cách cấp", type: "select", options: [["auto", "Tự sinh mật khẩu ngẫu nhiên"], ["manual", "Tự đặt"]] }, { name: "password", label: "Mật khẩu mới (nếu tự đặt)", type: "password" }, { name: "confirm", label: "Nhập lại", type: "password" }]); if (v) act(null, () => post(`/api/admin/staff/${b.dataset.p}/reset-password`, v.mode === "auto" ? {} : { password: v.password, confirm: v.confirm }), "", async x => { await showPw(x); reload(); }); });
         $$("[data-r]", body).forEach(b => b.onclick = async () => { const s = find(b.dataset.r); const v = await ask("Đổi vai trò " + s.id, [{ name: "role", label: "Vai trò mới", type: "select", value: s.role, options: ro }], { intro: "Không đổi được khi nhân viên còn việc đang xử lý." }); if (v) act(null, () => post(`/api/admin/staff/${s.id}/role`, v), "Đã đổi vai trò.", reload); });
@@ -1105,11 +1354,22 @@
       $("#sr", bar).onchange = reload; $("#ss", bar).onchange = reload;
       $("#ns", bar).onclick = async () => {
         if (!roles.length) await reload();
-        const v = await ask("Thêm nhân viên", [{ name: "name", label: "Họ tên", required: true }, { name: "role", label: "Vai trò", type: "select", options: roles.map(x => [x.key, x.name]) }, { name: "email", label: "Email" }, { name: "phone", label: "Điện thoại" },
-          { name: "auto", label: "Tự sinh mật khẩu", type: "checkbox", value: true }, { name: "password", label: "Mật khẩu (nếu tự đặt)", type: "password" }, { name: "confirm", label: "Nhập lại", type: "password" },
-          { name: "guideType", label: "Nếu là HDV – loại", type: "select", options: [["domestic", "Nội địa"], ["international", "Quốc tế"]] }, { name: "employmentType", label: "Nếu là HDV – hình thức", type: "select", options: [["staff", "Chính thức"], ["freelance", "Cộng tác viên"]] }, { name: "regions", label: "Nếu là HDV – khu vực (ngăn cách bằng dấu phẩy)", placeholder: "north,central,south" }]);
+        const v = await ask("Thêm nhân viên", [
+          { name: "name", label: "Họ tên", required: true },
+          { name: "role", label: "Vai trò", type: "select", options: roles.map(x => [x.key, x.name]) },
+          { name: "email", label: "Email công ty" },
+          { name: "phone", label: "Điện thoại" },
+          { name: "startDate", label: "Ngày vào làm", type: "date", value: new Date().toISOString().slice(0, 10) },
+          { name: "baseSalary", label: "Lương cơ bản (₫ - để trống = theo chuẩn vai trò)", type: "number" },
+          { name: "auto", label: "Tự sinh mật khẩu", type: "checkbox", value: true },
+          { name: "password", label: "Mật khẩu (nếu tự đặt)", type: "password" },
+          { name: "confirm", label: "Nhập lại", type: "password" },
+          { name: "guideType", label: "Nếu là HDV – loại", type: "select", options: [["domestic", "Nội địa"], ["international", "Quốc tế"]] },
+          { name: "employmentType", label: "Nếu là HDV – hình thức", type: "select", options: [["staff", "Chính thức"], ["freelance", "Cộng tác viên"]] },
+          { name: "regions", label: "Nếu là HDV – khu vực (ngăn cách bằng dấu phẩy)", placeholder: "north,central,south" }
+        ]);
         if (!v) return;
-        const body = { name: v.name, role: v.role, email: v.email, phone: v.phone, auto: v.auto, password: v.password, confirm: v.confirm };
+        const body = { name: v.name, role: v.role, email: v.email, phone: v.phone, startDate: v.startDate, baseSalary: v.baseSalary ? Number(v.baseSalary) : null, auto: v.auto, password: v.password, confirm: v.confirm };
         if (v.role === "guide") body.guide = { guideType: v.guideType, employmentType: v.employmentType, regions: v.regions.split(",").map(x => x.trim()).filter(Boolean) };
         act(null, () => post("/api/admin/staff", body), "Đã tạo nhân viên.", async x => { await showPw(x); reload(); });
       };
@@ -1243,13 +1503,19 @@
         tbl.innerHTML = table([
           { t: "Nhân viên", html: s => `<b>${esc(s.name)}</b><div class="small muted">${esc(s.email)} · ${esc(s.id)}</div>` },
           { t: "Vai trò", html: s => `<span class="badge info">${esc(s.roleName || s.role)}</span><div class="small muted">${esc(s.incomeTitle || "")}</div>` },
-          { t: "Lương định mức", num: true, html: s => `<b>${money(s.baseSalary || defSal)}</b>` },
-          { t: "Số dư ví hiện tại", num: true, html: s => `<span style="color:var(--ok);font-weight:700">${money(s.balance)}</span>` },
+          { t: "Lương cơ bản", num: true, html: s => `<b>${money(s.baseSalary || defSal)}</b>` },
+          { t: "Hạn xét lương", html: s => {
+            let badge = '';
+            if (s.isDue) badge = '<br><span class="badge bad" style="font-size:0.75rem">🔔 Đến hạn xét</span>';
+            else if (s.isUpcoming) badge = `<br><span class="badge warn" style="font-size:0.75rem">⚠️ Sắp đến hạn (${s.daysUntilReview}d)</span>`;
+            return `<span>${day(s.nextReviewDate)}</span>${badge}`;
+          } },
+          { t: "KPI gần nhất", html: s => s.kpiRecent != null ? `<span class="badge ${s.kpiRecent >= 80 ? 'ok' : (s.kpiRecent >= 60 ? 'info' : 'bad')}">${s.kpiRecent}% (${esc(s.kpiRating)})</span>` : '<span class="muted">Chưa có</span>' },
+          { t: "Số dư ví", num: true, html: s => `<span style="color:var(--ok);font-weight:700">${money(s.balance)}</span>` },
           { t: "Tổng đã nhận", num: true, html: s => money(s.totalEarned) },
-          { t: "Lỗi vi phạm", html: s => (s.strikes && s.strikes > 0) ? `<span class="badge bad">${s.strikes} lỗi</span>` : '<span class="muted">0</span>' },
-          { t: "Lần phát gần nhất", html: s => s.lastPaidAt ? dt(s.lastPaidAt) : '<span class="muted">—</span>' },
-          { t: "Hành động", nowrap: true, cls: "actions", minWidth: "360px", html: s => `
+          { t: "Hành động", nowrap: true, cls: "actions", minWidth: "440px", html: s => `
             <div class="act-btns">
+              <button class="btn ok sm" data-prof="${esc(s.id)}" title="Xem chi tiết hồ sơ lương, đánh giá KPI và xét tăng lương">👁️ Xét lương & KPI</button>
               <button class="btn ok sm" data-pay="${esc(s.id)}" title="Phát lương">💵 Phát lương</button>
               <button class="btn sm" data-inc="${esc(s.id)}" title="Tăng lương cơ bản">➕ Tăng</button>
               <button class="btn sm" data-dec="${esc(s.id)}" title="Giảm lương cơ bản">➖ Trừ</button>
@@ -1258,6 +1524,10 @@
             </div>
           ` }
         ], list, { empty: "Chưa có nhân viên văn phòng nào" });
+
+        $$("[data-prof]", tbl).forEach(btn => btn.onclick = () => {
+          if (window.__openStaffProfileModal) window.__openStaffProfileModal(btn.dataset.prof, reload);
+        });
 
         // Gắn sự kiện các nút hành động
         $$("[data-pay]", tbl).forEach(btn => btn.onclick = async () => {
@@ -1408,9 +1678,10 @@
       await reload();
     } },
 
-    { id: "refunds", label: "Duyệt hoàn tiền", icon: "💸", group: "Tài chính", perm: "refund:approve", async badge() { return (await get("/api/admin/queue")).refunds.length; }, async render(el) {
+    { id: "refunds", label: "Duyệt hoàn tiền", icon: "💸", group: "Tài chính", perm: "refund:approve", async badge() { const q = await get("/api/admin/queue"); return q && q.refunds ? q.refunds.length : 0; }, async render(el) {
       async function reload() {
-        const all = (await get("/api/admin/refunds")).refunds;
+        const res = await get("/api/admin/refunds");
+        const all = Array.isArray(res) ? res : (res && res.refunds) || [];
         tabs(el, [{ id: "pending_approval", label: "Chờ duyệt", n: all.filter(r => r.status === "pending_approval").length }, { id: "approved", label: "Đã duyệt – chờ Thu ngân chuyển" }, { id: "paid", label: "Đã hoàn" }, { id: "rejected", label: "Từ chối" }], (id, box) => {
           const list = all.filter(r => r.status === id);
           box.innerHTML = table([{ t: "Mã đơn", html: r => `<b class="mono">${esc(r.payCode)}</b>` }, { t: "Khách", k: "customerName" }, { t: "Nguồn", html: r => esc(SRC[r.source] || r.source) }, { t: "Số tiền", num: true, html: r => `<b>${money(r.amount)}</b>` }, { t: "Lý do", html: r => esc(r.reason || "") },
@@ -1447,9 +1718,10 @@
       await reload();
     } },
 
-    { id: "withdrawals", label: "Theo dõi rút tiền", icon: "💳", group: "Tài chính", perm: "payment:view", async badge() { const list = await get("/api/cashier/withdrawals?status=pending"); return list ? list.length : 0; }, async render(el) {
+    { id: "withdrawals", label: "Theo dõi rút tiền", icon: "💳", group: "Tài chính", perm: "payment:view", async badge() { const res = await get("/api/cashier/withdrawals?status=pending"); const list = Array.isArray(res) ? res : (res && res.withdrawals) || []; return list.length; }, async render(el) {
       async function reload() {
-        const all = await get("/api/cashier/withdrawals") || [];
+        const res = await get("/api/cashier/withdrawals");
+        const all = Array.isArray(res) ? res : (res && res.withdrawals) || [];
         tabs(el, [
           { id: "pending", label: "Chờ duyệt chi", n: all.filter(w => w.status === "pending").length },
           { id: "approved", label: "Đã chuyển tiền", n: all.filter(w => w.status === "approved").length },

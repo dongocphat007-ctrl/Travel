@@ -295,7 +295,8 @@ const BookingManager = (() => {
   const active = () => mine().filter(b => b.status !== "cancelled");
 
   const getStats = () => {
-    const all = mine(), act = all.filter(b => b.status !== "cancelled");
+    const all = mine() || [];
+    const act = all.filter(b => b.status !== "cancelled");
     const destMap = act.reduce((m, b) => { const k = (b.tourDest || "").trim(); if (k) m[k] = (m[k] || 0) + 1; return m; }, {});
     const today = dateToStr(new Date());
     return {

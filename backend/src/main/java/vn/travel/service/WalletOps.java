@@ -394,12 +394,7 @@ public class WalletOps {
     // ─────────────────────────
 
     public static long getStaffBaseSalary(Map<String, Object> acc) {
-        if (acc.get("baseSalary") != null) {
-            long bs = Maps.lng(acc, "baseSalary");
-            if (bs > 0)
-                return bs;
-        }
-        return DEFAULT_STAFF_SALARY;
+        return StaffOps.getStaffBaseSalary(acc);
     }
 
     /** Danh sách nhân viên văn phòng và bảng lương. */
@@ -416,11 +411,53 @@ public class WalletOps {
                 item.put("role", role);
                 item.put("roleName", roleDisplayName(role));
                 item.put("incomeTitle", roleIncomeTitle(role));
-                item.put("baseSalary", getStaffBaseSalary(a));
+                long curSal = getStaffBaseSalary(a);
+                item.put("baseSalary", curSal);
                 item.put("balance", Maps.lng(a, "balance"));
                 item.put("totalEarned", Maps.lng(a, "totalEarned"));
                 item.put("totalWithdrawn", Maps.lng(a, "totalWithdrawn"));
                 item.put("lastPaidAt", a.get("lastPaidAt"));
+
+                String startDate = Maps.str(a, "startDate");
+                if (startDate.isEmpty()) startDate = "2025-11-06";
+                item.put("startDate", startDate);
+
+                String nextReview = Maps.str(a, "nextReviewDate");
+                if (nextReview.isEmpty()) {
+                    try {
+                        nextReview = java.time.LocalDate.parse(startDate).plusYears(1).toString();
+                    } catch (Exception e) {
+                        nextReview = core.today().plusYears(1).toString();
+                    }
+                }
+                item.put("nextReviewDate", nextReview);
+                try {
+                    java.time.LocalDate nextLd = java.time.LocalDate.parse(nextReview);
+                    long daysUntil = java.time.temporal.ChronoUnit.DAYS.between(core.today(), nextLd);
+                    item.put("daysUntilReview", daysUntil);
+                    item.put("isDue", daysUntil <= 0);
+                    item.put("isUpcoming", daysUntil > 0 && daysUntil <= 30);
+                } catch (Exception e) {
+                    item.put("daysUntilReview", 365L);
+                    item.put("isDue", false);
+                    item.put("isUpcoming", false);
+                }
+
+                Object kpiObj = a.get("kpiRecent");
+                if (kpiObj != null) {
+                    int kpi = (int) vn.travel.util.Pricing.num(kpiObj);
+                    item.put("kpiRecent", kpi);
+                    item.put("kpiRating", a.getOrDefault("kpiRating", StaffOps.kpiRating(kpi)));
+                    item.put("expectedRaisePercent", StaffOps.kpiRaisePercent(kpi));
+                    item.put("expectedNewSalary", StaffOps.calculateNewSalary(curSal, StaffOps.kpiRaisePercent(kpi)));
+                } else {
+                    item.put("kpiRecent", null);
+                    item.put("kpiRating", null);
+                    item.put("expectedRaisePercent", 0);
+                    item.put("expectedNewSalary", curSal);
+                }
+                item.put("workingStatus", a.getOrDefault("workingStatus", "active"));
+
                 staffList.add(item);
             }
         }

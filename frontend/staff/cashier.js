@@ -227,9 +227,10 @@
       }
       await reload();
     } },
-    { id: "refunds", label: "Hoàn tiền", icon: "💸", perm: "payment:refund", async badge() { return (await get("/api/cashier/queue")).refunds.length; }, async render(el) {
+    { id: "refunds", label: "Hoàn tiền", icon: "💸", perm: "payment:refund", async badge() { const q = await get("/api/cashier/queue"); return q && q.refunds ? q.refunds.length : 0; }, async render(el) {
       async function reload() {
-        const all = (await get("/api/cashier/refunds")).refunds;
+        const res = await get("/api/cashier/refunds");
+        const all = Array.isArray(res) ? res : (res && res.refunds) || [];
         tabs(el, [{ id: "approved", label: "Cần chuyển tiền", n: all.filter(r => r.status === "approved").length }, { id: "pending_approval", label: "Chờ admin duyệt", n: all.filter(r => r.status === "pending_approval").length }, { id: "paid", label: "Đã hoàn" }], (id, box) => {
           const list = all.filter(r => r.status === id);
           box.innerHTML = (id === "approved" ? '<div class="note">Chỉ chuyển tiền các khoản <b>admin đã duyệt</b>. Chuyển xong bấm <b>Đã hoàn tiền</b> để ghi sổ.</div>' : "") + table([
@@ -256,9 +257,10 @@
       }
       await reload();
     } },
-    { id: "withdrawals", label: "Duyệt rút tiền", icon: "💳", perm: "payment:confirm", async badge() { const list = await get("/api/cashier/withdrawals?status=pending"); return list ? list.length : 0; }, async render(el) {
+    { id: "withdrawals", label: "Duyệt rút tiền", icon: "💳", perm: "payment:confirm", async badge() { const res = await get("/api/cashier/withdrawals?status=pending"); const list = Array.isArray(res) ? res : (res && res.withdrawals) || []; return list.length; }, async render(el) {
       async function reload() {
-        const all = await get("/api/cashier/withdrawals") || [];
+        const res = await get("/api/cashier/withdrawals");
+        const all = Array.isArray(res) ? res : (res && res.withdrawals) || [];
         tabs(el, [
           { id: "pending", label: "Chờ duyệt chi", n: all.filter(w => w.status === "pending").length },
           { id: "approved", label: "Đã chuyển tiền", n: all.filter(w => w.status === "approved").length },

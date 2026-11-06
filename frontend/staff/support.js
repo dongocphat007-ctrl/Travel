@@ -32,9 +32,10 @@
       el.innerHTML = `<div class="grid g4">${k("Khiếu nại mới", s.open, "bad")}${k("Đang xử lý", s.inProgress, "warn")}${k("Đã giải quyết", s.resolved, "ok")}${k("Quá hạn phản hồi", s.overdue, "bad")}${k("Thời gian xử lý TB", s.avgResolveHours + " giờ")}${k("Khách chờ chỗ", s.waitlist)}${k("Sai lệch thanh toán", s.paymentIssues, "warn")}</div>`;
     } },
     Customers.section(),
-    { id: "complaints", label: "Khiếu nại", icon: "📣", perm: "complaint:process", async badge() { return (await get("/api/support/complaints?status=open")).complaints.length; }, async render(el, ctx) {
+    { id: "complaints", label: "Khiếu nại", icon: "📣", perm: "complaint:process", async badge() { const res = await get("/api/support/complaints?status=open"); const list = Array.isArray(res) ? res : (res && res.complaints) || []; return list.length; }, async render(el, ctx) {
       async function reload() {
-        const all = (await get("/api/support/complaints")).complaints;
+        const res = await get("/api/support/complaints");
+        const all = Array.isArray(res) ? res : (res && res.complaints) || [];
         tabs(el, [{ id: "open", label: "Mới", n: all.filter(c => c.status === "open").length }, { id: "in_progress", label: "Đang xử lý", n: all.filter(c => c.status === "in_progress").length }, { id: "resolved", label: "Đã giải quyết" }], (id, box) => {
           const list = all.filter(c => c.status === id || (id === "resolved" && c.status === "closed"));
           box.innerHTML = table([{ t: "Gửi lúc", html: c => dt(c.createdAt), sort: c => c.createdAt }, { t: "Đơn", html: c => `<b class="mono">${esc(c.payCode)}</b><div class="small muted">${esc(c.tourName)}</div>` }, { t: "Khách", k: "customerName" }, { t: "Tiêu đề", k: "title" }, { t: "Hạn", html: c => dt(c.dueAt) + (c.overdue ? ' <span class="badge bad">quá hạn</span>' : "") }, { t: "Phụ trách", html: c => esc(c.assigneeName || "—") },

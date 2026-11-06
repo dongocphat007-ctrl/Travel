@@ -204,6 +204,41 @@ public class AdminOpsController {
         return staff.remove(Api.actor(u), id);
     }
 
+    // ── Quản lý Lương, KPI & Xét tăng lương nhân viên (Admin/HR) ──
+    @GetMapping("/api/admin/staff/{id}/salary-profile")
+    public Map<String, Object> staffSalaryProfile(@PathVariable String id, HttpServletRequest req) {
+        current.requirePermission(req, Permission.STAFF_MANAGE);
+        return staff.getSalaryProfile(id);
+    }
+
+    @PostMapping("/api/admin/staff/{id}/kpi-evaluate")
+    public Map<String, Object> staffKpiEvaluate(@PathVariable String id, @RequestBody(required = false) Map<String, Object> body, HttpServletRequest req) {
+        Map<String, Object> u = current.requirePermission(req, Permission.STAFF_MANAGE);
+        Map<String, Object> b = Api.body(body);
+        int kpi = (int) vn.travel.util.Pricing.num(b.get("kpi"));
+        return staff.evaluateKpi(Api.actor(u), id, kpi, Api.s(b, "period"), Api.s(b, "note"));
+    }
+
+    @PostMapping("/api/admin/staff/{id}/salary-review")
+    public Map<String, Object> staffSalaryReview(@PathVariable String id, @RequestBody(required = false) Map<String, Object> body, HttpServletRequest req) {
+        Map<String, Object> u = current.requirePermission(req, Permission.STAFF_MANAGE);
+        return staff.reviewSalary(Api.actor(u), id, Api.s(body, "note"));
+    }
+
+    @PostMapping("/api/admin/staff/{id}/salary-early-raise")
+    public Map<String, Object> staffEarlyRaise(@PathVariable String id, @RequestBody(required = false) Map<String, Object> body, HttpServletRequest req) {
+        Map<String, Object> u = current.requirePermission(req, Permission.STAFF_MANAGE);
+        Map<String, Object> b = Api.body(body);
+        long newSalary = Math.round(vn.travel.util.Pricing.num(b.get("newSalary")));
+        return staff.earlyRaiseSalary(Api.actor(u), id, newSalary, Api.s(b, "reasonType"), Api.s(b, "reason"), Api.s(b, "effectiveDate"));
+    }
+
+    @GetMapping("/api/admin/staff/{id}/salary-history")
+    public Map<String, Object> staffSalaryHistory(@PathVariable String id, HttpServletRequest req) {
+        current.requirePermission(req, Permission.STAFF_MANAGE);
+        return Maps.of("ok", true, "history", staff.getSalaryHistory(id));
+    }
+
     @DeleteMapping("/api/admin/accounts/{id}")
     public Map<String, Object> accountDelete(@PathVariable String id, HttpServletRequest req) {
         Map<String, Object> u = current.requirePermission(req, Permission.ACCOUNT_DELETE);
