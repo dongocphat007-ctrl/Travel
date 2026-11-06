@@ -49,7 +49,7 @@
         const list = (await get("/api/support/waitlist")).waitlist;
         el.innerHTML = `<div class="note">Khi chuyến có chỗ trống, hệ thống tự báo khách; CSKH cũng có thể báo tay hoặc đóng mục.</div>` + table([{ t: "Khách", html: w => esc(w.name) + `<div class="small muted">${esc(w.phone)} · ${esc(w.email)}</div>` }, { t: "Tour", html: w => `${esc(w.tourName)}<div class="small muted">Đi ${day(w.date)}</div>` }, { t: "Số khách", num: true, k: "pax" }, { t: "Đăng ký", html: w => dt(w.createdAt) },
           { t: "Trạng thái", html: w => pill({ waiting: "Đang chờ", notified: "Đã báo", closed: "Đã đóng" }[w.status] || w.status, w.status === "waiting" ? "warn" : w.status === "notified" ? "ok" : "") },
-          { t: "", html: w => w.status === "closed" ? "" : `<div class="row" style="gap:6px">${w.status === "waiting" ? `<button class="btn ok sm" data-n="${esc(w.id)}">Báo có chỗ</button>` : ""}<button class="btn sm" data-c="${esc(w.id)}">Đóng</button></div>` }], list, { empty: "Danh sách chờ trống" });
+          { t: "Thao tác", nowrap: true, cls: "actions", html: w => w.status === "closed" ? "" : `<div class="act-btns">${w.status === "waiting" ? `<button class="btn ok sm" data-n="${esc(w.id)}">Báo có chỗ</button>` : ""}<button class="btn sm" data-c="${esc(w.id)}">Đóng</button></div>` }], list, { empty: "Danh sách chờ trống" });
         $$("[data-n]", el).forEach(b => b.onclick = () => act(b, () => post(`/api/support/waitlist/${b.dataset.n}`, { action: "notify" }), "Đã báo khách.", reload));
         $$("[data-c]", el).forEach(b => b.onclick = () => act(b, () => post(`/api/support/waitlist/${b.dataset.c}`, { action: "close" }), "Đã đóng.", reload));
       }
@@ -59,7 +59,7 @@
       async function reload() {
         const list = (await get("/api/support/payment-issues")).issues;
         el.innerHTML = `<div class="note">Thu ngân chuyển sang đây các giao dịch lệch để liên hệ khách. CSKH không ghi nhận tiền; ghi lại kết quả liên hệ để Thu ngân xử lý.</div>` + table([{ t: "Mã đơn", html: p => `<b class="mono">${esc(p.payCode || "—")}</b>` }, { t: "Số tiền", num: true, html: p => money(p.amount) }, { t: "Vấn đề", html: p => esc(p.reason || p.problem) }, { t: "Lúc", html: p => dt(p.createdAt) }, { t: "Đã liên hệ", html: p => esc(p.contactNote) || "—" },
-          { t: "", html: p => `<div class="row" style="gap:6px">${p.bookingId ? `<button class="btn sm" data-v="${esc(p.bookingId)}">Xem đơn</button>` : ""}<button class="btn primary sm" data-c="${esc(p.id)}">Ghi kết quả liên hệ</button></div>` }], list, { empty: "Không có sai lệch cần liên hệ" });
+          { t: "Thao tác", nowrap: true, cls: "actions", html: p => `<div class="act-btns">${p.bookingId ? `<button class="btn sm" data-v="${esc(p.bookingId)}">Xem đơn</button>` : ""}<button class="btn primary sm" data-c="${esc(p.id)}">Ghi kết quả liên hệ</button></div>` }], list, { empty: "Không có sai lệch cần liên hệ" });
         $$("[data-v]", el).forEach(b => b.onclick = () => viewOrder(b.dataset.v));
         $$("[data-c]", el).forEach(b => b.onclick = async () => { const v = await ask("Kết quả liên hệ khách", [{ name: "note", label: "Đã trao đổi gì / khách cam kết gì", type: "textarea", required: true }]); if (v) act(null, () => post(`/api/support/payment-issues/${b.dataset.c}/contact`, { note: v.note }), "Đã ghi nhận.", reload); });
       }
@@ -70,7 +70,7 @@
         const list = (await get("/api/support/reschedule")).requests;
         el.innerHTML = table([{ t: "Mã đơn", html: b => `<a href="#" data-v="${esc(b.id)}" class="mono">${esc(b.payCode)}</a>` }, { t: "Khách", k: "customerName" }, { t: "Tour", k: "tourName" }, { t: "Ngày hiện tại → mới", html: b => `${day(b.date)} → <b>${day(b.reschedule.to)}</b><div class="small muted">${esc(b.reschedule.reason || "")}</div>` },
           { t: "Kiểm tra", html: b => `${b.check.seatsOk ? pill("Đủ chỗ", "ok") : pill("Hết chỗ", "bad")} ${b.check.guideOk ? pill("HDV rảnh", "ok") : pill("HDV bận", "bad")}` },
-          { t: "", html: b => `<div class="row" style="gap:6px"><button class="btn ok sm" data-y="${esc(b.id)}" ${b.check.seatsOk && b.check.guideOk ? "" : "disabled"}>Đồng ý</button><button class="btn bad sm" data-n="${esc(b.id)}">Từ chối</button></div>` }], list, { empty: "Không có yêu cầu đổi ngày" });
+          { t: "Thao tác", nowrap: true, cls: "actions", html: b => `<div class="act-btns"><button class="btn ok sm" data-y="${esc(b.id)}" ${b.check.seatsOk && b.check.guideOk ? "" : "disabled"}>Đồng ý</button><button class="btn bad sm" data-n="${esc(b.id)}">Từ chối</button></div>` }], list, { empty: "Không có yêu cầu đổi ngày" });
         $$("[data-v]", el).forEach(a => a.onclick = e => { e.preventDefault(); viewOrder(a.dataset.v); });
         $$("[data-y]", el).forEach(b => b.onclick = () => act(b, () => post(`/api/support/reschedule/${b.dataset.y}`, { approve: true }), "Đã đổi ngày.", reload));
         $$("[data-n]", el).forEach(b => b.onclick = async () => { const v = await ask("Từ chối đổi ngày", [{ name: "note", label: "Lý do", type: "textarea", required: true }], { kind: "bad" }); if (v) act(null, () => post(`/api/support/reschedule/${b.dataset.n}`, { approve: false, note: v.note }), "Đã từ chối.", reload); });

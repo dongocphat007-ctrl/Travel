@@ -137,7 +137,7 @@ const Customers = (() => {
         { t: "Đã thanh toán", num: true, sort: x => x.totalPaid, html: x => money(x.totalPaid) },
         { t: "Khiếu nại", html: x => x.openComplaints ? pill(x.openComplaints + " đang mở", "bad") : "—" },
         { t: "Trạng thái", html: x => x.locked ? pill("Đã khóa", "bad") : pill("Hoạt động", "ok") },
-        { t: "", html: x => `<div class="row" style="gap:6px"><button class="btn sm" data-c="${esc(x.id)}">Xem</button>${canDelete ? `<button class="btn bad sm" data-del="${esc(x.id)}">Xóa</button>` : ""}</div>` }
+        { t: "Thao tác", nowrap: true, cls: "actions", html: x => `<div class="act-btns"><button class="btn sm" data-c="${esc(x.id)}">Xem</button>${canDelete ? `<button class="btn bad sm" data-del="${esc(x.id)}">Xóa</button>` : ""}</div>` }
       ], list, { empty: "Không tìm thấy khách phù hợp" });
       $$("[data-c]", body).forEach(b => b.onclick = async () => {
         try { if (await openCustomer(ctx, b.dataset.c)) await reload(); } catch (e) { fail(e); }

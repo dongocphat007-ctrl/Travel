@@ -47,7 +47,7 @@
         const r = await get("/api/content/drafts");
         el.innerHTML = `<div class="toolbar"><button class="btn primary" id="nd">✏️ Biên tập nội dung tour</button></div><div class="note">Nhân viên biên tập hình ảnh, lịch trình cho tour có sẵn. Chỉ <b>Admin</b> mới có quyền tạo tour mới. Nội dung chỉ lên trang công khai sau khi <b>Admin duyệt</b>.</div>` +
           table([{ t: "Tour", html: d => esc((d.fields && d.fields.name) || d.tourId) + (d.isNew ? " " + pill("Tour mới", "info") : "") }, { t: "Trạng thái", html: d => pill(...(DS[d.status] || [d.status, ""])) + (d.status === "rejected" && d.reviewNote ? `<div class="small" style="color:var(--bad)">${esc(d.reviewNote)}</div>` : "") }, { t: "Cập nhật", html: d => dt(d.updatedAt), sort: d => d.updatedAt },
-            { t: "", html: d => ["draft", "rejected"].includes(d.status) ? `<div class="row" style="gap:6px"><button class="btn sm" data-e="${esc(d.id)}">Sửa</button><button class="btn ok sm" data-s="${esc(d.id)}">Gửi duyệt</button></div>` : "" }], r.drafts, { sortable: true, empty: "Chưa có bản nháp" });
+            { t: "Thao tác", nowrap: true, cls: "actions", html: d => ["draft", "rejected"].includes(d.status) ? `<div class="act-btns"><button class="btn sm" data-e="${esc(d.id)}">Sửa</button><button class="btn ok sm" data-s="${esc(d.id)}">Gửi duyệt</button></div>` : "" }], r.drafts, { sortable: true, empty: "Chưa có bản nháp" });
         $("#nd", el).onclick = () => editDraft(null, tours, reload);
         $$("[data-e]", el).forEach(b => b.onclick = () => editDraft(r.drafts.find(x => x.id === b.dataset.e), tours, reload));
         $$("[data-s]", el).forEach(b => b.onclick = () => act(b, () => post(`/api/content/drafts/${b.dataset.s}/submit`), "Đã gửi Admin duyệt.", reload));
@@ -66,7 +66,7 @@
           <button class="btn sm" id="food-imp">📥 Nhập Excel/CSV</button>
           <button class="btn primary" id="nf" style="margin-left:auto">+ Thêm món</button>
         </div>` + table([{ t: "Món", html: f => `<b>${esc(f.name)}</b><div class="small muted">${esc(f.description || "")}</div>` }, { t: "Vùng", html: f => esc(REG[f.region] || f.region) }, { t: "Tỉnh", k: "province" }, { t: "Hiển thị", html: f => f.active === false ? pill("Ẩn", "") : pill("Hiện", "ok") },
-          { t: "", html: f => `<div class="row" style="gap:6px"><button class="btn sm" data-e="${esc(f.id)}">Sửa</button><button class="btn bad sm" data-x="${esc(f.id)}">Xóa</button></div>` }], list, { empty: "Chưa có món nào" });
+          { t: "Thao tác", nowrap: true, cls: "actions", html: f => `<div class="act-btns"><button class="btn sm" data-e="${esc(f.id)}">Sửa</button><button class="btn bad sm" data-x="${esc(f.id)}">Xóa</button></div>` }], list, { empty: "Chưa có món nào" });
 
         const feExcel = $("#food-exp-excel", el);
         if (feExcel) feExcel.onclick = () => window.DataExportImport && window.DataExportImport.exportFoodsList(list, "excel");
@@ -109,7 +109,7 @@
       async function reload() {
         const list = (await get("/api/admin/banners")).banners;
         el.innerHTML = `<div class="toolbar"><button class="btn primary" id="nb">+ Thêm banner</button></div>` + table([{ t: "Banner", html: b => `<b>${esc(b.title)}</b><div class="small muted">${esc(b.subtitle || "")}</div>` }, { t: "Lịch chạy", html: b => (b.startAt ? dt(b.startAt) : "—") + " → " + (b.endAt ? dt(b.endAt) : "—") }, { t: "Ưu tiên", num: true, k: "priority" }, { t: "Trạng thái", html: b => pill({ running: "Đang chạy", scheduled: "Chờ chạy", expired: "Hết hạn", disabled: "Đã tắt" }[b.status] || b.status || "", b.status === "running" ? "ok" : "") },
-          { t: "", html: b => `<div class="row" style="gap:6px"><button class="btn sm" data-e="${esc(b.id)}">Sửa</button><button class="btn bad sm" data-x="${esc(b.id)}">Xóa</button></div>` }], list, { empty: "Chưa có banner" });
+          { t: "Thao tác", nowrap: true, cls: "actions", html: b => `<div class="act-btns"><button class="btn sm" data-e="${esc(b.id)}">Sửa</button><button class="btn bad sm" data-x="${esc(b.id)}">Xóa</button></div>` }], list, { empty: "Chưa có banner" });
         $("#nb", el).onclick = async () => { const v = await ask("Thêm banner", form(null)); if (v) act(null, () => post("/api/admin/banners", clean(v)), "Đã thêm.", reload); };
         $$("[data-e]", el).forEach(x => x.onclick = async () => { const b = list.find(i => i.id === x.dataset.e); const v = await ask("Sửa banner", form(b)); if (v) act(null, () => put(`/api/admin/banners/${b.id}`, clean(v)), "Đã lưu.", reload); });
         $$("[data-x]", el).forEach(x => x.onclick = async () => { if (await confirmBox("Xóa banner", "Xóa banner này?", "bad")) act(null, () => del(`/api/admin/banners/${x.dataset.x}`), "Đã xóa.", reload); });
@@ -193,8 +193,10 @@
           },
           {
             t: "Thao tác",
+            nowrap: true,
+            cls: "actions",
             html: r => `
-              <div class="row" style="gap:6px">
+              <div class="act-btns">
                 <button class="btn sm primary" data-rep="${esc(r.id)}" title="Trả lời / Phản hồi">${r.reply && r.reply.content ? "✏️ Sửa rep" : "💬 Rep"}</button>
                 ${r.reply && r.reply.content ? `<button class="btn sm" data-delrep="${esc(r.id)}" title="Xóa phản hồi">🗑️</button>` : ""}
                 ${r.hidden ? `<button class="btn sm" data-s="${esc(r.id)}">Hiện lại</button>` : `<button class="btn bad sm" data-h="${esc(r.id)}">Ẩn</button>`}

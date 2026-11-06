@@ -50,7 +50,7 @@
       { t: "Tour", html: b => `${esc(b.tourName)}<div class="small muted">Đi ${day(b.date)}</div>` },
       { t: "Cần thu", num: true, html: b => `<b>${money(b.due)}</b><div class="small muted">${esc(KIND_LABEL[b.dueKind])}</div>`, sort: b => b.due },
       { t: opts.dateLabel, html: b => opts.date(b) },
-      { t: "", html: b => `<div class="row" style="gap:6px"><button class="btn ok sm" data-a="ok" data-id="${esc(b.id)}">Đã nhận</button><button class="btn sm" data-a="flag" data-id="${esc(b.id)}">Chuyển lệch</button><button class="btn sm" data-a="view" data-id="${esc(b.id)}">Chi tiết</button></div>` }
+      { t: "Thao tác", nowrap: true, cls: "actions", html: b => `<div class="act-btns"><button class="btn ok sm" data-a="ok" data-id="${esc(b.id)}">Đã nhận</button><button class="btn sm" data-a="flag" data-id="${esc(b.id)}">Chuyển lệch</button><button class="btn sm" data-a="view" data-id="${esc(b.id)}">Chi tiết</button></div>` }
     ], list, { empty: opts.empty, sortable: true });
     $$("button[data-a]", el).forEach(btn => btn.onclick = () => { const b = list.find(x => x.id === btn.dataset.id); ({ ok: confirmPayment, flag, view: detail })[btn.dataset.a](b, reload); });
   }
@@ -199,7 +199,7 @@
         el.innerHTML = `<div class="note">Các giao dịch sai lệch (thiếu / thừa / sai nội dung / chuyển hai lần). Số tiền chỉ được cộng vào đơn khi bạn chọn cách xử lý và ghi chú lý do.</div>` + table([
           { t: "Mã đơn", html: p => `<b class="mono">${esc(p.payCode || "—")}</b>` }, { t: "Số tiền", num: true, html: p => money(p.amount) }, { t: "Lý do", html: p => esc(p.reason || p.problem) + (p.contactNote ? `<div class="small" style="color:var(--ok)">CSKH: ${esc(p.contactNote)}</div>` : "") },
           { t: "Trạng thái", html: p => p.handoff ? pill("Đã chuyển CSKH", "info") : pill("Chờ xử lý", "warn") }, { t: "Lúc", html: p => dt(p.createdAt) },
-          { t: "", html: p => `<div class="row" style="gap:6px"><button class="btn ok sm" data-a="acc" data-id="${esc(p.id)}">Ghi nhận tiền</button><button class="btn sm" data-a="hand" data-id="${esc(p.id)}">Chuyển CSKH</button><button class="btn sm" data-a="dis" data-id="${esc(p.id)}">Bỏ qua</button></div>` }], q.discrepancies, { empty: "Không có giao dịch lệch nào 🎉" });
+          { t: "Thao tác", nowrap: true, cls: "actions", html: p => `<div class="act-btns"><button class="btn ok sm" data-a="acc" data-id="${esc(p.id)}">Ghi nhận tiền</button><button class="btn sm" data-a="hand" data-id="${esc(p.id)}">Chuyển CSKH</button><button class="btn sm" data-a="dis" data-id="${esc(p.id)}">Bỏ qua</button></div>` }], q.discrepancies, { empty: "Không có giao dịch lệch nào 🎉" });
         $$("button[data-a]", el).forEach(btn => btn.onclick = async () => {
           const p = q.discrepancies.find(x => x.id === btn.dataset.id), a = btn.dataset.a;
           if (a === "acc") {
@@ -274,7 +274,7 @@
               { t: "Số tài khoản", html: w => `<span class="mono">${esc(w.accountNumber)}</span>` },
               { t: "Chủ thẻ", html: w => `<b>${esc(w.accountHolder)}</b>` },
               { t: "Ghi chú", html: w => esc(w.note || "—") + (w.rejectReason ? `<div class="small bad">Từ chối: ${esc(w.rejectReason)}</div>` : "") + (w.adminNote ? `<div class="small ok">Ghi chú: ${esc(w.adminNote)}</div>` : "") },
-              { t: "", html: w => statusId === "pending" ? `<div class="row" style="gap:6px"><button class="btn ok sm" data-appr="${esc(w.id)}">Đã chuyển tiền</button><button class="btn bad sm" data-rej="${esc(w.id)}">Từ chối</button></div>` : `<span class="muted small">${esc(w.handledByName || "—")}</span>` }
+              { t: "Thao tác", nowrap: true, cls: "actions", html: w => statusId === "pending" ? `<div class="act-btns"><button class="btn ok sm" data-appr="${esc(w.id)}">Đã chuyển tiền</button><button class="btn bad sm" data-rej="${esc(w.id)}">Từ chối</button></div>` : `<span class="muted small">${esc(w.handledByName || "—")}</span>` }
             ], list, { empty: "Không có yêu cầu rút tiền nào" });
 
           $$("[data-appr]", box).forEach(btn => btn.onclick = async () => {

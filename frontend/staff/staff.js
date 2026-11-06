@@ -160,8 +160,16 @@ const Staff = (() => {
     opts = opts || {};
     if (!rows || !rows.length) return `<div class="empty">${esc(opts.empty || "Không có dữ liệu")}</div>`;
     const id = "t" + Math.random().toString(36).slice(2, 8);
-    const head = cols.map((c, i) => `<th class="${c.num ? "num" : ""} ${c.sort || opts.sortable ? "sortable" : ""}" data-i="${i}">${esc(c.t)}</th>`).join("");
-    const body = rows.map((r, ri) => `<tr data-row="${ri}">${cols.map(c => `<td class="${c.num ? "num" : ""}">${c.html ? c.html(r, ri) : esc(r[c.k])}</td>`).join("")}</tr>`).join("");
+    const head = cols.map((c, i) => {
+      const cls = [c.num ? "num" : "", c.nowrap ? "nowrap" : "", c.cls || "", (c.sort || opts.sortable) ? "sortable" : ""].filter(Boolean).join(" ");
+      const st = [c.width ? `width:${c.width}` : "", c.minWidth ? `min-width:${c.minWidth}` : (c.nowrap ? "white-space:nowrap" : "")].filter(Boolean).join(";");
+      return `<th class="${cls}" ${st ? `style="${st}"` : ""} data-i="${i}">${esc(c.t)}</th>`;
+    }).join("");
+    const body = rows.map((r, ri) => `<tr data-row="${ri}">${cols.map(c => {
+      const cls = [c.num ? "num" : "", c.nowrap ? "nowrap" : "", c.cls || ""].filter(Boolean).join(" ");
+      const st = [c.minWidth ? `min-width:${c.minWidth}` : "", c.nowrap ? "white-space:nowrap" : ""].filter(Boolean).join(";");
+      return `<td class="${cls}" ${st ? `style="${st}"` : ""}>${c.html ? c.html(r, ri) : esc(r[c.k])}</td>`;
+    }).join("")}</tr>`).join("");
     setTimeout(() => {
       const t = document.getElementById(id); if (!t) return;
       let dir = 1, last = -1;

@@ -613,7 +613,7 @@
         el.innerHTML = `<div class="note">Đơn Thu ngân đã xác nhận nhận tiền. Admin duyệt để giữ chỗ chính thức, hoặc từ chối (kèm lý do) để hoàn tiền 100%. Admin không xác nhận tiền.</div>` +
           table([{ t: "Mã đơn", html: b => `<a href="#" data-view="${esc(b.id)}" class="mono">${esc(b.payCode)}</a>` }, { t: "Khách", k: "customerName" }, { t: "Tour", html: b => `${esc(b.tourName)}<div class="small muted">Đi ${day(b.date)} · ${b.pax} khách</div>` },
             { t: "Đã nhận", num: true, html: b => money(b.paidAmount) }, { t: "Trạng thái", html: b => badge(b.status) },
-            { t: "", html: b => `<div class="row" style="gap:6px"><button class="btn ok sm" data-c="${esc(b.id)}">Duyệt</button><button class="btn bad sm" data-r="${esc(b.id)}">Từ chối</button></div>` }], q.confirm, { empty: "Không có đơn chờ duyệt" });
+            { t: "Thao tác", nowrap: true, cls: "actions", html: b => `<div class="act-btns"><button class="btn ok sm" data-c="${esc(b.id)}">Duyệt</button><button class="btn bad sm" data-r="${esc(b.id)}">Từ chối</button></div>` }], q.confirm, { empty: "Không có đơn chờ duyệt" });
         bindView(el); $$("[data-view]", el).forEach(a => a.addEventListener("click", e => e.preventDefault()));
         $$("[data-c]", el).forEach(b => b.onclick = () => act(b, () => post(`/api/admin/bookings/${b.dataset.c}/confirm`, {}), "Đã duyệt đơn.", reload));
         $$("[data-r]", el).forEach(b => b.onclick = async () => { const v = await ask("Từ chối đơn", [{ name: "reason", label: "Lý do từ chối", type: "textarea", required: true }], { kind: "bad", submit: "Từ chối & hoàn tiền" }); if (v) act(null, () => post(`/api/admin/bookings/${b.dataset.r}/reject`, { reason: v.reason }), "Đã từ chối, tạo yêu cầu hoàn tiền.", reload); });
@@ -683,8 +683,8 @@
         const doCancel = async (tourId, date, name, pid) => { const v = await ask(`Hủy tour ${name} ngày ${day(date)}`, [{ name: "reason", label: "Lý do (gửi cho khách)", type: "textarea", required: true }, { name: "mode", label: "Cách xử lý", type: "select", value: "refund", options: [["refund", "Hủy hết và hoàn 100% ngay"], ["offer", "Để khách chọn: hoàn 100% hoặc đổi sang ngày khác"]] }], { kind: "bad", submit: "Hủy chuyến", intro: "Chuyến này sẽ đóng đặt chỗ. CSKH được báo để liên hệ khách. Không tính phí hủy." }); if (v) act(null, () => post("/api/admin/company-cancel", { tourId, date, reason: v.reason, mode: v.mode, proposalId: pid }), v.mode === "offer" ? "Đã gửi đề nghị cho khách." : "Đã hủy chuyến, các khoản hoàn đã được tạo.", reload); };
         el.innerHTML = `<div class="card"><h2>Đề xuất hủy / dồn tour từ Điều hành</h2><div id="p"></div></div><div class="card"><h2>Các chuyến sắp đi</h2><div id="d"></div></div>`;
         $("#p", el).innerHTML = table([{ t: "Tour", html: p => `${esc(p.tourName)}<div class="small muted">Ngày ${day(p.date)} · ${p.pax}/${p.minGuests} khách tối thiểu</div>` }, { t: "Lý do", html: p => esc(p.reason) }, { t: "Đề xuất bởi", html: p => esc(p.proposedByName || p.proposedBy) }, { t: "Trạng thái", html: p => pill({ pending: "Chờ duyệt", approved: "Đã duyệt", rejected: "Từ chối" }[p.status] || p.status, p.status === "pending" ? "warn" : p.status === "approved" ? "ok" : "bad") },
-          { t: "", html: p => p.status === "pending" ? `<div class="row" style="gap:6px"><button class="btn bad sm" data-ok="${esc(p.id)}">Duyệt hủy</button><button class="btn sm" data-no="${esc(p.id)}">Từ chối</button></div>` : "" }], r.proposals, { empty: "Chưa có đề xuất" });
-        $("#d", el).innerHTML = table([{ t: "Tour", k: "tourName" }, { t: "Ngày", html: d => day(d.date), sort: d => d.date }, { t: "Khách", num: true, html: d => `${d.pax}/${d.capacity}` }, { t: "Tình trạng", html: d => d.cancelled ? pill("Đã hủy", "bad") : d.atRisk ? pill("Có nguy cơ", "warn") : pill("Bình thường", "ok") }, { t: "", html: d => d.cancelled ? "" : `<button class="btn sm" data-c="${esc(d.key)}">Hủy chuyến</button>` }], r.departures, { empty: "Không có chuyến" });
+          { t: "Thao tác", nowrap: true, cls: "actions", html: p => p.status === "pending" ? `<div class="act-btns"><button class="btn bad sm" data-ok="${esc(p.id)}">Duyệt hủy</button><button class="btn sm" data-no="${esc(p.id)}">Từ chối</button></div>` : "" }], r.proposals, { empty: "Chưa có đề xuất" });
+        $("#d", el).innerHTML = table([{ t: "Tour", k: "tourName" }, { t: "Ngày", html: d => day(d.date), sort: d => d.date }, { t: "Khách", num: true, html: d => `${d.pax}/${d.capacity}` }, { t: "Tình trạng", html: d => d.cancelled ? pill("Đã hủy", "bad") : d.atRisk ? pill("Có nguy cơ", "warn") : pill("Bình thường", "ok") }, { t: "Thao tác", nowrap: true, cls: "actions", html: d => d.cancelled ? "" : `<button class="btn sm" data-c="${esc(d.key)}">Hủy chuyến</button>` }], r.departures, { empty: "Không có chuyến" });
         $$("[data-ok]", el).forEach(b => b.onclick = () => { const p = pend.find(x => x.id === b.dataset.ok); doCancel(p.tourId, p.date, p.tourName, p.id); });
         $$("[data-no]", el).forEach(b => b.onclick = async () => { const v = await ask("Từ chối đề xuất", [{ name: "note", label: "Lý do", type: "textarea", required: true }]); if (v) act(null, () => post(`/api/admin/cancel-proposals/${b.dataset.no}/reject`, { note: v.note }), "Đã từ chối đề xuất.", reload); });
         $$("[data-c]", el).forEach(b => b.onclick = () => { const d = r.departures.find(x => x.key === b.dataset.c); doCancel(d.tourId, d.date, d.tourName, ""); });
@@ -809,8 +809,8 @@
             { t: "Loại HDV", html: t => t.guideType === "self" || t.guide === "self" ? "Tự túc" : t.guideType === "international" ? "Quốc tế" : "Nội địa" },
             { t: "Sức chứa", num: true, html: t => `${t.capacity ?? 30} khách<div class="small muted">Tối thiểu: ${t.minGuests ?? 1}</div>` },
             { t: "Trạng thái", html: t => t.active !== false ? pill("Đang mở bán", "ok") : pill("Đang ẩn", "bad") },
-            { t: "Thao tác", html: t => `
-              <div class="row" style="gap:6px">
+            { t: "Thao tác", nowrap: true, cls: "actions", html: t => `
+              <div class="act-btns">
                 <button class="btn sm" data-edit="${esc(t.id)}">Sửa</button>
                 <button class="btn sm ${t.active !== false ? "bad" : "ok"}" data-toggle="${esc(t.id)}">${t.active !== false ? "Ẩn" : "Hiện"}</button>
                 <button class="btn bad sm" data-del="${esc(t.id)}" title="Xóa tour">Xóa</button>
@@ -889,8 +889,8 @@
             { t: "Vùng miền", html: f => pill(REG[f.region] || f.region, f.region === "bac" ? "info" : f.region === "trung" ? "warn" : "ok") },
             { t: "Mô tả", html: f => `<div style="max-width:420px;font-size:0.85rem;line-height:1.45;color:var(--muted)">${esc(f.description || f.desc || "—")}</div>` },
             { t: "Trạng thái", html: f => f.active !== false ? pill("Đang hiện", "ok") : pill("Đang ẩn", "bad") },
-            { t: "Thao tác", html: f => `
-              <div class="row" style="gap:6px">
+            { t: "Thao tác", nowrap: true, cls: "actions", html: f => `
+              <div class="act-btns">
                 <button class="btn sm" data-f-edit="${esc(f.id)}">Sửa</button>
                 <button class="btn sm ${f.active !== false ? "bad" : "ok"}" data-f-toggle="${esc(f.id)}">${f.active !== false ? "Ẩn" : "Hiện"}</button>
                 <button class="btn bad sm" data-f-del="${esc(f.id)}">Xóa</button>
@@ -1051,7 +1051,7 @@
         body.innerHTML = table([{ t: "Mã", html: s => `<b class="mono">${esc(s.id)}</b>` }, { t: "Họ tên", k: "name" }, { t: "Vai trò", html: s => esc((Staff.ROLE_NAME[s.role] || s.role)) }, { t: "Email / SĐT", html: s => esc(s.email) + `<div class="small muted">${esc(s.phone || "")}</div>` },
           { t: "Số lỗi", html: s => (s.strikes && s.strikes > 0) ? `<span class="badge bad">${s.strikes} lỗi</span>` : '<span class="muted">0</span>' },
           { t: "Trạng thái", html: s => s.locked ? pill("Đã khóa", "bad") : pill("Hoạt động", "ok") },
-          { t: "", html: s => `<div class="row" style="gap:6px">
+          { t: "Hành động", nowrap: true, cls: "actions", minWidth: "380px", html: s => `<div class="act-btns">
             <button class="btn sm" data-e="${esc(s.id)}">Sửa</button>
             <button class="btn sm" data-l="${esc(s.id)}" data-v="${s.locked ? 0 : 1}">${s.locked ? "Mở khóa" : "Khóa"}</button>
             <button class="btn sm" data-p="${esc(s.id)}">Cấp lại MK</button>
@@ -1224,8 +1224,8 @@
           { t: "Tổng đã nhận", num: true, html: s => money(s.totalEarned) },
           { t: "Lỗi vi phạm", html: s => (s.strikes && s.strikes > 0) ? `<span class="badge bad">${s.strikes} lỗi</span>` : '<span class="muted">0</span>' },
           { t: "Lần phát gần nhất", html: s => s.lastPaidAt ? dt(s.lastPaidAt) : '<span class="muted">—</span>' },
-          { t: "Hành động", html: s => `
-            <div class="row" style="gap:6px;justify-content:flex-end">
+          { t: "Hành động", nowrap: true, cls: "actions", minWidth: "360px", html: s => `
+            <div class="act-btns">
               <button class="btn ok sm" data-pay="${esc(s.id)}" title="Phát lương">💵 Phát lương</button>
               <button class="btn sm" data-inc="${esc(s.id)}" title="Tăng lương cơ bản">➕ Tăng</button>
               <button class="btn sm" data-dec="${esc(s.id)}" title="Giảm lương cơ bản">➖ Trừ</button>
@@ -1390,7 +1390,7 @@
         tabs(el, [{ id: "pending_approval", label: "Chờ duyệt", n: all.filter(r => r.status === "pending_approval").length }, { id: "approved", label: "Đã duyệt – chờ Thu ngân chuyển" }, { id: "paid", label: "Đã hoàn" }, { id: "rejected", label: "Từ chối" }], (id, box) => {
           const list = all.filter(r => r.status === id);
           box.innerHTML = table([{ t: "Mã đơn", html: r => `<b class="mono">${esc(r.payCode)}</b>` }, { t: "Khách", k: "customerName" }, { t: "Nguồn", html: r => esc(SRC[r.source] || r.source) }, { t: "Số tiền", num: true, html: r => `<b>${money(r.amount)}</b>` }, { t: "Lý do", html: r => esc(r.reason || "") },
-            { t: "Yêu cầu bởi", html: r => esc(r.requestedByName || r.requestedBy || "—") }, { t: "", html: r => id === "pending_approval" ? `<div class="row" style="gap:6px"><button class="btn ok sm" data-a="${esc(r.id)}">Duyệt</button><button class="btn bad sm" data-x="${esc(r.id)}">Từ chối</button></div>` : "" }], list, { empty: "Không có khoản nào" });
+            { t: "Yêu cầu bởi", html: r => esc(r.requestedByName || r.requestedBy || "—") }, { t: "Thao tác", nowrap: true, cls: "actions", html: r => id === "pending_approval" ? `<div class="act-btns"><button class="btn ok sm" data-a="${esc(r.id)}">Duyệt</button><button class="btn bad sm" data-x="${esc(r.id)}">Từ chối</button></div>` : "" }], list, { empty: "Không có khoản nào" });
           $$("[data-a]", box).forEach(b => b.onclick = async () => { const r = list.find(x => x.id === b.dataset.a); const v = await ask("Duyệt hoàn " + money(r.amount), [{ name: "amount", label: "Số tiền hoàn (để trống = giữ nguyên)", type: "number", value: r.amount, hint: "Không được vượt số tiền khách đã trả." }, { name: "note", label: "Ghi chú", type: "text" }], { kind: "ok", submit: "Duyệt" }); if (v) act(null, () => post(`/api/admin/refunds/${r.id}/approve`, { amount: v.amount === "" ? null : Number(v.amount), note: v.note }), "Đã duyệt. Thu ngân sẽ chuyển tiền.", reload); });
           $$("[data-x]", box).forEach(b => b.onclick = async () => { const v = await ask("Từ chối hoàn tiền", [{ name: "note", label: "Lý do", type: "textarea", required: true }], { kind: "bad" }); if (v) act(null, () => post(`/api/admin/refunds/${b.dataset.x}/reject`, { note: v.note }), "Đã từ chối.", reload); });
         }, "pending_approval");
@@ -1403,7 +1403,7 @@
         const list = (await get("/api/admin/reconcile")).reconciliations;
         el.innerHTML = `<div class="note">Người tạo bản đóng sổ không được tự duyệt. Bản có chênh lệch cần xem kỹ giải trình.</div>` + table([{ t: "Ngày", html: x => day(x.date), sort: x => x.date }, { t: "Thu ngân", html: x => esc(x.createdByName || x.createdBy) }, { t: "Thực thu", num: true, html: x => money(x.netTotal) }, { t: "Sao kê", num: true, html: x => money(x.bankStatementTotal) },
           { t: "Chênh lệch", num: true, html: x => x.discrepancy ? `<b style="color:var(--bad)">${money(x.discrepancy)}</b>` : "0 ₫" }, { t: "Ghi chú", html: x => esc(x.note) }, { t: "Trạng thái", html: x => pill({ pending_approval: "Chờ duyệt", approved: "Đã duyệt", rejected: "Từ chối" }[x.status] || x.status, x.status === "approved" ? "ok" : x.status === "rejected" ? "bad" : "warn") },
-          { t: "", html: x => x.status === "pending_approval" ? `<div class="row" style="gap:6px"><button class="btn ok sm" data-y="${esc(x.id)}">Duyệt</button><button class="btn bad sm" data-n="${esc(x.id)}">Từ chối</button></div>` : "" }], list, { empty: "Chưa có bản đóng sổ" });
+          { t: "Thao tác", nowrap: true, cls: "actions", html: x => x.status === "pending_approval" ? `<div class="act-btns"><button class="btn ok sm" data-y="${esc(x.id)}">Duyệt</button><button class="btn bad sm" data-n="${esc(x.id)}">Từ chối</button></div>` : "" }], list, { empty: "Chưa có bản đóng sổ" });
         const dec = (id, approve) => async () => { const v = await ask(approve ? "Duyệt đóng sổ" : "Từ chối đóng sổ", [{ name: "note", label: "Ghi chú", type: "textarea", required: !approve }], { kind: approve ? "ok" : "bad" }); if (v) act(null, () => post(`/api/admin/reconcile/${id}/decision`, { approve, note: v.note }), "Đã xử lý.", reload); };
         $$("[data-y]", el).forEach(b => b.onclick = dec(b.dataset.y, true)); $$("[data-n]", el).forEach(b => b.onclick = dec(b.dataset.n, false));
       }
@@ -1414,7 +1414,7 @@
       async function reload() {
         const r = await get("/api/admin/vouchers");
         el.innerHTML = `<div class="toolbar"><button class="btn primary" id="nv">+ Tạo voucher</button></div>` + table([{ t: "Mã", html: v => `<b class="mono">${esc(v.code)}</b>` }, { t: "Giảm", html: v => esc(v.type === "percent" ? v.value + "%" : money(v.value)) }, { t: "Hạn", html: v => esc(v.expiresAt || v.expires || "—") }, { t: "Trạng thái", html: v => v.disabled ? pill("Tạm tắt", "bad") : pill("Đang dùng", "ok") },
-          { t: "", html: v => `<div class="row" style="gap:6px"><button class="btn sm" data-t="${esc(v.code)}" data-d="${v.disabled ? 0 : 1}">${v.disabled ? "Bật" : "Tắt"}</button><button class="btn bad sm" data-x="${esc(v.code)}">Xóa</button></div>` }], r.vouchers, { empty: "Chưa có voucher" });
+          { t: "Thao tác", nowrap: true, cls: "actions", html: v => `<div class="act-btns"><button class="btn sm" data-t="${esc(v.code)}" data-d="${v.disabled ? 0 : 1}">${v.disabled ? "Bật" : "Tắt"}</button><button class="btn bad sm" data-x="${esc(v.code)}">Xóa</button></div>` }], r.vouchers, { empty: "Chưa có voucher" });
         $("#nv", el).onclick = async () => { const v = await ask("Tạo voucher", [{ name: "code", label: "Mã", required: true }, { name: "type", label: "Loại", type: "select", options: [["percent", "Giảm %"], ["amount", "Giảm tiền"]] }, { name: "value", label: "Giá trị", type: "number", required: true }, { name: "expiresAt", label: "Hạn dùng", type: "date" }]); if (v) act(null, () => post("/api/admin/vouchers", { ...v, value: Number(v.value) }), "Đã tạo.", reload); };
         $$("[data-t]", el).forEach(b => b.onclick = () => act(b, () => put(`/api/admin/vouchers/${encodeURIComponent(b.dataset.t)}`, { disabled: b.dataset.d === "1" }), "Đã cập nhật.", reload));
         $$("[data-x]", el).forEach(b => b.onclick = async () => { if (await confirmBox("Xóa voucher", "Xóa " + esc(b.dataset.x) + "?", "bad")) act(null, () => del(`/api/admin/vouchers/${encodeURIComponent(b.dataset.x)}`), "Đã xóa.", reload); });
@@ -1452,7 +1452,7 @@
       async function reload() {
         const r = await get("/api/content/drafts?status=pending");
         el.innerHTML = `<div class="note">Bản nháp do Biên tập gửi. Giá, loại HDV, gia hạn, sức chứa chỉ Admin chỉnh khi duyệt.</div>` + table([{ t: "Tour", html: d => esc((d.fields && (d.fields.name || d.fields.title)) || d.tourId) + (d.isNew ? " " + pill("Tour mới", "info") : "") }, { t: "Người soạn", html: d => esc(d.createdByName) }, { t: "Trường đã sửa", html: d => esc(Object.keys(d.fields || {}).join(", ")) }, { t: "Gửi lúc", html: d => dt(d.submittedAt || d.updatedAt) },
-          { t: "", html: d => `<div class="row" style="gap:6px"><button class="btn sm" data-v="${esc(d.id)}">Xem</button><button class="btn ok sm" data-a="${esc(d.id)}">Duyệt</button><button class="btn bad sm" data-x="${esc(d.id)}">Trả lại</button></div>` }], r.drafts, { empty: "Không có bản nháp chờ duyệt" });
+          { t: "Thao tác", nowrap: true, cls: "actions", html: d => `<div class="act-btns"><button class="btn sm" data-v="${esc(d.id)}">Xem</button><button class="btn ok sm" data-a="${esc(d.id)}">Duyệt</button><button class="btn bad sm" data-x="${esc(d.id)}">Trả lại</button></div>` }], r.drafts, { empty: "Không có bản nháp chờ duyệt" });
         const find = id => r.drafts.find(d => d.id === id);
         $$("[data-v]", el).forEach(b => b.onclick = () => Staff.modal("Nội dung bản nháp", `<dl class="kv">${Object.entries(find(b.dataset.v).fields || {}).map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(typeof v === "object" ? JSON.stringify(v) : v)}</dd>`).join("")}</dl>`, [{ label: "Đóng" }], { wide: true }));
         $$("[data-a]", el).forEach(b => b.onclick = async () => {
@@ -1495,8 +1495,8 @@
             { t: "Ưu tiên", num: true, html: b => `<b>${b.priority || 0}</b>` },
             { t: "Thời gian chạy", html: b => `<div class="small">${dt(b.startAt)}<br>→ ${b.endAt ? dt(b.endAt) : "Không giới hạn"}</div>` },
             { t: "Trạng thái", html: b => b.enabled !== false ? pill("Đang bật", "ok") : pill("Đang tắt", "bad") },
-            { t: "Thao tác", html: b => `
-              <div class="row" style="gap:6px">
+            { t: "Thao tác", nowrap: true, cls: "actions", html: b => `
+              <div class="act-btns">
                 <button class="btn sm" data-b-edit="${esc(b.id)}">Sửa</button>
                 <button class="btn sm ${b.enabled !== false ? "bad" : "ok"}" data-b-toggle="${esc(b.id)}" data-en="${b.enabled !== false ? 0 : 1}">${b.enabled !== false ? "Tắt" : "Bật"}</button>
                 <button class="btn bad sm" data-b-del="${esc(b.id)}">Xóa</button>
@@ -1635,8 +1635,10 @@
           },
           {
             t: "Thao tác",
+            nowrap: true,
+            cls: "actions",
             html: r => `
-              <div class="row" style="gap:6px">
+              <div class="act-btns">
                 <button class="btn sm primary" data-rep="${esc(r.id)}" title="Trả lời / Phản hồi">${r.reply && r.reply.content ? "✏️ Sửa rep" : "💬 Rep"}</button>
                 ${r.reply && r.reply.content ? `<button class="btn sm" data-delrep="${esc(r.id)}" title="Xóa phản hồi">🗑️</button>` : ""}
                 ${r.hidden ? `<button class="btn sm" data-s="${esc(r.id)}">Hiện lại</button>` : `<button class="btn bad sm" data-h="${esc(r.id)}">Ẩn</button>`}
