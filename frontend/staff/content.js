@@ -66,7 +66,11 @@
           <button class="btn sm" id="food-imp">📥 Nhập Excel/CSV</button>
           ${list.length === 0 ? '<button class="btn ok sm" id="food-seed-btn">🌱 Nạp 153 món mẫu</button>' : ""}
           <button class="btn primary" id="nf" style="margin-left:auto">+ Thêm món</button>
-        </div>` + table([{ t: "Món", html: f => `<b>${esc(f.name)}</b><div class="small muted">${esc(f.description || "")}</div>` }, { t: "Vùng", html: f => esc(REG[f.region] || f.region) }, { t: "Tỉnh", k: "province" }, { t: "Hiển thị", html: f => f.active === false ? pill("Ẩn", "") : pill("Hiện", "ok") },
+        </div>` + table([{ t: "Món", html: f => {
+          const src = f.image ? (/^(https?:|\/|data:)/.test(f.image) ? f.image : "/" + f.image) : "";
+          const img = src ? `<img src="${esc(src)}" style="width:44px;height:44px;border-radius:6px;object-fit:cover" onerror="this.outerHTML='<div style=\\'width:44px;height:44px;border-radius:6px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:22px\\'>${esc(f.emoji || "🍜")}</div>'">` : `<div style="width:44px;height:44px;border-radius:6px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:22px">${esc(f.emoji || "🍜")}</div>`;
+          return `<div style="display:flex;align-items:center;gap:10px">${img}<div><b>${esc(f.name)}</b><div class="small muted">${esc(f.description || "")}</div></div></div>`;
+        } }, { t: "Vùng", html: f => esc(REG[f.region] || f.region) }, { t: "Tỉnh", k: "province" }, { t: "Hiển thị", html: f => f.active === false ? pill("Ẩn", "") : pill("Hiện", "ok") },
           { t: "Thao tác", nowrap: true, cls: "actions", html: f => `<div class="act-btns"><button class="btn sm" data-e="${esc(f.id)}">Sửa</button><button class="btn bad sm" data-x="${esc(f.id)}">Xóa</button></div>` }], list, { empty: "Chưa có món nào" });
 
         const feExcel = $("#food-exp-excel", el);

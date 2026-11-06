@@ -884,7 +884,8 @@
           </div>` +
           table([
             { t: "Món ăn", html: f => {
-              const img = f.image ? `<img src="${esc(f.image)}" style="width:44px;height:44px;border-radius:6px;object-fit:cover">` : `<div style="width:44px;height:44px;border-radius:6px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:22px">${esc(f.emoji || "🍜")}</div>`;
+              const src = f.image ? (/^(https?:|\/|data:)/.test(f.image) ? f.image : "/" + f.image) : "";
+              const img = src ? `<img src="${esc(src)}" style="width:44px;height:44px;border-radius:6px;object-fit:cover" onerror="this.outerHTML='<div style=\\'width:44px;height:44px;border-radius:6px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:22px\\'>${esc(f.emoji || "🍜")}</div>'">` : `<div style="width:44px;height:44px;border-radius:6px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:22px">${esc(f.emoji || "🍜")}</div>`;
               return `<div style="display:flex;align-items:center;gap:10px">${img}<div><b>${esc(f.name)}</b>${(f.province || f.dest) ? `<div class="small muted">📍 ${esc(f.province || f.dest)}</div>` : ""}</div></div>`;
             } },
             { t: "Vùng miền", html: f => pill(REG[f.region] || f.region, f.region === "bac" ? "info" : f.region === "trung" ? "warn" : "ok") },
