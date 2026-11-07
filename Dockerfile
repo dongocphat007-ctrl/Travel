@@ -11,7 +11,7 @@ WORKDIR /app/backend
 ENV PORT=8080 \
     WEB_ROOT=/var/data/site \
     DB_DIR=/var/data/db \
-    SAMPLE_DATA=false \
+    SAMPLE_DATA=true \
     OTP_DEV_LOG=false
 COPY --from=build /build/backend/target/travel-4.0.0.jar /app/backend/app.jar
 COPY frontend /opt/travel/frontend

@@ -19,7 +19,7 @@ services:
       - key: DB_DIR
         value: /var/data/db
       - key: SAMPLE_DATA
-        value: "false"
+        value: "true"
       - key: OTP_DEV_LOG
         value: "false"
       - key: TRUST_PROXY

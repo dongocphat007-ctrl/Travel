@@ -1,6 +1,8 @@
 package vn.travel.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
+import vn.travel.config.TravelProperties;
 import vn.travel.security.Role;
 import vn.travel.service.OpsCore.Actor;
 import vn.travel.store.Db;
@@ -27,11 +29,15 @@ public class ContentOps {
     private final Db db;
     private final OpsCore core;
     private final Reviews reviews;
+    private final TravelProperties props;
+    private final ObjectMapper mapper;
 
-    public ContentOps(Db db, OpsCore core, Reviews reviews) {
+    public ContentOps(Db db, OpsCore core, Reviews reviews, TravelProperties props, ObjectMapper mapper) {
         this.db = db;
         this.core = core;
         this.reviews = reviews;
+        this.props = props;
+        this.mapper = mapper;
     }
 
     // ───────────────────────── tour (bản nháp) ─────────────────────────
@@ -379,10 +385,63 @@ public class ContentOps {
     public static final Set<String> REGIONS = Set.of("bac", "trung", "nam");
 
     public List<Map<String, Object>> foods(boolean publicOnly) {
+        List<Map<String, Object>> list = db.list("foods");
+        if (list.isEmpty() && props != null && mapper != null) {
+            seedFoodsIfEmpty();
+            list = db.list("foods");
+        }
         List<Map<String, Object>> out = new ArrayList<>();
-        for (Map<String, Object> f : db.list("foods")) if (!publicOnly || !Boolean.FALSE.equals(f.get("active"))) out.add(f);
+        for (Map<String, Object> f : list) if (!publicOnly || !Boolean.FALSE.equals(f.get("active"))) out.add(f);
         out.sort((a, b) -> Maps.str(a, "name").compareToIgnoreCase(Maps.str(b, "name")));
         return out;
+    }
+
+    private synchronized void seedFoodsIfEmpty() {
+        if (!db.list("foods").isEmpty()) return;
+        try {
+            java.nio.file.Path file = java.nio.file.Paths.get(props.webRoot(), "data", "foods.json");
+            if (!java.nio.file.Files.exists(file)) return;
+            Map<String, Object> root = mapper.readValue(java.nio.file.Files.readString(file), Db.OBJ);
+            Map<String, String> regMap = Map.of("north", "bac", "center", "trung", "south", "nam");
+            List<Map<String, Object>> seeded = new ArrayList<>();
+            int count = 1;
+            for (Map.Entry<String, Object> entry : root.entrySet()) {
+                String regKey = regMap.getOrDefault(entry.getKey(), "bac");
+                if (entry.getValue() instanceof Map<?, ?> regObj) {
+                    List<Object> allItems = new ArrayList<>();
+                    if (regObj.get("featured") instanceof Map<?, ?> feat) allItems.add(feat);
+                    if (regObj.get("foods") instanceof List<?> fList) allItems.addAll(fList);
+                    for (Object item : allItems) {
+                        if (item instanceof Map<?, ?> m) {
+                            String name = Maps.str((Map<String, Object>) m, "name");
+                            if (name.isEmpty()) continue;
+                            Map<String, Object> f = new LinkedHashMap<>();
+                            f.put("id", String.format("food_%04d", count++));
+                            f.put("name", name);
+                            f.put("region", regKey);
+                            String prov = Maps.str((Map<String, Object>) m, "region");
+                            if (prov.isEmpty()) prov = Maps.str((Map<String, Object>) regObj, "label");
+                            f.put("province", prov);
+                            String desc = Maps.str((Map<String, Object>) m, "desc");
+                            f.put("description", desc);
+                            f.put("desc", desc);
+                            f.put("emoji", Maps.str((Map<String, Object>) m, "emoji"));
+                            f.put("image", Maps.str((Map<String, Object>) m, "image"));
+                            f.put("active", true);
+                            f.put("createdAt", Times.iso(core.now()));
+                            f.put("updatedAt", Times.iso(core.now()));
+                            seeded.add(f);
+                        }
+                    }
+                }
+            }
+            if (!seeded.isEmpty()) {
+                db.edit("foods", all -> {
+                    if (all.isEmpty()) all.addAll(seeded);
+                });
+            }
+        } catch (Exception ignored) {
+        }
     }
 
     public Map<String, Object> saveFood(Actor by, String id, Map<String, Object> in) {
