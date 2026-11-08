@@ -26,6 +26,8 @@ services:
         value: "true"
       - key: SESSION_SECRET
         generateValue: true
+      - key: GOOGLE_CLIENT_ID
+        value: 480770803476-s834au6ab8go1uasl0cm7akar6ge8n1e.apps.googleusercontent.com
       - key: ADMIN_EMAIL
         sync: false
       - key: ADMIN_PASSWORD

@@ -12,7 +12,8 @@ ENV PORT=8080 \
     WEB_ROOT=/var/data/site \
     DB_DIR=/var/data/db \
     SAMPLE_DATA=true \
-    OTP_DEV_LOG=false
+    OTP_DEV_LOG=false \
+    GOOGLE_CLIENT_ID=480770803476-s834au6ab8go1uasl0cm7akar6ge8n1e.apps.googleusercontent.com
 COPY --from=build /build/backend/target/travel-4.0.0.jar /app/backend/app.jar
 COPY frontend /opt/travel/frontend
 COPY docker-entrypoint.sh /usr/local/bin/travel-entrypoint
