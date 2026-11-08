@@ -1,6 +1,7 @@
 package vn.travel.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import vn.travel.config.TravelProperties;
 import vn.travel.security.Role;
@@ -32,6 +33,11 @@ public class ContentOps {
     private final TravelProperties props;
     private final ObjectMapper mapper;
 
+    public ContentOps(Db db, OpsCore core, Reviews reviews) {
+        this(db, core, reviews, null, null);
+    }
+
+    @Autowired
     public ContentOps(Db db, OpsCore core, Reviews reviews, TravelProperties props, ObjectMapper mapper) {
         this.db = db;
         this.core = core;
