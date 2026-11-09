@@ -115,16 +115,20 @@ const Chatbot = (() => {
   // 13.7: Phân loại câu hỏi thông minh
   function isTravelTopic(text) {
     const t = (text || "").toLowerCase().trim();
-    // Các câu hỏi hoàn toàn phi du lịch (code, toán học, chính trị thuần túy...)
-    if (/^(giải phương trình|đạo hàm|tích phân|viết code|debug code|lập trình python|lập trình java|hóa học|công thức toán)/i.test(t)) return false;
-    // Mọi câu hỏi khác về du lịch, điểm đến, ăn uống, văn hóa, thời tiết, hành lý, kinh nghiệm đi chơi... đều cho là travel topic
+    // Ngoại lệ: câu hỏi liên quan tour/chuyến đi/khách sạn/ẩm thực/voucher thì là du lịch
+    if (/(tour|chuyến đi|lịch trình|khách sạn|vé máy bay|ẩm thực|đặc sản|đi đâu|chơi đâu|du lịch|voucher|giảm giá|khuyến mãi)/i.test(t)) {
+      if (!/(code|lập trình|thuật toán|fix bug|debug)/i.test(t)) return true;
+    }
+    // Bắt các chủ đề phi du lịch: lập trình, code, giải toán, bài tập, chính trị, chứng khoán...
+    const nonTravelRegex = /(code\b|lập\s*trình|coder|coding|debug|viết\s*code|fix\s*bug|source\s*code|mã\s*nguồn|thuật\s*toán|giải\s*thuật|software|phần\s*mềm|developer|frontend|backend|fullstack|devops|python|javascript|typescript|java\b|c\+\+|c#|php\b|ruby|golang|rust|html|css|sql\b|database|cơ\s*sở\s*dữ\s*liệu|react|vue|angular|spring\s*boot|nodejs|docker|kubernetes|git\b|github|hacker|bài\s*tập|giải\s*toán|toán\s*học|phương\s*trình|đạo\s*hàm|tích\s*phân|công\s*thức|vật\s*lý|hóa\s*học|làm\s*văn|nghị\s*luận|viết\s*thơ|chính\s*trị|chứng\s*khoán|tiền\s*ảo|bitcoin|crypto)/i;
+    if (nonTravelRegex.test(t)) return false;
     return true;
   }
 
   function classifyQuestion(userText) {
     if (isSelfQuestion(userText)) return "self";
-    if (isCatalogQuestion(userText)) return "travel_in";
     if (!isTravelTopic(userText)) return "non_travel";
+    if (isCatalogQuestion(userText)) return "travel_in";
     // Mọi câu hỏi có yếu tố du lịch / điểm đến / trải nghiệm đều là travel_in để AI trả lời tự nhiên và trích dẫn
     return "travel_in";
   }
@@ -134,7 +138,7 @@ const Chatbot = (() => {
   }
 
   function nonTravelResponse(query) {
-    return "Xin lỗi bạn, mình là trợ lý chuyên về du lịch của Travel nên chỉ có thể hỗ trợ các thông tin về tour, điểm đến, chuyến đi và ẩm thực thôi ạ. Để tìm câu trả lời cho chủ đề này, bạn có thể tham khảo các trợ lý AI đa năng bên dưới nhé:\n" + renderAiLinksHtml();
+    return "Chào bạn! Mình là trợ lý ảo chuyên về **du lịch & ẩm thực** của Travel nên mấy câu hỏi về lập trình, viết code hay chủ đề nằm ngoài du lịch này mình xin phép không hỗ trợ trực tiếp được rồi ạ! 😄\n\nĐể được giải đáp nhanh và chuẩn xác nhất về chủ đề này, bạn có thể tham khảo các trợ lý AI đa năng nổi tiếng dưới đây nhé:\n" + renderAiLinksHtml();
   }
 
   const REFUSAL = nonTravelResponse("");
@@ -148,6 +152,7 @@ Phong cách giao tiếp:
 - Luôn trả lời tự nhiên, nhiệt tình, lịch thiệp như chuyên viên du lịch thực thụ (dưới 250 từ) bằng tiếng Việt, dùng emoji sinh động.
 - Tuyệt đối KHÔNG dùng các câu máy móc như "Theo dữ liệu được cung cấp" hay "Dựa vào hệ thống".
 - Đối với những câu hỏi kinh nghiệm du lịch chung, thời tiết, chuẩn bị hành lý, so sánh điểm đến ngoài danh mục: Bạn VẪN trả lời đầy đủ, tận tình, sau đó khéo léo kết nối và gợi ý các tour hoặc dịch vụ tương đồng đang có trên website Travel.
+- QUY TẮC TỪ CHỐI TỰ NHIÊN: Nếu người dùng hỏi những chủ đề hoàn toàn không liên quan đến du lịch (ví dụ: viết code, lập trình, giải toán, bài tập, chính trị...): Hãy vui vẻ, khiêm tốn từ chối một cách duyên dáng (nói bạn là trợ lý chuyên về du lịch & ẩm thực nên không thạo lĩnh vực này), và giới thiệu người dùng tham khảo các trợ lý AI đa năng nổi tiếng như ChatGPT, Google Gemini, Claude hoặc Perplexity.
 
 QUY TẮC TRÍCH DẪN NGUỒN BẮT BUỘC (RẤT QUAN TRỌNG):
 Mỗi khi bạn đề cập hoặc gợi ý bất kỳ thông tin nào có trong dữ liệu Travel, BẮT BUỘC phải trích dẫn rõ nguồn theo định dạng chuẩn:
@@ -415,6 +420,7 @@ ${userSection}`;
    */
   async function tryTourSearch(userText) {
     if (typeof TourSearch === "undefined" || typeof RAG === "undefined") return null;
+    if (!isTravelTopic(userText)) return null;
     if (isCatalogQuestion(userText)) return null; // Hỏi tổng quan số lượng/danh mục -> để chat AI trả lời, không bật thẻ tour
     await TourSearch.prepare();
     await RAG.loadGuides();
@@ -569,22 +575,30 @@ ${userSection}`;
     let tourReply = null;
     let actionData = detectBookingIntent(text);
 
-    try { if (typeof RAG !== "undefined") await RAG.loadGuides(); } catch (err) { /* không có dữ liệu HDV vẫn chat được */ }
-    try { tourReply = await tryTourSearch(text); }
-    catch (err) { console.warn("[Chatbot] TourSearch lỗi, dùng chat thường:", err.message); }
+    const category = classifyQuestion(text);
+    if (category === "self") {
+      reply = selfResponse();
+    } else if (category === "non_travel") {
+      await new Promise((r) => setTimeout(r, 400 + Math.random() * 300));
+      reply = nonTravelResponse(text);
+    } else {
+      try { if (typeof RAG !== "undefined") await RAG.loadGuides(); } catch (err) { /* không có dữ liệu HDV vẫn chat được */ }
+      try { tourReply = await tryTourSearch(text); }
+      catch (err) { console.warn("[Chatbot] TourSearch lỗi, dùng chat thường:", err.message); }
 
-    try {
-      if (GeminiAI.hasKey()) {
-        reply = await callGeminiAPI(text);
-      } else if (tourReply) {
-        reply = tourReply.text;
-      } else {
-        await new Promise((r) => setTimeout(r, 600 + Math.random() * 500));
-        reply = getMockResponse(text);
+      try {
+        if (GeminiAI.hasKey()) {
+          reply = await callGeminiAPI(text);
+        } else if (tourReply) {
+          reply = tourReply.text;
+        } else {
+          await new Promise((r) => setTimeout(r, 600 + Math.random() * 500));
+          reply = getMockResponse(text);
+        }
+      } catch (err) {
+        console.warn("[Chatbot] Gemini error, fallback:", err.message);
+        reply = tourReply ? tourReply.text : getMockResponse(text);
       }
-    } catch (err) {
-      console.warn("[Chatbot] Gemini error, fallback:", err.message);
-      reply = tourReply ? tourReply.text : getMockResponse(text);
     }
 
     const aiAction = extractAction(reply);
@@ -1000,4 +1014,4 @@ ${userSection}`;
   return { init, toggle, quickSend, refresh, continueFrom, clear: clearChat, renderChat, classifyQuestion, isSelfQuestion, isCatalogQuestion, isTravelTopic, getMockResponse, selfResponse, travelOutResponse, nonTravelResponse, renderAiLinksHtml };
 })();
 if (typeof module !== "undefined" && module.exports) module.exports = Chatbot;
-window.Chatbot = Chatbot;   // để main.js gọi window.Chatbot?.refresh() khi đổi tài khoản
+if (typeof window !== "undefined") window.Chatbot = Chatbot;   // để main.js gọi window.Chatbot?.refresh() khi đổi tài khoản
