@@ -248,5 +248,41 @@ sequenceDiagram
 - `SESSION_SECRET` và `PAYMENT_WEBHOOK_SECRET` đang trống. Khóa phiên tự sinh vào `storage/db/.secret`, còn webhook thanh toán cần đặt secret trước khi chạy thật.
 - Mã hiện tại trong `frontend/staff/admin.js` dùng các API `/api/admin/tours` cho thao tác quản lý tour; `AdminController` vẫn có endpoint đồng bộ tương thích `/api/admin/tours/sync`. Đây là mô tả theo mã nguồn, không theo ghi chú cũ trong README.
 - Danh mục chuyến bay/khách sạn tự quản chưa trừ tồn kho; nguồn trực tuyến (Ignav, Places, Travelpayouts) chưa chạy thử với khóa thật.
-- Thù lao HDV: comment trong `Rewards` ghi 20% giá tour, còn cấu hình mặc định là 500.000 đ/ngày (`guideFeePerDay`). Nên thống nhất một cách tính.
+- Thù lao HDV: HDV hưởng 20% thù lao theo giá tour hoàn thành kết hợp lương cơ bản hàng tháng.
+
+## 11. Các nghiệp vụ nâng cao mới hoàn thiện
+
+### 11.1 Ghép tour & Dồn đoàn thông minh (Tour Pooling & AI RAG)
+- **Tự động ghép nhóm**: Khách hàng có thể đăng ký ghép đoàn trên trang chủ (`/api/tours/pool`).
+- **Gợi ý AI thông minh**: Chatbot AI RAG tự động đề xuất các tour đang gom đoàn cận ngày khởi hành để tối ưu công suất phục vụ.
+- **Dồn đoàn tại chỗ**: HDV tại điểm xuất phát có thể hợp nhất các đoàn nhỏ cùng tuyến thông qua `POST /api/guide/tours/pool/merge-onsite`.
+- **Điều hành quản lý**: Theo dõi danh sách chờ dồn đoàn và kích hoạt xe tăng cường khi đủ sĩ số.
+
+### 11.2 Quỹ lưu động & Bảng lương toàn công ty (Payroll & KPI)
+- **Công thức Quỹ lưu động**:
+  $$\text{Quỹ lưu động} = \text{Doanh thu thực thu} - \text{Đã hoàn tiền} - \text{Tổng lương đã chi} - \text{Chi phí lưu động}$$
+- **Quyền hạn xem**: Chỉ **Admin** và **Thu ngân** được quyền xem số dư Quỹ lưu động và lịch sử chi theo năm/hạng mục.
+- **Chi lương toàn công ty**: Nút bấm một chạm `[Chi lương toàn bộ nhân sự]` (`/api/admin/salaries/pay-all`) với kiểm tra ngày 25 hàng tháng, tự động cộng số dư ví nhân viên, ghi log `salary_logs.json` và trừ trực tiếp vào Quỹ lưu động.
+- **Xét duyệt KPI**: Bảng xếp hạng KPI tự động dựa trên số chuyến đi an toàn, điểm đánh giá của khách và tỷ lệ xử lý khiếu nại thành công.
+
+### 11.3 Vòng đời mác "MỚI" (New Badge Lifecycle)
+- **Tự động hết hạn sau 30 ngày**: Mác `MỚI` trên tour và món ăn đặc sản tự động biến mất khi đến hạn (`newUntil = createdAt + 30 ngày`).
+- **Tùy chỉnh ngày hết hạn**: Admin có thể chỉ định ngày kết thúc mác `MỚI` khi tạo hoặc chỉnh sửa tour; hiển thị rõ ràng trên thẻ tour `MỚI (đến dd/mm)`.
+
+### 11.4 Phân quyền bình luận & Trả lời Form chân trang
+- **Bộ lọc trọng tâm**: CSKH và Biên tập sử dụng bộ lọc chính là **"Cần xử lý"** để tập trung vào các thắc mắc và khiếu nại chưa có phản hồi.
+- **Phân định rõ ranh giới**:
+  - CSKH & Biên tập: Trả lời khách, ẩn bình luận vi phạm, gắn nhãn (Hỏi / Đánh giá / Khiếu nại / Góp ý), chuyển giao vấn đề.
+  - Admin: Toàn quyền trên + Xóa vĩnh viễn bình luận, thiết lập từ khóa cấm, kiểm tra lịch sử audit và danh tính người xử lý.
+- **Phản hồi Form Footer**: Tiếp nhận yêu cầu tư vấn của khách vãng lai gửi từ chân trang, CSKH liên hệ xử lý trong 30 phút.
+
+### 11.5 Báo cáo tour tương tác của HDV
+- **Điểm danh trực quan ngay trong Modal Báo cáo**: HDV có thể chỉnh sửa trực tiếp trạng thái từng hành khách (Có mặt / Trễ / Vắng), số liệu KPI cập nhật thời gian thực.
+- **Phím tắt hàng loạt**: Có mặt tất cả, Trễ tất cả, Vắng tất cả, Đặt lại ban đầu.
+- **Ghi chú chi phí & Xuất danh sách**: Xuất danh sách hành khách ra file PDF / Word / Excel trực tiếp từ phiếu báo cáo.
+
+### 11.6 Đề xuất hủy tour của Điều hành & Hoàn tiền 100%
+- Khi không bố trí được HDV hoặc gặp sự cố bất khả kháng, Điều hành gửi đề xuất hủy tour (`POST /api/operator/cancel-proposals`).
+- Admin phê duyệt một chạm -> Hệ thống tự động chuyển trạng thái đơn sang `cancelled` và tạo hồ sơ hoàn trả 100% số tiền đã đóng cho toàn bộ khách hàng.
+
 - Một số file rất lớn: `main.js` (\~138 KB), `staff/admin.js` (\~125 KB), `chatbot.js` (\~58 KB), khó bảo trì nếu tiếp tục phình.

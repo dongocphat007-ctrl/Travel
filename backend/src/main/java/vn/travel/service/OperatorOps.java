@@ -57,13 +57,17 @@ public class OperatorOps {
         Map<String, String> state = new HashMap<>();
         for (Map<String, Object> sd : db.list("departures")) state.put(Maps.str(sd, "id"), Maps.str(sd, "status").isEmpty() ? "open" : Maps.str(sd, "status"));
         int defMin = core.config.i("departure", "defaultMinGuests");
+        Map<String, Map<String, Object>> toursById = new HashMap<>();
+        for (Map<String, Object> t : core.tours.list()) toursById.put(Maps.str(t, "id"), t);
+
         for (Map<String, Object> b : core.bookings()) {
             if (Flow.inactive(b.get("status")) || Flow.COMPLETED.equals(Flow.norm(b.get("status")))) continue;
-            String key = Capacity.depKey(b.get("tourId"), b.get("date"));
+            String tid = Maps.str(b, "tourId");
+            String key = Capacity.depKey(tid, b.get("date"));
             Map<String, Object> d = map.computeIfAbsent(key, k -> {
-                Map<String, Object> t = core.tourOf(b);
-                int max = core.depCapacityRaw(t, b.get("tourId"), b.get("date")), min = Capacity.minGuests(t, defMin);
-                return Maps.of("key", k, "tourId", b.get("tourId"), "tourName", b.get("tourName"), "date", b.get("date"), "pax", 0, "capacity", max, "minGuests", min,
+                Map<String, Object> t = toursById.get(tid);
+                int max = core.depCapacityRaw(t, tid, b.get("date")), min = Capacity.minGuests(t, defMin);
+                return Maps.of("key", k, "tourId", tid, "tourName", b.get("tourName"), "date", b.get("date"), "pax", 0, "capacity", max, "minGuests", min,
                         "orders", 0, "guides", new TreeSet<String>());
             });
             d.put("pax", (int) Maps.lng(d, "pax") + (int) Maps.lng(b, "pax"));
@@ -75,10 +79,11 @@ public class OperatorOps {
         for (Map<String, Object> sd : db.list("departures")) {   // chuyến Điều hành đã mở sẵn nhưng chưa có đơn
             String key = Maps.str(sd, "id");
             LocalDate dt = GuideAvailability.parse(sd.get("date"));
-            Map<String, Object> t = core.tours.find(sd.get("tourId"));
+            String tid = Maps.str(sd, "tourId");
+            Map<String, Object> t = toursById.get(tid);
             if (map.containsKey(key) || t == null || dt == null || dt.isBefore(today) || "cancelled".equals(sd.get("status"))) continue;
-            map.put(key, Maps.of("key", key, "tourId", Maps.str(sd, "tourId"), "tourName", t.get("name"), "date", Maps.str(sd, "date"), "pax", 0,
-                    "capacity", core.depCapacityRaw(t, sd.get("tourId"), sd.get("date")), "minGuests", Capacity.minGuests(t, defMin), "orders", 0, "guides", new TreeSet<String>()));
+            map.put(key, Maps.of("key", key, "tourId", tid, "tourName", t.get("name"), "date", Maps.str(sd, "date"), "pax", 0,
+                    "capacity", core.depCapacityRaw(t, tid, sd.get("date")), "minGuests", Capacity.minGuests(t, defMin), "orders", 0, "guides", new TreeSet<String>()));
         }
         List<Map<String, Object>> out = new ArrayList<>();
         int cutoff = core.config.i("departure", "cutoffDaysBeforeTrip");
@@ -114,13 +119,25 @@ public class OperatorOps {
         final String start = from;
         final int nd = n;
         List<Map<String, Object>> out = new ArrayList<>();
-        List<Map<String, Object>> allBookings = core.bookings();   // đọc đơn MỘT lần cho mọi HDV (trước đây mỗi HDV đọc lại 2 lần)
+        List<Map<String, Object>> allBookings = core.bookings();
+        Map<String, List<Map<String, Object>>> bookingsByGuide = new HashMap<>();
+        for (Map<String, Object> bk : allBookings) {
+            if (Flow.inactive(bk.get("status"))) continue;
+            String gid = core.canonGuide(Maps.str(bk, "guideId"));
+            if (!gid.isEmpty()) bookingsByGuide.computeIfAbsent(gid, k -> new ArrayList<>()).add(bk);
+        }
         for (Map<String, Object> g : core.guideProfiles()) {
-            List<String> conflicts = core.guideConflicts(g, bookingId, start, nd, allBookings);
+            String gid = Maps.str(g, "id");
+            List<Map<String, Object>> gBookings = bookingsByGuide.getOrDefault(gid, Collections.emptyList());
+            List<String> conflicts = core.guideConflicts(g, bookingId, start, nd, gBookings);
             String fit = core.fitProblem(g, b);
+            int workload = 0;
+            for (Map<String, Object> gbk : gBookings) {
+                if (Flow.active(gbk.get("status")) && Maps.str(gbk, "date").startsWith(month)) workload++;
+            }
             Map<String, Object> row = Maps.of("id", g.get("id"), "name", g.get("name"), "guideType", OpsCore.guideTypeOf(g), "employmentType", Maps.str(g, "employmentType").isEmpty() ? "staff" : g.get("employmentType"),
                     "regions", g.get("regions") == null ? List.of() : g.get("regions"), "rating", g.get("rating") == null ? 0 : g.get("rating"), "phone", g.get("phone") == null ? "" : g.get("phone"),
-                    "workload", core.workload(Maps.str(g, "id"), month, allBookings), "available", conflicts.isEmpty() && fit.isEmpty(), "reasons", conflicts, "fitProblem", fit);
+                    "workload", workload, "available", conflicts.isEmpty() && fit.isEmpty(), "reasons", conflicts, "fitProblem", fit);
             out.add(row);
         }
         out.sort((a, c) -> {
@@ -340,12 +357,18 @@ public class OperatorOps {
         String ym = first.toString().substring(0, 7);
         int len = first.lengthOfMonth();
         List<Map<String, Object>> rows = new ArrayList<>();
+        Map<String, List<Map<String, Object>>> bookingsByGuide = new HashMap<>();
+        for (Map<String, Object> b : core.bookings()) {
+            if (Flow.inactive(b.get("status"))) continue;
+            String gid = core.canonGuide(Maps.str(b, "guideId"));
+            if (!gid.isEmpty()) bookingsByGuide.computeIfAbsent(gid, k -> new ArrayList<>()).add(b);
+        }
         for (Map<String, Object> g : core.guideProfiles()) {
             Map<String, Object> days = new TreeMap<>();
             for (Object d : Maps.list(g.get("busyDates"))) if (String.valueOf(d).startsWith(ym)) days.put(String.valueOf(d), Maps.of("kind", "busy", "label", "Bận"));
             String gid = Maps.str(g, "id");
-            for (Map<String, Object> b : core.bookings()) {
-                if (Flow.inactive(b.get("status")) || !gid.equals(core.canonGuide(Maps.str(b, "guideId")))) continue;
+            List<Map<String, Object>> gBookings = bookingsByGuide.getOrDefault(gid, Collections.emptyList());
+            for (Map<String, Object> b : gBookings) {
                 int n = core.daysOf(b);
                 List<String> range = GuideAvailability.rangeDays(b.get("date"), n);
                 for (String d : range) if (d.startsWith(ym)) days.put(d, Maps.of("kind", "tour", "label", Maps.str(b, "payCode") + " – " + Maps.str(b, "tourName"), "bookingId", b.get("id"), "status", Flow.norm(b.get("status"))));

@@ -81,9 +81,60 @@ Giới hạn theo IP: đánh giá xác thực 5/phút, bình luận 10/phút, ph
 - Bài seed được sao chép vào reviews.json khi thành viên phản hồi lần đầu.
 - Phản hồi chính thức reply độc lập với replies[] của cộng đồng.
 
-## 6. Tệp mã nguồn
+## 7. Phân quyền xử lý bình luận giữa Admin và Biên tập & CSKH
 
-- Backend: Reviews.java, ReviewSchema.java, Stats.java, ImageStore.java, ContentController.java, UploadController.java, RateLimitFilter.java.
-- Frontend: js/review-community.js, js/tour-page.js, js/food-page.js, css/review-community.css.
-- Dữ liệu chạy: backend/storage/db/reviews.json; ảnh trong frontend/img/reviews/.
-- Tài liệu API, SRS và JSON: docs/API_DOCUMENT.MD, docs/SRS_TRAVEL.md, docs/Thiết kế database.md.
+Nhằm tối ưu hóa tốc độ phản hồi và bảo vệ dữ liệu hệ thống, luồng quản trị bình luận được phân định rõ ràng giữa 2 cấp độ:
+
+```mermaid
+flowchart TD
+    Review[Bình luận / Phản hồi mới] --> FilterState{Bộ lọc chính: Trạng thái xử lý}
+    FilterState -->|Cần xử lý| Queue[Hàng đợi ưu tiên CSKH / Biên tập]
+    FilterState -->|Đã giải quyết / Đã ẩn| Archive[Lịch sử lưu trữ]
+
+    Queue --> ActionStaff{Biên tập & CSKH thực hiện}
+    ActionStaff -->|1. Trả lời| Reply[Phản hồi giải đáp thắc mắc]
+    ActionStaff -->|2. Phân loại| Tag[Gắn thẻ: Hỏi thông tin / Đánh giá / Khiếu nại / Góp ý]
+    ActionStaff -->|3. Vi phạm| Hide[Ẩn bình luận vi phạm tiêu chuẩn]
+    ActionStaff -->|4. Vượt thẩm quyền| Transfer[Chuyển vấn đề cho Điều hành / Thu ngân / HDV]
+
+    Queue --> ActionAdmin{Đặc quyền Admin}
+    ActionAdmin --> Del[Xóa vĩnh viễn bình luận]
+    ActionAdmin --> Rule[Quản lý từ điển từ cấm / quy tắc lọc tự động]
+    ActionAdmin --> Audit[Tra cứu người đã xử lý & lịch sử thao tác]
+```
+
+### 7.1 Ma trận phân quyền chi tiết
+
+| Quyền hạn | Biên tập & CSKH | Admin | Ghi chú nghiệp vụ |
+| :--- | :---: | :---: | :--- |
+| **Xem danh sách bình luận** | Có | Có | Truy cập tại portal `/staff/content.html` hoặc `/staff/support.html` |
+| **Trả lời khách hàng** | Có | Có | Phản hồi hiển thị công khai dưới danh nghĩa CSKH / Ban quản trị |
+| **Ẩn bình luận vi phạm** | Có | Có | Ẩn tạm thời khỏi giao diện khách, bảo toàn dữ liệu phục vụ đối soát |
+| **Gắn phân loại** | Có | Có | 4 nhãn: `Hỏi thông tin`, `Đánh giá`, `Khiếu nại`, `Góp ý` |
+| **Chuyển vấn đề** | Có | Có | Tạo phiếu chuyển giao sang Điều hành (lịch trình), Thu ngân (tiền), HDV (thái độ) |
+| **Bộ lọc chính** | **Cần xử lý** | **Cần xử lý** | Tuyệt đối không dùng filter "Admin trả lời / Biên tập trả lời" làm filter chính |
+| **Xóa vĩnh viễn** | ❌ Không | **Có** | Xóa hoàn toàn bản ghi khỏi `reviews.json`, chỉ Admin được thao tác |
+| **Cấu hình quy tắc lọc** | ❌ Không | **Có** | Thêm bớt từ cấm, cấu hình bộ lọc spam tự động |
+| **Xem lịch sử xử lý** | ❌ Không | **Có** | Hiển thị chi tiết: Ai đã ẩn, ai đã gắn tag, thời gian xử lý |
+
+---
+
+## 8. Luồng phản hồi Form chân trang (Footer Feedback)
+
+- **Thu thập yêu cầu**: Tại form liên hệ / phản hồi dưới footer website, khách hàng gửi họ tên, email, số điện thoại và nội dung cần hỗ trợ.
+- **Tiếp nhận & Phân loại**:
+  - Dữ liệu lưu vào hàng đợi chăm sóc khách hàng.
+  - CSKH nhận thông báo chuông trên thanh tác vụ.
+  - Tự động phân loại nguồn: `Web Footer Contact`.
+- **Xử lý phản hồi**:
+  - CSKH bấm trực tiếp vào phiếu yêu cầu để gửi email giải đáp hoặc gọi điện thoại tư vấn.
+  - Cập nhật trạng thái phiếu: `Đang liên hệ` -> `Đã giải quyết`.
+
+---
+
+## 9. Tệp mã nguồn và dữ liệu
+
+- Backend: `Reviews.java`, `ReviewSchema.java`, `ContentOps.java`, `ContentController.java`, `SupportOps.java`.
+- Frontend: `frontend/staff/content.js`, `frontend/staff/support.js`, `frontend/js/review-community.js`, `frontend/html/footer.html`.
+- Dữ liệu lưu trữ: `storage/db/reviews.json`, `storage/db/complaints.json`, `storage/db/audit_logs.json`.
+

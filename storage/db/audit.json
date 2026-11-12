@@ -1,0 +1,32 @@
+[
+  {
+    "id": "aud_001",
+    "actorId": "ad001",
+    "actorName": "Quản Trị Viên",
+    "actorRole": "ADMIN",
+    "action": "salary.pay",
+    "targetId": "SAL-tn001-202610",
+    "note": "Phát lương định kỳ tháng 10/2026 cho nhân viên",
+    "at": "2026-10-26T09:00:00.000Z"
+  },
+  {
+    "id": "aud_002",
+    "actorId": "ad001",
+    "actorName": "Quản Trị Viên",
+    "actorRole": "ADMIN",
+    "action": "reconciliation.approve",
+    "targetId": "rec_20261109",
+    "note": "Duyệt đóng sổ ca ngày 09/11",
+    "at": "2026-11-10T08:30:00.000Z"
+  },
+  {
+    "id": "aud_003",
+    "actorId": "tn001",
+    "actorName": "Lê Thu Ngân",
+    "actorRole": "CASHIER",
+    "action": "payment.confirm",
+    "targetId": "TV1052",
+    "note": "Xác nhận thu tiền cọc đơn TV1052",
+    "at": "2026-11-06T10:00:00.000Z"
+  }
+]

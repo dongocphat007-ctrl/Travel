@@ -57,6 +57,20 @@ class ImageStoreTest {
     }
 
     @Test
+    void staffAvatarIsWrittenUnderStaffDirAndIncludesId(@TempDir Path web) throws Exception {
+        ImageStore s = store(web);
+        String p1 = s.saveStaffAvatar("ad001", ImageStore.decode(url("png", PNG)));
+        assertTrue(p1.startsWith("/img/avatars/staff/staff_ad001_"), p1);
+        assertTrue(Files.exists(web.resolve(p1.substring(1))));
+        String p2 = s.saveStaffAvatar("ad001", ImageStore.decode(url("jpeg", JPG)));
+        assertTrue(p2.startsWith("/img/avatars/staff/staff_ad001_"));
+        assertTrue(p2.endsWith(".jpg"));
+        assertFalse(Files.exists(web.resolve(p1.substring(1))), "ảnh nhân viên cũ cùng ID phải bị xóa");
+        s.deleteStaffAvatar("ad001");
+        assertFalse(Files.exists(web.resolve(p2.substring(1))));
+    }
+
+    @Test
     void hostileIdsCannotEscapeImgDir(@TempDir Path web) throws Exception {
         ImageStore s = store(web);
         String p = s.saveAvatar("../../etc/passwd", ImageStore.decode(url("png", PNG)));

@@ -1,0 +1,459 @@
+[
+  {
+    "id": "g1",
+    "name": "Trần Văn Quân",
+    "phone": "0987110001",
+    "email": "hdv1@travel.vn",
+    "status": "active",
+    "guideType": "domestic",
+    "employmentType": "permanent",
+    "languages": [
+      "Tiếng Việt",
+      "Tiếng Anh"
+    ],
+    "regions": [
+      "north"
+    ],
+    "rating": 4.5,
+    "toursCount": 15,
+    "balance": 3500000,
+    "busyDates": [
+      "2026-11-11",
+      "2026-11-12",
+      "2026-11-17",
+      "2026-11-18"
+    ],
+    "bio": "Hướng dẫn viên kinh nghiệm 5 năm dẫn các đoàn khách trong và ngoài nước."
+  },
+  {
+    "id": "g2",
+    "name": "Nguyễn Thu Hà",
+    "phone": "0987110002",
+    "email": "hdv2@travel.vn",
+    "status": "off",
+    "guideType": "outbound",
+    "employmentType": "permanent",
+    "languages": [
+      "Tiếng Việt",
+      "Tiếng Pháp"
+    ],
+    "regions": [
+      "central",
+      "south"
+    ],
+    "rating": 4.6,
+    "toursCount": 16,
+    "balance": 4500000,
+    "busyDates": [
+      "2026-11-11",
+      "2026-11-12",
+      "2026-11-17",
+      "2026-11-18"
+    ],
+    "bio": "Hướng dẫn viên kinh nghiệm 6 năm dẫn các đoàn khách trong và ngoài nước."
+  },
+  {
+    "id": "g3",
+    "name": "Lê Hoàng Long",
+    "phone": "0987110003",
+    "email": "hdv3@travel.vn",
+    "status": "active",
+    "guideType": "all",
+    "employmentType": "permanent",
+    "languages": [
+      "Tiếng Việt",
+      "Tiếng Anh"
+    ],
+    "regions": [
+      "north",
+      "central",
+      "south"
+    ],
+    "rating": 4.7,
+    "toursCount": 17,
+    "balance": 5500000,
+    "busyDates": [
+      "2026-11-11",
+      "2026-11-12",
+      "2026-11-17",
+      "2026-11-18"
+    ],
+    "bio": "Hướng dẫn viên kinh nghiệm 7 năm dẫn các đoàn khách trong và ngoài nước."
+  },
+  {
+    "id": "g4",
+    "name": "Phạm Minh Đức",
+    "phone": "0987110004",
+    "email": "hdv4@travel.vn",
+    "status": "active",
+    "guideType": "domestic",
+    "employmentType": "permanent",
+    "languages": [
+      "Tiếng Việt",
+      "Tiếng Pháp"
+    ],
+    "regions": [
+      "north"
+    ],
+    "rating": 4.8,
+    "toursCount": 18,
+    "balance": 6500000,
+    "busyDates": [
+      "2026-11-11",
+      "2026-11-12",
+      "2026-11-17",
+      "2026-11-18"
+    ],
+    "bio": "Hướng dẫn viên kinh nghiệm 8 năm dẫn các đoàn khách trong và ngoài nước."
+  },
+  {
+    "id": "g5",
+    "name": "Võ Thị Mai",
+    "phone": "0987110005",
+    "email": "hdv5@travel.vn",
+    "status": "active",
+    "guideType": "outbound",
+    "employmentType": "permanent",
+    "languages": [
+      "Tiếng Việt",
+      "Tiếng Anh"
+    ],
+    "regions": [
+      "central",
+      "south"
+    ],
+    "rating": 4.9,
+    "toursCount": 19,
+    "balance": 7500000,
+    "busyDates": [
+      "2026-11-11",
+      "2026-11-12",
+      "2026-11-17",
+      "2026-11-18"
+    ],
+    "bio": "Hướng dẫn viên kinh nghiệm 9 năm dẫn các đoàn khách trong và ngoài nước."
+  },
+  {
+    "id": "g6",
+    "name": "Đặng Hữu Phúc",
+    "phone": "0987110006",
+    "email": "hdv6@travel.vn",
+    "status": "active",
+    "guideType": "all",
+    "employmentType": "permanent",
+    "languages": [
+      "Tiếng Việt",
+      "Tiếng Pháp"
+    ],
+    "regions": [
+      "north",
+      "central",
+      "south"
+    ],
+    "rating": 4.5,
+    "toursCount": 20,
+    "balance": 8500000,
+    "busyDates": [
+      "2026-11-11",
+      "2026-11-12",
+      "2026-11-17",
+      "2026-11-18"
+    ],
+    "bio": "Hướng dẫn viên kinh nghiệm 10 năm dẫn các đoàn khách trong và ngoài nước."
+  },
+  {
+    "id": "g7",
+    "name": "Bùi Thanh Trúc",
+    "phone": "0987110007",
+    "email": "hdv7@travel.vn",
+    "status": "active",
+    "guideType": "domestic",
+    "employmentType": "collaborator",
+    "languages": [
+      "Tiếng Việt",
+      "Tiếng Anh"
+    ],
+    "regions": [
+      "north"
+    ],
+    "rating": 4.6,
+    "toursCount": 21,
+    "balance": 9500000,
+    "busyDates": [
+      "2026-11-11",
+      "2026-11-12",
+      "2026-11-17",
+      "2026-11-18"
+    ],
+    "bio": "Hướng dẫn viên kinh nghiệm 11 năm dẫn các đoàn khách trong và ngoài nước."
+  },
+  {
+    "id": "g8",
+    "name": "Hoàng Gia Bảo",
+    "phone": "0987110008",
+    "email": "hdv8@travel.vn",
+    "status": "busy",
+    "guideType": "outbound",
+    "employmentType": "collaborator",
+    "languages": [
+      "Tiếng Việt",
+      "Tiếng Pháp"
+    ],
+    "regions": [
+      "central",
+      "south"
+    ],
+    "rating": 4.7,
+    "toursCount": 22,
+    "balance": 10500000,
+    "busyDates": [
+      "2026-11-11",
+      "2026-11-12",
+      "2026-11-17",
+      "2026-11-18"
+    ],
+    "bio": "Hướng dẫn viên kinh nghiệm 12 năm dẫn các đoàn khách trong và ngoài nước."
+  },
+  {
+    "id": "g9",
+    "name": "Đỗ Thị Ngọc",
+    "phone": "0987110009",
+    "email": "hdv9@travel.vn",
+    "status": "active",
+    "guideType": "all",
+    "employmentType": "collaborator",
+    "languages": [
+      "Tiếng Việt",
+      "Tiếng Anh"
+    ],
+    "regions": [
+      "north",
+      "central",
+      "south"
+    ],
+    "rating": 4.8,
+    "toursCount": 23,
+    "balance": 11500000,
+    "busyDates": [
+      "2026-11-11",
+      "2026-11-12",
+      "2026-11-17",
+      "2026-11-18"
+    ],
+    "bio": "Hướng dẫn viên kinh nghiệm 13 năm dẫn các đoàn khách trong và ngoài nước."
+  },
+  {
+    "id": "g10",
+    "name": "Ngô Quốc Tuấn",
+    "phone": "0987110010",
+    "email": "hdv10@travel.vn",
+    "status": "active",
+    "guideType": "domestic",
+    "employmentType": "collaborator",
+    "languages": [
+      "Tiếng Việt",
+      "Tiếng Pháp"
+    ],
+    "regions": [
+      "north"
+    ],
+    "rating": 4.9,
+    "toursCount": 24,
+    "balance": 12500000,
+    "busyDates": [
+      "2026-11-11",
+      "2026-11-12",
+      "2026-11-17",
+      "2026-11-18"
+    ],
+    "bio": "Hướng dẫn viên kinh nghiệm 14 năm dẫn các đoàn khách trong và ngoài nước."
+  },
+  {
+    "id": "g11",
+    "name": "Dương Cẩm Tú",
+    "phone": "0987110011",
+    "email": "hdv11@travel.vn",
+    "status": "active",
+    "guideType": "outbound",
+    "employmentType": "collaborator",
+    "languages": [
+      "Tiếng Việt",
+      "Tiếng Anh"
+    ],
+    "regions": [
+      "central",
+      "south"
+    ],
+    "rating": 4.5,
+    "toursCount": 25,
+    "balance": 3500000,
+    "busyDates": [
+      "2026-11-11",
+      "2026-11-12",
+      "2026-11-17",
+      "2026-11-18"
+    ],
+    "bio": "Hướng dẫn viên kinh nghiệm 5 năm dẫn các đoàn khách trong và ngoài nước."
+  },
+  {
+    "id": "g12",
+    "name": "Lý Kiến Quốc",
+    "phone": "0987110012",
+    "email": "hdv12@travel.vn",
+    "status": "active",
+    "guideType": "all",
+    "employmentType": "collaborator",
+    "languages": [
+      "Tiếng Việt",
+      "Tiếng Pháp"
+    ],
+    "regions": [
+      "north",
+      "central",
+      "south"
+    ],
+    "rating": 4.6,
+    "toursCount": 26,
+    "balance": 4500000,
+    "busyDates": [
+      "2026-11-11",
+      "2026-11-12",
+      "2026-11-17",
+      "2026-11-18"
+    ],
+    "bio": "Hướng dẫn viên kinh nghiệm 6 năm dẫn các đoàn khách trong và ngoài nước."
+  },
+  {
+    "id": "g13",
+    "name": "Trương Vĩnh Ký",
+    "phone": "0987110013",
+    "email": "hdv13@travel.vn",
+    "status": "active",
+    "guideType": "domestic",
+    "employmentType": "collaborator",
+    "languages": [
+      "Tiếng Việt",
+      "Tiếng Anh"
+    ],
+    "regions": [
+      "north"
+    ],
+    "rating": 4.7,
+    "toursCount": 27,
+    "balance": 5500000,
+    "busyDates": [
+      "2026-11-11",
+      "2026-11-12",
+      "2026-11-17",
+      "2026-11-18"
+    ],
+    "bio": "Hướng dẫn viên kinh nghiệm 7 năm dẫn các đoàn khách trong và ngoài nước."
+  },
+  {
+    "id": "g14",
+    "name": "Vũ Mai Phương",
+    "phone": "0987110014",
+    "email": "hdv14@travel.vn",
+    "status": "active",
+    "guideType": "outbound",
+    "employmentType": "collaborator",
+    "languages": [
+      "Tiếng Việt",
+      "Tiếng Pháp"
+    ],
+    "regions": [
+      "central",
+      "south"
+    ],
+    "rating": 4.8,
+    "toursCount": 28,
+    "balance": 6500000,
+    "busyDates": [
+      "2026-11-11",
+      "2026-11-12",
+      "2026-11-17",
+      "2026-11-18"
+    ],
+    "bio": "Hướng dẫn viên kinh nghiệm 8 năm dẫn các đoàn khách trong và ngoài nước."
+  },
+  {
+    "id": "g15",
+    "name": "Hồ Trọng Nghĩa",
+    "phone": "0987110015",
+    "email": "hdv15@travel.vn",
+    "status": "active",
+    "guideType": "all",
+    "employmentType": "collaborator",
+    "languages": [
+      "Tiếng Việt",
+      "Tiếng Anh"
+    ],
+    "regions": [
+      "north",
+      "central",
+      "south"
+    ],
+    "rating": 4.9,
+    "toursCount": 29,
+    "balance": 7500000,
+    "busyDates": [
+      "2026-11-11",
+      "2026-11-12",
+      "2026-11-17",
+      "2026-11-18"
+    ],
+    "bio": "Hướng dẫn viên kinh nghiệm 9 năm dẫn các đoàn khách trong và ngoài nước."
+  },
+  {
+    "id": "g16",
+    "name": "Nguyễn Thị Kim Chi",
+    "phone": "0987110016",
+    "email": "hdv16@travel.vn",
+    "status": "active",
+    "guideType": "domestic",
+    "employmentType": "collaborator",
+    "languages": [
+      "Tiếng Việt",
+      "Tiếng Pháp"
+    ],
+    "regions": [
+      "north"
+    ],
+    "rating": 4.5,
+    "toursCount": 30,
+    "balance": 8500000,
+    "busyDates": [
+      "2026-11-11",
+      "2026-11-12",
+      "2026-11-17",
+      "2026-11-18"
+    ],
+    "bio": "Hướng dẫn viên kinh nghiệm 10 năm dẫn các đoàn khách trong và ngoài nước."
+  },
+  {
+    "id": "g_test",
+    "name": "Nguyễn Văn Test (HDV Trống Lịch)",
+    "phone": "0987110099",
+    "email": "hdv.test@travel.vn",
+    "status": "active",
+    "guideType": "all",
+    "employmentType": "permanent",
+    "languages": [
+      "Tiếng Việt",
+      "English"
+    ],
+    "regions": [
+      "Miền Bắc",
+      "Miền Trung",
+      "Miền Nam",
+      "Quốc tế"
+    ],
+    "rating": 5,
+    "toursCount": 0,
+    "busyDates": [],
+    "bio": "Hướng dẫn viên dự bị kiểm thử hệ thống. Lịch trình hoàn toàn trống cả năm, sẵn sàng để Điều hành phân công và thử nghiệm các luồng nhận tour, check-in, báo sự cố.",
+    "demo": true,
+    "title": "HDV Trống Lịch (Test)",
+    "avatar": "img/guides/g_hn01.jpg"
+  }
+]

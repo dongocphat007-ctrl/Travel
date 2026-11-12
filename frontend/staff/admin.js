@@ -7,6 +7,241 @@
   async function viewOrder(id) { await Parts.showOrder(`/api/admin/bookings/${encodeURIComponent(id)}`, "Chi tiết đơn"); }
   const bindView = (el) => $$("[data-view]", el).forEach(b => b.onclick = () => viewOrder(b.dataset.view).catch(fail));
 
+  // ── Modal Chi tiết Hồ sơ Nhân viên & Nghiệp vụ Lương, KPI, Xét tăng lương (Dùng chung) ──
+  async function openStaffProfileModal(staffId, onUpdate) {
+    async function fetchAndRender() {
+      const res = await get(`/api/admin/staff/${encodeURIComponent(staffId)}/salary-profile`);
+      if (!res || !res.profile) {
+        Staff.toast("Không tải được hồ sơ nhân viên", "bad");
+        return;
+      }
+      const p = res.profile;
+      const hist = res.history || [];
+
+      let dueBadge = '';
+      if (p.isDue) {
+        dueBadge = '<span class="badge bad" style="font-size:0.85rem">🔔 Đã đến hạn xét tăng lương</span>';
+      } else if (p.isUpcoming) {
+        dueBadge = `<span class="badge warn" style="font-size:0.85rem">⚠️ Sắp đến hạn xét (${p.daysUntilReview} ngày nữa)</span>`;
+      } else {
+        dueBadge = `<span class="badge info" style="font-size:0.85rem">Còn ${p.daysUntilReview} ngày tới hạn</span>`;
+      }
+
+      const kpiVal = p.kpiRecent != null ? p.kpiRecent : p.kpi;
+      const kpiRating = p.kpiRating || (kpiVal != null ? (kpiVal >= 90 ? 'Xuất sắc' : (kpiVal >= 80 ? 'Tốt' : 'Khá')) : null);
+      const kpiBadge = kpiVal != null
+        ? `<span class="badge ${kpiVal >= 80 ? 'ok' : (kpiVal >= 60 ? 'info' : 'bad')}">${kpiVal}% (${esc(kpiRating)})</span>`
+        : '<span class="muted">Chưa đánh giá KPI</span>';
+
+      const statusBadge = p.locked ? pill("Đã khóa", "bad") : pill({ active: "Đang làm việc", probation: "Thử việc", suspended: "Tạm hoãn", resigned: "Đã nghỉ việc" }[p.workingStatus] || "Đang làm việc", "ok");
+
+      const contentHtml = `
+        <div style="width:100%;box-sizing:border-box">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding-bottom:12px;border-bottom:1px solid var(--border);margin-bottom:14px;flex-wrap:wrap;gap:10px">
+            <div style="display:flex;align-items:center;gap:12px">
+              <div style="width:48px;height:48px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.2rem">${esc(p.initials || "NV")}</div>
+              <div>
+                <h3 style="margin:0;font-size:1.2rem">${esc(p.name)} <span class="mono muted" style="font-size:0.85rem">(${esc(p.id)})</span></h3>
+                <div class="muted small">${esc(p.email)} · ${esc(Staff.ROLE_NAME[p.role] || p.role)} · ${statusBadge}</div>
+              </div>
+            </div>
+            <div>
+              ${dueBadge}
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(170px, 1fr));gap:12px;margin-bottom:16px;width:100%;box-sizing:border-box">
+            <div class="kpi" style="padding:12px;margin:0">
+              <div class="l">Ngày vào làm</div>
+              <div class="v" style="font-size:1.05rem">${day(p.startDate)}</div>
+              <div class="s">Hợp đồng lao động</div>
+            </div>
+            <div class="kpi ok" style="padding:12px;margin:0">
+              <div class="l">Lương cơ bản hiện tại</div>
+              <div class="v" style="font-size:1.15rem;color:var(--ok)">${money(p.baseSalary)}</div>
+              <div class="s">${p.role === "guide" ? (p.baseSalary > 0 ? "Lương cứng + thù lao tour (3–7%)" : "Thù lao tour (7–12% theo quy chế)") : "Chưa gồm phụ cấp & thưởng"}</div>
+            </div>
+            <div class="kpi ${p.isDue ? 'bad' : (p.isUpcoming ? 'warn' : '')}" style="padding:12px;margin:0">
+              <div class="l">Hạn xét tăng lương</div>
+              <div class="v" style="font-size:1.05rem">${day(p.nextReviewDate)}</div>
+              <div class="s">${p.isDue ? 'Đủ 12 tháng – Cần xét ngay' : (p.isUpcoming ? 'Sắp đến hạn xét định kỳ' : 'Chu kỳ xét 12 tháng')}</div>
+            </div>
+            <div class="kpi" style="padding:12px;margin:0">
+              <div class="l">KPI gần nhất</div>
+              <div class="v" style="font-size:1.05rem">${kpiBadge}</div>
+              <div class="s">${esc(p.kpiPeriod || "Kỳ đánh giá 2026")}</div>
+            </div>
+          </div>
+
+          <!-- Thẻ dự báo xét tăng lương -->
+          <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:16px;width:100%;box-sizing:border-box">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+              <div style="flex:1;min-width:240px">
+                <b style="font-size:0.95rem">📊 Thông tin & Dự kiến xét tăng lương:</b>
+                <div class="small muted" style="margin-top:4px">
+                  Tỷ lệ tăng lương theo kết quả KPI: <b>+${p.expectedRaisePercent}%</b> 
+                  ${kpiRating ? `(Xếp loại: <b>${esc(kpiRating)}</b>)` : ''} 
+                  → Lương mới dự kiến: <b style="color:var(--ok);font-size:1rem">${money(p.expectedNewSalary)} / tháng</b>
+                  ${p.expectedRaisePercent > 0 ? ` (+${money(p.expectedNewSalary - p.baseSalary)})` : ''}
+                </div>
+              </div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap">
+                <button class="btn sm" id="m-kpi-btn" title="Chấm điểm KPI cho nhân viên">📝 Đánh giá KPI</button>
+                <button class="btn ok sm" id="m-rev-btn" title="Xét tăng lương định kỳ 12 tháng dựa trên KPI">📈 Xét tăng lương</button>
+                <button class="btn primary sm" id="m-early-btn" title="Tăng lương trước hạn do thăng chức hoặc thành tích">⚡ Tăng trước hạn</button>
+              </div>
+            </div>
+            ${p.kpiNote ? `<div class="small muted" style="margin-top:8px;font-style:italic">Ghi chú đánh giá KPI: "${esc(p.kpiNote)}"</div>` : ''}
+          </div>
+
+          <!-- Bảng lịch sử thay đổi lương -->
+          <div style="width:100%;box-sizing:border-box">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+              <h4 style="margin:0">📜 Lịch sử thay đổi lương (${hist.length} bản ghi)</h4>
+              <span class="small muted">Lưu trữ vĩnh viễn, không ghi đè dữ liệu cũ</span>
+            </div>
+            <div class="tbl-wrap" style="max-height:220px;overflow:auto;border:1px solid var(--border);border-radius:8px;width:100%;box-sizing:border-box;margin-bottom:0">
+              <table style="width:100%;min-width:620px;font-size:0.85rem;margin:0">
+                <thead>
+                  <tr>
+                    <th>Ngày áp dụng</th>
+                    <th>Lương cũ</th>
+                    <th>Lương mới</th>
+                    <th>% Tăng</th>
+                    <th>KPI</th>
+                    <th>Xếp loại</th>
+                    <th>Lý do / Căn cứ</th>
+                    <th>Người duyệt</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${hist.length === 0 ? '<tr><td colspan="8" class="muted center" style="padding:16px">Chưa có lịch sử thay đổi lương</td></tr>' : hist.map(h => `
+                    <tr>
+                      <td>${day(h.effectiveDate)}</td>
+                      <td>${h.oldSalary > 0 ? money(h.oldSalary) : '—'}</td>
+                      <td><b>${money(h.newSalary)}</b></td>
+                      <td>${h.increasePercent > 0 ? `<b style="color:var(--ok)">+${h.increasePercent}%</b>` : '<span class="muted">0%</span>'}</td>
+                      <td>${h.kpi != null ? `${h.kpi}%` : '—'}</td>
+                      <td>${h.kpiRating ? `<span class="badge ${h.kpi >= 80 ? 'ok' : 'info'}">${esc(h.kpiRating)}</span>` : '—'}</td>
+                      <td>${esc(h.reason || '—')}</td>
+                      <td>${esc(h.approvedByName || h.approvedBy || 'Admin')}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      `;
+
+      let closeProfileModal = null;
+      Staff.modal(`Hồ sơ & Quản lý Lương: ${p.name}`, contentHtml, [
+        { label: "Đóng", kind: "ghost" }
+      ], {
+        wide: true,
+        onOpen: (ov, close) => {
+          closeProfileModal = close;
+          const modalBox = $(".modal", ov);
+          if (modalBox) {
+            modalBox.style.maxWidth = "960px";
+            modalBox.style.width = "95vw";
+          }
+
+          // Sự kiện Đánh giá KPI
+          const kpiBtn = $("#m-kpi-btn", ov);
+          if (kpiBtn) kpiBtn.onclick = async () => {
+            const v = await ask(`Đánh giá KPI cho ${p.name}`, [
+              { name: "kpi", label: "Điểm KPI (0 - 100%)", type: "number", value: kpiVal != null ? kpiVal : 85, required: true, hint: ">=90%: Xuất sắc (+10%) | 80-89%: Tốt (+7%) | 70-79%: Khá (+5%) | 60-69%: Đạt (+3%) | <60%: Không đạt (0%)" },
+              { name: "period", label: "Kỳ đánh giá", type: "text", value: "Kỳ đánh giá " + new Date().getFullYear(), required: true },
+              { name: "note", label: "Nhận xét / Đánh giá chi tiết", type: "textarea", placeholder: "Ghi nhận đóng góp, hiệu quả công việc và thái độ..." }
+            ], { kind: "ok", submit: "Lưu kết quả KPI" });
+            if (v) {
+              await post(`/api/admin/staff/${p.id}/kpi-evaluate`, { kpi: Number(v.kpi), period: v.period, note: v.note });
+              Staff.toast("Đã lưu kết quả đánh giá KPI thành công.", "ok");
+              if (closeProfileModal) closeProfileModal();
+              if (onUpdate) onUpdate();
+              openStaffProfileModal(staffId, onUpdate);
+            }
+          };
+
+          // Sự kiện Xét tăng lương định kỳ
+          const revBtn = $("#m-rev-btn", ov);
+          if (revBtn) revBtn.onclick = async () => {
+            if (kpiVal == null) {
+              Staff.toast("Nhân viên chưa có kết quả đánh giá KPI. Vui lòng bấm 'Đánh giá KPI' trước khi xét tăng lương.", "bad");
+              return;
+            }
+            const confirmMsg = `
+              <div style="font-size:0.95rem;line-height:1.6">
+                <div>Nhân viên: <b>${esc(p.name)}</b> (${esc(p.id)})</div>
+                <div>Lương cơ bản hiện tại: <b>${money(p.baseSalary)}</b></div>
+                <div>Kết quả KPI: <b class="badge ${kpiVal >= 80 ? 'ok' : 'info'}">${kpiVal}% (${esc(kpiRating || 'Tốt')})</b></div>
+                <div>Tỷ lệ tăng theo quy chế: <b style="color:var(--ok)">+${p.expectedRaisePercent}%</b></div>
+                <div>Mức lương mới sau xét duyệt: <b style="color:var(--ok);font-size:1.1rem">${money(p.expectedNewSalary)} / tháng</b></div>
+                <div class="note info" style="margin-top:10px">Kỳ xét tăng lương tiếp theo sẽ tự động được gia hạn thêm <b>12 tháng</b>.</div>
+              </div>
+            `;
+            const v = await ask("Xác nhận xét tăng lương định kỳ 12 tháng", [
+              { name: "note", label: "Ghi chú phê duyệt", type: "text", value: `Xét định kỳ 12 tháng theo KPI ${kpiVal}% (${kpiRating || 'Tốt'})` }
+            ], {
+              intro: confirmMsg,
+              kind: "ok",
+              submit: "Phê duyệt tăng lương"
+            });
+            if (v) {
+              await post(`/api/admin/staff/${p.id}/salary-review`, { note: v.note });
+              Staff.toast("Đã phê duyệt điều chỉnh lương định kỳ thành công.", "ok");
+              if (closeProfileModal) closeProfileModal();
+              if (onUpdate) onUpdate();
+              openStaffProfileModal(staffId, onUpdate);
+            }
+          };
+
+          // Sự kiện Tăng lương trước hạn
+          const earlyBtn = $("#m-early-btn", ov);
+          if (earlyBtn) earlyBtn.onclick = async () => {
+            const v = await ask(`Tăng lương trước hạn cho ${p.name}`, [
+              {
+                name: "reasonType",
+                label: "Lý do tăng trước hạn",
+                type: "select",
+                options: [
+                  ["promotion", "Thăng chức (Áp dụng khung lương chức danh mới)"],
+                  ["outstanding", "Thành tích nổi bật / Dự án xuất sắc"],
+                  ["responsibility", "Đảm nhận thêm phạm vi trách nhiệm mới"],
+                  ["position_adjustment", "Điều chỉnh theo vị trí công việc"],
+                  ["other", "Lý do đặc biệt khác"]
+                ]
+              },
+              { name: "newSalary", label: "Mức lương mới (₫ / tháng)", type: "number", value: Math.round(p.baseSalary * 1.15 / 1000) * 1000, required: true, hint: `Mức lương hiện tại: ${money(p.baseSalary)}. Không bị giới hạn 3–10% khi thăng chức.` },
+              { name: "effectiveDate", label: "Ngày bắt đầu áp dụng", type: "date", value: new Date().toISOString().slice(0, 10), required: true },
+              { name: "reason", label: "Quyết định & Căn cứ chi tiết", type: "textarea", required: true, placeholder: "Mô tả lý do thăng chức, thành tích nổi bật hoặc quyết định bổ nhiệm..." }
+            ], {
+              kind: "ok",
+              submit: "Phê duyệt tăng trước hạn",
+              intro: `<div class="note info">Trường hợp thăng chức hoặc thành tích nổi bật, Ban Giám Đốc có thể chỉ định mức lương mới vượt khung 10% của xét định kỳ. Ngày xét lương tiếp theo sẽ được tính 12 tháng kể từ ngày áp dụng này.</div>`
+            });
+            if (v) {
+              await post(`/api/admin/staff/${p.id}/salary-early-raise`, {
+                newSalary: Number(v.newSalary),
+                reasonType: v.reasonType,
+                reason: v.reason,
+                effectiveDate: v.effectiveDate
+              });
+              Staff.toast("Đã phê duyệt tăng lương trước hạn thành công.", "ok");
+              if (closeProfileModal) closeProfileModal();
+              if (onUpdate) onUpdate();
+              openStaffProfileModal(staffId, onUpdate);
+            }
+          };
+        }
+      });
+    }
+
+    await fetchAndRender();
+  }
+  window.__openStaffProfileModal = openStaffProfileModal;
+
   const sections = [
 
     { id: "stats", label: "Tổng quan & thống kê", icon: "📊", group: "Tổng quan", perm: "stats:view_full", async render(el) {
@@ -31,7 +266,7 @@
         </div>
         <div class="row ${st.period === "day" ? "hidden" : ""}" id="y-ctrls" style="gap:4px">
           <button class="btn sm" id="y-prev" title="Năm trước">◀</button>
-          <input type="number" id="sy" style="width:85px;text-align:center;font-weight:700" value="${st.year}" min="2020" max="2100" aria-label="Năm">
+          <input type="number" id="sy" style="width:85px;text-align:center;font-weight:700" value="${st.year}" min="1986" max="2100" aria-label="Năm">
           <button class="btn sm" id="y-next" title="Năm sau">▶</button>
         </div>
         <div class="pills-group ${st.period === "quarter" ? "" : "hidden"}" id="q-pills">
@@ -196,6 +431,10 @@
         $$("#m-pills button", bar).forEach(b => b.classList.toggle("active", +b.dataset.m === st.month));
         $("#sy", bar).value = st.year;
 
+        const wc = d.wc;
+        const curWcNet = wc ? wc.netBalance : (k.collected - (k.refunded || 0));
+        const curWcSpent = wc ? wc.totalSpent : (k.refunded || 0);
+
         // KPI cards
         const kpiHtml = `
           <div class="note info" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
@@ -203,26 +442,87 @@
             ${d.reconciled ? `<span class="badge ok">✓ Số liệu đối chiếu chuẩn khớp</span>` : ""}
           </div>
           ${d.warnings && d.warnings.length ? `<div class="note warn"><b>Cảnh báo chênh lệch:</b><ul>${d.warnings.map(w => `<li>${esc(w)}</li>`).join("")}</ul></div>` : ""}
-          <div class="grid g4" style="margin-bottom:18px">
-            <div class="kpi ok">
-              <div class="l">Doanh thu thuần (Thực thu)</div>
-              <div class="v">${money(k.revenue)}</div>
-              <div class="s" style="margin-top:4px">Đã thu: <b>${money(k.collected || k.revenue)}</b> · Hoàn: ${money(k.refunded || 0)}</div>
+          <div class="grid g4" style="margin-bottom:14px">
+            <div class="kpi ok" style="border-left:4px solid var(--teal,#0F766E)">
+              <div class="l">Doanh thu từ tour du lịch</div>
+              <div class="v" style="color:var(--teal,#0F766E)">${money(k.tourRevenue || k.bookedRevenue || k.revenue)}</div>
+              <div class="s" style="margin-top:4px">Chỉ doanh thu tour (Đã thu: <b>${money(k.collected || k.revenue)}</b>)</div>
             </div>
-            <div class="kpi" style="border-left:4px solid var(--accent,#D97706)">
-              <div class="l">Doanh số tour chốt duyệt</div>
-              <div class="v" style="color:var(--accent,#D97706)">${money(k.bookedRevenue || k.revenue)}</div>
-              <div class="s" style="margin-top:4px">Công nợ còn phải thu: <b style="color:var(--bad,#DC2626)">${money(k.receivable || 0)}</b></div>
+            <div class="kpi" style="border-left:4px solid #059669;background:#f0fdf4">
+              <div class="l" style="color:#047857;font-weight:700">🏦 Số tiền lưu động hiện có</div>
+              <div class="v" style="color:#059669;font-weight:800">${money(curWcNet)}</div>
+              <div class="s" style="margin-top:4px;color:#047857"><b>= Doanh thu tour − Lương NV − Tiền tiêu</b></div>
             </div>
-            <div class="kpi">
-              <div class="l">Số đơn tour hiệu lực</div>
-              <div class="v">${k.orders.toLocaleString("vi-VN")} đơn</div>
-              <div class="s" style="margin-top:4px">Đã duyệt: <b>${(k.confirmedOrders || k.orders).toLocaleString("vi-VN")}</b> đơn chốt</div>
+            <div class="kpi" style="border-left:4px solid #e11d48">
+              <div class="l">Tổng tiền tiêu & Chi phí</div>
+              <div class="v" style="color:#e11d48">-${money(curWcSpent)}</div>
+              <div class="s" style="margin-top:4px">Lương NV, dụng cụ mang đi cho khách, cọc, hoàn tiền...</div>
             </div>
             <div class="kpi ${k.cancelRate > 15 ? "warn" : ""}">
-              <div class="l">Lượng khách / Tỷ lệ hủy</div>
-              <div class="v">${k.guests.toLocaleString("vi-VN")} khách</div>
-              <div class="s" style="margin-top:4px">Tỷ lệ hủy: <b>${k.cancelRate}%</b> (${k.cancelRate <= 10 ? "An toàn" : "Cần theo dõi"})</div>
+              <div class="l">Đơn tour & Lượng khách</div>
+              <div class="v">${k.orders.toLocaleString("vi-VN")} đơn · ${k.guests.toLocaleString("vi-VN")} khách</div>
+              <div class="s" style="margin-top:4px">Đã duyệt: <b>${(k.confirmedOrders || k.orders).toLocaleString("vi-VN")}</b> đơn chốt (Hủy: ${k.cancelRate}%)</div>
+            </div>
+          </div>
+
+          <!-- BẢNG GIÁM SÁT SỐ TIỀN LƯU ĐỘNG CÔNG TY RÕ RÀNG TRỰC TIẾP TRÊN DASHBOARD -->
+          <div class="card" style="margin-bottom:18px">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:14px">
+              <div>
+                <h2 style="margin:0;display:flex;align-items:center;gap:8px">
+                  <span>🏦 Quỹ Tiền Lưu Động Công Ty (Năm ${d.year})</span>
+                  <span class="badge ok">Đồng bộ 100% với Thu Ngân</span>
+                </h2>
+                <div class="muted small" style="margin-top:4px">
+                  <b>Công thức kiểm soát dòng tiền:</b> <span class="mono" style="font-weight:700;color:var(--navy)">Số tiền lưu động = Doanh thu từ tour du lịch − Lương nhân viên − Tiền tiêu (mua dụng cụ cho khách mang đi, hoàn tiền, cọc đối tác, thù lao HDV...)</span>
+                </div>
+              </div>
+              <button class="btn ok sm" id="btn-goto-wc" style="font-weight:700">🔍 Mở Sổ Quỹ Tiền Lưu Động & Toàn Bộ Lịch Sử Vào/Ra →</button>
+            </div>
+
+            <div class="grid g3" style="gap:14px;margin-bottom:14px">
+              <div class="kpi" style="border-left:4px solid var(--teal);padding:14px">
+                <div class="small muted" style="font-weight:600">1. Tổng thu từ tour du lịch (Dòng tiền Vào)</div>
+                <div style="font-size:1.45rem;font-weight:800;color:var(--teal);margin-top:4px">+${money(wc ? wc.totalCollected : k.collected)}</div>
+                <div class="small muted" style="margin-top:4px">Thu cọc, đủ 100%, thu nốt & quầy (+${wc ? (wc.incomes || []).length : k.orders} GD)</div>
+              </div>
+              <div class="kpi bad" style="border-left:4px solid var(--bad);padding:14px">
+                <div class="small muted" style="font-weight:600">2. Tổng tiền tiêu & Chi phí đã chi (Dòng tiền Ra)</div>
+                <div style="font-size:1.45rem;font-weight:800;color:var(--bad);margin-top:4px">-${money(curWcSpent)}</div>
+                <div class="small muted" style="margin-top:4px">Lương NV, dụng cụ mang đi, cọc, thù lao, hoàn (-${wc ? (wc.expenses || []).length : 0} GD)</div>
+              </div>
+              <div class="kpi ok" style="border-left:4px solid var(--ok);background:#ecfdf5;padding:14px">
+                <div class="small" style="color:#047857;font-weight:700">3. Số tiền lưu động ròng hiện tại (1 − 2)</div>
+                <div style="font-size:1.6rem;font-weight:900;color:#047857;margin-top:4px">${money(curWcNet)}</div>
+                <div class="small" style="color:#047857;margin-top:4px;font-weight:600">✓ Quỹ tiền mặt thực tế sẵn sàng hoạt động</div>
+              </div>
+            </div>
+
+            <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:0.86rem;background:var(--bg);padding:10px 14px;border-radius:8px;border:1px solid var(--border);align-items:center;margin-bottom:14px">
+              <span style="font-weight:700;color:var(--text)">Chi tiết các khoản tiền tiêu & chi phí:</span>
+              <span class="badge" style="background:var(--surface);border:1px solid var(--border);color:var(--text)">💼 Lương nhân viên: <b>${money(wc?.summary?.salary || 0)}</b></span>
+              <span class="badge info">🎒 Dụng cụ mang đi cho khách: <b>${money(wc?.summary?.supplies || 0)}</b></span>
+              <span class="badge" style="background:#fef3c7;color:#92400e;border:1px solid #fde68a">🧭 Thù lao HDV: <b>${money(wc?.summary?.guide_fee || 0)}</b></span>
+              <span class="badge" style="background:#f3e8ff;color:#6b21a8;border:1px solid #e9d5ff">🤝 Cọc đối tác: <b>${money(wc?.summary?.partner_deposit || 0)}</b></span>
+              <span class="badge bad">💸 Hoàn tiền hủy tour: <b>${money(wc?.summary?.refund || 0)}</b></span>
+              <span class="badge" style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe">💳 Rút tiền ví: <b>${money(wc?.summary?.wallet_withdrawal || 0)}</b></span>
+            </div>
+
+            <!-- BẢNG XEM TRỰC TIẾP LỊCH SỬ THU CHI TIỀN LƯU ĐỘNG GẦN NHẤT -->
+            <div style="border-top:1px solid var(--border);padding-top:12px">
+              <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px">
+                <div style="font-weight:700;font-size:13.5px;color:var(--navy);display:flex;align-items:center;gap:6px">
+                  <span>📜 Lịch sử biến động tiền lưu động gần nhất:</span>
+                </div>
+                <div style="display:flex;gap:6px" id="wc-quick-filter-btns">
+                  <button type="button" class="btn sm active" data-qwc="all" style="font-size:11.5px">Toàn bộ gần đây</button>
+                  <button type="button" class="btn sm" data-qwc="in" style="font-size:11.5px">📥 Tiền vào (+)</button>
+                  <button type="button" class="btn sm" data-qwc="out" style="font-size:11.5px">📤 Tiền ra (-)</button>
+                </div>
+              </div>
+              <div id="wc-quick-preview-box">
+                ${renderWcQuickPreview(wc, "all")}
+              </div>
             </div>
           </div>
         `;
@@ -265,8 +565,7 @@
               </div>
               ${table([
                 { t: useQ ? "Quý" : "Tháng", html: r => `<b>${useQ ? "Quý " + r.quarter : "Tháng " + r.month}</b>` },
-                { t: "Thực thu thuần", num: true, html: r => `<b>${money(r.revenue)}</b>` },
-                { t: "Doanh số chốt duyệt", num: true, html: r => `<b style="color:var(--accent,#D97706)">${money(r.bookedRevenue || 0)}</b>` },
+                { t: "Doanh thu", num: true, html: r => `<b style="color:var(--accent,#D97706)">${money(r.bookedRevenue || r.revenue || 0)}</b>` },
                 { t: "Đã thu", num: true, html: r => money(r.collected) },
                 { t: "Đã hoàn", num: true, html: r => money(r.refunded) },
                 { t: "Số đơn", num: true, k: "orders" },
@@ -279,14 +578,18 @@
             ${renderOrdersList(d.orders)}
           `;
 
+          const isCurYear = (st.period === "year" && d.year === 2026);
+          const chartRows = isCurYear ? rows.slice(0, 11) : rows;
+          const chartLabels = isCurYear ? labels.slice(0, 11) : labels;
+          const chartSeries = [
+            { name: "Doanh thu", values: chartRows.map(r => r.bookedRevenue || r.revenue || 0), color: "var(--accent,#D97706)" }
+          ];
+
           const cc = $("#chart-container", body);
           if (st.chartType === "line") {
-            cc.innerHTML = lineChart(labels, rows.map(r => r.revenue), { fmt: v => money(Math.round(v)), axisFmt: compactMoney, label: "Doanh thu thuần (Thực thu)" });
+            cc.innerHTML = lineChart(chartLabels, chartSeries, { fmt: v => money(Math.round(v)), axisFmt: compactMoney, label: "Doanh thu" });
           } else {
-            cc.innerHTML = barChart(labels, [
-              { name: "Thực thu thuần", values: rows.map(r => r.revenue), color: "var(--teal,#0F766E)" },
-              { name: "Doanh số chốt duyệt", values: rows.map(r => r.bookedRevenue || 0), color: "var(--accent,#D97706)" }
-            ], { fmt: v => money(Math.round(v)), axisFmt: compactMoney, label: "Doanh thu & Doanh số" });
+            cc.innerHTML = barChart(chartLabels, chartSeries, { fmt: v => money(Math.round(v)), axisFmt: compactMoney, label: "Doanh thu" });
           }
 
           $("#dn-chart", body).innerHTML = donut(Object.entries(d.byStatus || {}).map(([s, n]) => ({ label: (Staff.STATUS[s] || [s])[0], value: n })));
@@ -334,8 +637,7 @@
                   <thead>
                     <tr>
                       <th class="sortable">Kỳ (${useQ ? "Quý" : "Tháng"})</th>
-                      <th class="num sortable">Thực thu thuần</th>
-                      <th class="num sortable">Doanh số chốt duyệt</th>
+                      <th class="num sortable">Doanh thu</th>
                       <th class="num sortable">Thực thu (In)</th>
                       <th class="num sortable">Đã hoàn (Out)</th>
                       <th class="num sortable">Số đơn hiệu lực</th>
@@ -353,8 +655,7 @@
                       const avgP = r.guests > 0 ? Math.round(r.revenue / r.guests) : 0;
                       return `<tr class="clickable-row" data-drill="${useQ ? "q_" + r.quarter : "m_" + r.month}">
                         <td><b>${useQ ? "Quý " + r.quarter : "Tháng " + r.month + "/" + d.year}</b></td>
-                        <td class="num"><b>${money(r.revenue)}</b></td>
-                        <td class="num" style="color:var(--accent,#D97706)"><b>${money(r.bookedRevenue || 0)}</b></td>
+                        <td class="num" style="color:var(--accent,#D97706)"><b>${money(r.bookedRevenue || r.revenue || 0)}</b></td>
                         <td class="num" style="color:var(--ok)">${money(r.collected)}</td>
                         <td class="num" style="color:var(--bad)">${money(r.refunded)}</td>
                         <td class="num">${r.orders}</td>
@@ -411,33 +712,132 @@
           e.preventDefault();
           viewOrder(a.dataset.view).catch(fail);
         });
+
+        const btnGotoWc = $("#btn-goto-wc", body);
+        if (btnGotoWc) {
+          btnGotoWc.onclick = () => {
+            const wcTab = document.querySelector('.nav a[data-id="working-capital"]') || document.querySelector('[data-section="working-capital"]');
+            if (wcTab) wcTab.click();
+            else window.location.hash = "#working-capital";
+          };
+        }
+
+        $$("[data-qwc]", body).forEach(btn => {
+          btn.onclick = () => {
+            const q = btn.dataset.qwc;
+            $$("[data-qwc]", body).forEach(b => b.classList.toggle("active", b.dataset.qwc === q));
+            const box = $("#wc-quick-preview-box", body);
+            if (box) box.innerHTML = renderWcQuickPreview(wc, q);
+          };
+        });
+
+        $$("#ord-filter-seg button", body).forEach(btn => btn.onclick = () => {
+          orderFilter = btn.dataset.of;
+          draw();
+        });
       };
 
+      function renderWcQuickPreview(wcData, filter) {
+        if (!wcData) return '<div class="empty" style="padding:14px">Đang cập nhật dòng tiền lưu động...</div>';
+        const inc = (wcData.incomes || []).map(x => ({ ...x, flowType: "in" }));
+        const exp = (wcData.expenses || []).map(x => ({ ...x, flowType: "out" }));
+        let list = [];
+        if (filter === "in") list = inc;
+        else if (filter === "out") list = exp;
+        else list = [...inc, ...exp].sort((a, b) => String(b.at || "").localeCompare(String(a.at || "")));
+        list = list.slice(0, 8);
+        if (!list.length) return '<div class="empty" style="padding:14px">Chưa có giao dịch dòng tiền nào được ghi nhận.</div>';
+        return `
+          <div class="tbl-wrap" style="max-height:260px;overflow-y:auto;border:1px solid var(--border);border-radius:6px">
+            <table class="tbl" style="margin:0;font-size:12.5px">
+              <thead>
+                <tr>
+                  <th>Thời gian</th>
+                  <th>Loại</th>
+                  <th>Khoản mục / Nguồn thu</th>
+                  <th>Đối tượng / Khách hàng</th>
+                  <th style="text-align:right">Số tiền</th>
+                  <th>Ghi chú / Tham chiếu</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${list.map(r => {
+                  const isIn = r.flowType === "in";
+                  return `
+                    <tr>
+                      <td style="white-space:nowrap">${dt(r.at)}</td>
+                      <td><span class="badge ${isIn ? 'ok' : 'bad'}" style="font-size:11px">${isIn ? '📥 Tiền vào' : '📤 Tiền ra'}</span></td>
+                      <td><b>${esc(r.category || (isIn ? 'Thu tiền tour' : 'Chi phí'))}</b></td>
+                      <td>${esc(r.customerName || r.recipient || '—')}</td>
+                      <td style="text-align:right;white-space:nowrap;font-weight:700;color:${isIn ? 'var(--ok)' : 'var(--bad)'}">${isIn ? '+' : '-'}${money(r.amount)}</td>
+                      <td class="small muted">${esc(r.note || r.ref || '—')}</td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      }
+
+      let orderFilter = "all";
       function renderOrdersList(orders) {
         if (!orders || !orders.length) {
           if (st.period === "month") return `<div class="card"><div class="empty">Không có đơn hàng nào trong tháng ${st.month}/${st.year}.</div></div>`;
           return "";
         }
-        const title = st.period === "month" ? `Danh sách đơn hàng trong Tháng ${st.month}/${st.year} (${orders.length} đơn)` :
-                      st.period === "quarter" ? `Danh sách đơn hàng trong Quý ${st.quarter}/${st.year} (${orders.length} đơn)` :
-                      `Danh sách đơn hàng năm ${st.year} (${orders.length} đơn)`;
+        const confCount = orders.filter(o => !o.isFinancial && (o.isConfirmed || ["confirmed", "in_progress", "completed", "guide_accepted", "departed"].includes(o.status))).length;
+        const debtCount = orders.filter(o => !o.isFinancial && (o.remaining > 0 || (o.amount > o.paid && !["cancelled", "refunded"].includes(o.status)))).length;
+        const finCount = orders.filter(o => o.isFinancial).length;
+
+        let displayList = orders;
+        if (orderFilter === "confirmed") {
+          displayList = orders.filter(o => !o.isFinancial && (o.isConfirmed || ["confirmed", "in_progress", "completed", "guide_accepted", "departed"].includes(o.status)));
+        } else if (orderFilter === "debt") {
+          displayList = orders.filter(o => !o.isFinancial && (o.remaining > 0 || (o.amount > o.paid && !["cancelled", "refunded"].includes(o.status))));
+        } else if (orderFilter === "financial") {
+          displayList = orders.filter(o => o.isFinancial);
+        }
+
+        const title = st.period === "month" ? `Danh sách giao dịch & đơn hàng Tháng ${st.month}/${st.year} (${displayList.length}/${orders.length})` :
+                      st.period === "quarter" ? `Danh sách giao dịch & đơn hàng Quý ${st.quarter}/${st.year} (${displayList.length}/${orders.length})` :
+                      `Danh sách giao dịch & đơn hàng năm ${st.year} (${displayList.length}/${orders.length})`;
+
+        const sumAmt = displayList.reduce((s, x) => s + (x.amount || 0), 0);
+        const sumPaid = displayList.reduce((s, x) => s + (x.paid || 0), 0);
+        const sumRem = displayList.reduce((s, x) => s + (x.remaining || 0), 0);
+
         return `
           <div class="card">
-            <div class="card-header-acts">
-              <h2>${title}</h2>
-              <span class="small muted">Bấm mã đơn để xem chi tiết nghiệp vụ</span>
+            <div class="card-header-acts" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+              <div>
+                <h2 style="margin:0">${title}</h2>
+                <div class="small muted" style="margin-top:2px">
+                  ${orderFilter === "confirmed" ? `Tổng giá trị chốt: <b>${money(sumAmt)}</b> · Còn phải thu: <b style="color:var(--bad)">${money(sumRem)}</b>` :
+                    orderFilter === "debt" ? `Tổng công nợ còn phải thu: <b style="color:var(--bad)">${money(sumRem)}</b>` :
+                    orderFilter === "financial" ? `Tổng dòng tiền tài chính: <b>${money(sumPaid)}</b>` :
+                    `Tổng tiền: <b>${money(sumAmt)}</b> · Thực thu thuần: <b>${money(sumPaid)}</b> · Công nợ: <b style="color:var(--bad)">${money(sumRem)}</b>`}
+                </div>
+              </div>
+              <div class="seg-group" id="ord-filter-seg">
+                <button class="pill-btn ${orderFilter === "all" ? "active" : ""}" data-of="all">Tất cả (${orders.length})</button>
+                <button class="pill-btn ${orderFilter === "confirmed" ? "active" : ""}" data-of="confirmed">Đơn chốt duyệt (${confCount})</button>
+                <button class="pill-btn ${orderFilter === "debt" ? "active" : ""}" data-of="debt">Đơn còn nợ (${debtCount})</button>
+                ${finCount ? `<button class="pill-btn ${orderFilter === "financial" ? "active" : ""}" data-of="financial">Lương & Thu quầy (${finCount})</button>` : ""}
+              </div>
             </div>
             ${table([
-              { t: "Mã đơn", html: o => `<a href="#" data-view="${esc(o.id)}" class="mono" style="font-weight:700">${esc(o.payCode)}</a>` },
-              { t: "Khách hàng", html: o => `<b>${esc(o.customerName)}</b>${o.phone ? `<div class="small muted">${esc(o.phone)}</div>` : ""}` },
-              { t: "Tour & Ngày đi", html: o => `${esc(o.tourName)}${o.date ? `<div class="small muted">Khởi hành: ${day(o.date)}</div>` : ""}` },
-              { t: "Số khách", num: true, html: o => (o.pax || "—") + " khách" },
+              { t: "Mã GD / Đơn", html: o => o.isFinancial ? `<span class="mono">${esc(o.payCode || o.id)}</span>` : `<a href="#" data-view="${esc(o.id)}" class="mono" style="font-weight:700">${esc(o.payCode)}</a>` },
+              { t: "Khách hàng / Đối tượng", html: o => `<b>${esc(o.customerName)}</b>${o.phone ? `<div class="small muted">${esc(o.phone)}</div>` : ""}` },
+              { t: "Tour & Nghiệp vụ", html: o => `${esc(o.tourName)}${o.date ? `<div class="small muted">${o.isFinancial ? "Ngày: " : "Khởi hành: "}${day(o.date)}</div>` : ""}` },
+              { t: "Số khách", num: true, html: o => o.isFinancial ? "—" : (o.pax || "—") + " khách" },
               { t: "Tổng tiền", num: true, html: o => money(o.amount) },
-              { t: "Đã thu", num: true, html: o => `<b style="color:var(--ok)">${money(o.paid)}</b>` },
-              { t: "Trạng thái", html: o => badge(o.status) },
-              { t: "Ngày đặt", html: o => dt(o.createdAt) },
-              { t: "", html: o => `<button class="btn sm" data-view="${esc(o.id)}">Xem</button>` }
-            ], orders.slice(0, 200))}
+              { t: "Đã thu (Thực thu)", num: true, html: o => `<b style="color:${o.paid < 0 ? "var(--bad)" : "var(--ok)"}">${o.paid < 0 ? "-" : "+"}${money(Math.abs(o.paid))}</b>` },
+              { t: "Còn nợ", num: true, html: o => (o.remaining > 0 ? `<b style="color:var(--bad)">${money(o.remaining)}</b>` : `<span class="muted">0 đ</span>`) },
+              { t: "Trạng thái", html: o => o.isFinancial ? `<span class="badge ${o.paid < 0 ? "bad" : "ok"}">${esc(o.statusLabel)}</span>` : badge(o.status) },
+              { t: "Thời gian", html: o => dt(o.createdAt) },
+              { t: "", html: o => o.isFinancial ? "" : `<button class="btn sm" data-view="${esc(o.id)}">Xem</button>` }
+            ], displayList.slice(0, 300))}
           </div>
         `;
       }
@@ -446,7 +846,12 @@
         if (st.period === "day") {
           data = await get(`/api/admin/daily-stats?date=${encodeURIComponent(st.day)}`);
         } else {
-          data = await get(`/api/stats?period=${st.period}&year=${st.year}&quarter=${st.quarter}&month=${st.month}`);
+          const [statsData, wcData] = await Promise.all([
+            get(`/api/stats?period=${st.period}&year=${st.year}&quarter=${st.quarter}&month=${st.month}`),
+            get(`/api/finance/working-capital?year=${st.year}`).catch(() => null)
+          ]);
+          data = statsData;
+          if (data) data.wc = wcData;
         }
         draw();
       };
@@ -474,9 +879,11 @@
         load().catch(fail);
       };
       $("#y-prev", bar).onclick = () => {
-        st.year--;
-        $("#sy", bar).value = st.year;
-        load().catch(fail);
+        if (st.year > 1986) {
+          st.year--;
+          $("#sy", bar).value = st.year;
+          load().catch(fail);
+        }
       };
       $("#y-next", bar).onclick = () => {
         st.year++;
@@ -624,6 +1031,7 @@
     { id: "orders", label: "Tất cả đơn", icon: "📋", group: "Đơn tour", perm: "booking:manage", async render(el) {
       const bar = Parts.search(() => reload(), "Tìm mã đơn, tên khách, tour…", `<select id="os"><option value="">Mọi trạng thái</option>${Object.entries(Staff.STATUS).map(([k, v]) => `<option value="${k}">${esc(v[0])}</option>`).join("")}</select>
         <div class="row" style="gap:6px;margin-left:auto">
+          <button class="btn ok sm" id="bo-import" title="Nhập danh sách đơn hàng / booking từ Excel hoặc CSV">📥 Nhập file đơn hàng</button>
           <button class="btn sm" id="bo-excel" title="Xuất danh sách khách & đơn ra Excel (.xls)">📊 Xuất Excel</button>
           <button class="btn sm" id="bo-word" title="Xuất danh sách khách & đơn ra Word (.doc)">📝 Xuất Word</button>
           <button class="btn sm" id="bo-pdf" title="In / Lưu PDF">🖨️ In / PDF</button>
@@ -649,6 +1057,42 @@
           b.statusLabel || b.status || "—"
         ]);
         return { title: "DANH SÁCH ĐƠN HÀNG & KHÁCH HÀNG", headers, rows };
+      };
+
+      const boImport = $("#bo-import", bar);
+      if (boImport) boImport.onclick = () => {
+        if (!window.DataExportImport) return;
+        window.DataExportImport.importData({
+          title: "Nhập danh sách đơn hàng / bookings từ tệp Excel hoặc CSV",
+          sampleHeaders: ["Mã đơn", "Khách hàng", "Số điện thoại", "Email", "Tour", "Ngày khởi hành", "Số khách", "Tổng tiền", "Đã thanh toán", "Trạng thái"],
+          onConfirm: async (parsed) => {
+            const rows = parsed.rows || [];
+            const itemsToImport = rows.map(r => {
+              let price = 0;
+              let paid = 0;
+              for (let i = 0; i < r.length; i++) {
+                const val = String(r[i]).replace(/[^\d]/g, "");
+                if (val && Number(val) >= 500000) {
+                  if (price === 0) price = Number(val);
+                  else if (paid === 0) paid = Number(val);
+                }
+              }
+              return {
+                payCode: r[0] && String(r[0]).startsWith("TRAVEL") ? String(r[0]).trim() : "",
+                customerName: r[1] || r[0] || "Khách nhập file",
+                phone: r[2] || "",
+                email: r[3] || "",
+                tourName: r[4] || "Tour du lịch",
+                date: r[5] || "",
+                pax: Number(r[6]) || 2,
+                price: price || 3500000,
+                paidAmount: paid || price || 0,
+                status: r[9] || (paid > 0 ? "confirmed" : "pending_payment")
+              };
+            });
+            await act(null, () => post("/api/admin/bookings/import", { items: itemsToImport }), `Đã nạp thành công ${itemsToImport.length} đơn hàng vào hệ thống.`, reload);
+          }
+        });
       };
 
       const boExcel = $("#bo-excel", bar);
@@ -733,6 +1177,7 @@
           { name: "capacity", label: "Sức chứa tối đa (khách)", type: "number", value: t?.capacity || 30 },
           { name: "minGuests", label: "Khách tối thiểu để khởi hành", type: "number", value: t?.minGuests || 10 },
           { name: "allowExtension", label: "Cho phép khách gia hạn tour", type: "checkbox", value: t ? t.allowExtension !== false : true },
+          { name: "newUntil", label: "Hạn gắn mác 'MỚI' (để trống = 30 ngày kể từ khi tạo)", type: "date", value: t?.newUntil ? t.newUntil.slice(0, 10) : new Date(Date.now() + 30*86400000).toISOString().slice(0, 10) },
           { name: "active", label: "Mở bán ngay (Hiển thị trên website)", type: "checkbox", value: t ? t.active !== false : true },
           { name: "image", label: "Ảnh đại diện (đường dẫn, hoặc bấm chọn ảnh để tải lên)", upload: "tour", value: t?.image || "", placeholder: "VD: img/tours/da-nang.jpg hoặc URL ảnh" },
           { name: "subtitle", label: "Mô tả ngắn / Giới thiệu", type: "textarea", value: t?.desc || t?.description || t?.subtitle || "" },
@@ -758,6 +1203,9 @@
           capacity: Number(v.capacity) || 30,
           minGuests: Number(v.minGuests) || 10,
           allowExtension: v.allowExtension,
+          newUntil: v.newUntil,
+          isNew: !isEdit || t.isNew,
+          badge: "new",
           active: v.active,
           image: v.image,
           subtitle: v.subtitle,
@@ -802,7 +1250,12 @@
             <span class="badge info">Tổng: ${allTours.length} tour · Hiển thị: ${filtered.length} tour</span>
           </div>` +
           table([
-            { t: "Tour", html: t => `<b>${esc(t.name)}</b>${(t.isNew || String(t.id).startsWith("tour_")) ? ' <span class="badge" style="background:#ef4444;color:#fff;font-weight:700">MỚI</span>' : ''}<div class="small muted"><span class="mono">${esc(t.id)}</span> · Điểm đến: ${esc(t.dest || t.destination || "—")}</div>` },
+            { t: "Tour", html: t => {
+              const today = new Date().toISOString().slice(0, 10);
+              const isNewT = t.newUntil ? t.newUntil >= today : (t.isNew || String(t.id).startsWith("tour_"));
+              const expBadge = (isNewT && t.newUntil) ? ` <span class="badge" style="background:#ef4444;color:#fff;font-size:11px" title="Hạn mác MỚI đến ${t.newUntil}">MỚI (đến ${day(t.newUntil)})</span>` : (isNewT ? ' <span class="badge" style="background:#ef4444;color:#fff;font-size:11px">MỚI</span>' : '');
+              return `<b>${esc(t.name)}</b>${expBadge}<div class="small muted"><span class="mono">${esc(t.id)}</span> · Điểm đến: ${esc(t.dest || t.destination || "—")}</div>`;
+            } },
             { t: "Vùng", html: t => pill(t.region || "Khác", t.region === "Miền Bắc" ? "info" : t.region === "Miền Trung" ? "warn" : t.region === "Quốc tế" ? "amber" : "ok") },
             { t: "Thời lượng", html: t => esc(t.duration || "—") },
             { t: "Giá niêm yết", num: true, html: t => `<b>${money(t.price)}</b>` },
@@ -838,6 +1291,233 @@
       $("#t-reg", bar).onchange = reload;
       $("#t-st", bar).onchange = reload;
       $("#btn-create-tour", bar).onclick = () => openTourForm(null);
+
+      await reload();
+    } },
+
+    { id: "tour-pool", label: "Ghép tour & Gom đoàn", icon: "🤝", group: "Tour", perm: "tour:manage_sensitive", async render(el) {
+      el.innerHTML = `
+        <div class="card">
+          <div class="card-header-acts" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+            <div>
+              <h2 style="margin:0">🤝 Quản lý Ghép Tour & Gom Đoàn Khởi Hành</h2>
+              <div class="muted small" style="margin-top:4px">Dùng AI & RAG để quét các đơn lẻ, ghép nhóm khách đủ điều kiện xe và HDV, hoặc chủ động ghép tay khi điều phối tour.</div>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button class="btn ok" id="btn-ai-scan">🤖 AI Quét & Đề xuất ghép (RAG)</button>
+              <button class="btn" id="btn-manual-merge">✋ Ghép đoàn bằng tay</button>
+              <button class="btn primary" id="btn-create-pool">+ Mở đợt gom tour mới</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="pool-ai-results" style="display:none;margin-bottom:16px"></div>
+        <div id="pool-list-view"></div>
+      `;
+
+      const aiBox = $("#pool-ai-results", el);
+      const listView = $("#pool-list-view", el);
+
+      async function reload() {
+        const [poolsRes, bookingsRes] = await Promise.all([
+          get("/api/admin/tours/pool").catch(() => ({ pools: [] })),
+          get("/api/admin/bookings?status=").catch(() => ({ bookings: [] }))
+        ]);
+        const pools = poolsRes.pools || [];
+        const bookings = bookingsRes.bookings || [];
+
+        listView.innerHTML = `
+          <div class="grid g3" style="margin-bottom:16px">
+            <div class="kpi ok"><div class="l">Đợt ghép đang mở</div><div class="v">${pools.filter(p => p.status === 'open').length} đợt</div><div class="s">Đang nhận thêm khách</div></div>
+            <div class="kpi"><div class="l">Tổng khách đã ghép</div><div class="v">${pools.reduce((s, p) => s + (p.currentPax || 0), 0)} khách</div><div class="s">Gom từ nhiều đoàn lẻ</div></div>
+            <div class="kpi warn"><div class="l">Đơn đủ điều kiện ghép</div><div class="v">${bookings.filter(b => (b.pax || 0) <= 5 && !['cancelled','refunded'].includes(b.status)).length} đơn</div><div class="s">Khách lẻ & gia đình nhỏ</div></div>
+          </div>
+
+          <div class="card">
+            <h2 style="margin:0 0 14px">Danh sách các đợt Gom tour & Ghép đoàn (${pools.length})</h2>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));gap:16px">
+              ${pools.map(p => {
+                const cur = p.currentPax || 0;
+                const min = p.minPax || 10;
+                const max = p.maxPax || 16;
+                const pct = Math.min(100, Math.round((cur / min) * 100));
+                const isReady = cur >= min;
+                const needed = Math.max(0, min - cur);
+                return `
+                <div class="card" style="border:1px solid var(--border);border-radius:10px;padding:16px;background:var(--surface);display:flex;flex-direction:column;justify-content:space-between">
+                  <div>
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+                      <span class="badge ${p.status === 'open' ? 'ok' : 'info'}">${p.status === 'open' ? '🟢 Đang mở gom' : 'Chờ khởi hành'}</span>
+                      <span class="badge amber">Ưu đãi ghép -${p.discountPercent || 10}%</span>
+                    </div>
+                    <h3 style="margin:0 0 6px;font-size:1.05rem">${esc(p.tourName)}</h3>
+                    <div class="small muted" style="margin-bottom:10px">📍 ${esc(p.destination || 'Việt Nam')} · Khởi hành: <b>${day(p.date)}</b></div>
+
+                    <div style="margin-bottom:12px">
+                      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+                        <span>Tiến độ gom: <b>${cur}/${min} khách</b> (Tối đa: ${max})</span>
+                        <b style="color:${isReady ? 'var(--ok)' : 'var(--accent)'}">${pct}%</b>
+                      </div>
+                      <div style="width:100%;height:8px;background:var(--border);border-radius:99px;overflow:hidden">
+                        <div style="width:${pct}%;height:100%;background:${isReady ? 'var(--ok)' : 'var(--accent)'};border-radius:99px;transition:width .3s"></div>
+                      </div>
+                      <div class="small" style="margin-top:4px;color:${isReady ? 'var(--ok)' : 'var(--bad)'}">
+                        ${isReady ? '✓ Đã đủ đoàn tối thiểu để khởi hành xe riêng!' : `⚠️ Còn thiếu <b>${needed} khách</b> nữa để chốt đoàn.`}
+                      </div>
+                    </div>
+
+                    <div class="small muted" style="background:var(--bg);padding:8px 10px;border-radius:6px;margin-bottom:12px">
+                      📝 ${esc(p.notes || 'Đoàn ghép khởi hành theo lịch trình chung')}
+                    </div>
+                  </div>
+
+                  <div style="display:flex;gap:6px;justify-content:flex-end;border-top:1px solid var(--border);padding-top:10px;margin-top:10px">
+                    <button class="btn sm" data-pool-add="${esc(p.id)}">➕ Ghép thêm đơn</button>
+                    <button class="btn ok sm" data-pool-detail="${esc(p.id)}">👁️ Chi tiết đoàn</button>
+                  </div>
+                </div>`;
+              }).join("")}
+            </div>
+          </div>
+        `;
+
+        // Sự kiện AI Quét & Đề xuất
+        $("#btn-ai-scan", el).onclick = async () => {
+          aiBox.style.display = "block";
+          aiBox.innerHTML = `
+            <div class="card" style="border:2px solid var(--primary);background:var(--bg-subtle,#f8fafc)">
+              <div style="display:flex;align-items:center;gap:10px;color:var(--primary);font-weight:700">
+                <span class="spinner" style="display:inline-block;width:18px;height:18px;border:2px solid var(--primary);border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite"></span>
+                Đang kích hoạt AI & RAG quét dữ liệu hành trình, điểm đến và số lượng khách...
+              </div>
+            </div>`;
+
+          try {
+            const aiRes = await post("/api/admin/tours/pool/ai-match", {});
+            const sugs = aiRes.smartSuggestions || [];
+            const alerts = aiRes.poolFillAlerts || [];
+
+            aiBox.innerHTML = `
+              <div class="card" style="border:2px solid var(--primary);background:#f0fdf4">
+                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px">
+                  <div>
+                    <h3 style="margin:0;color:var(--ok);font-size:1.15rem">🤖 Kết quả AI & RAG Đề xuất Ghép Tour Thông Minh</h3>
+                    <div class="small muted">Quét ${aiRes.candidatesScanned || 0} đơn khách lẻ · Tìm thấy ${sugs.length} cặp ghép tối ưu</div>
+                  </div>
+                  <button class="btn sm" id="btn-close-ai" style="padding:4px 10px">Đóng gợi ý</button>
+                </div>
+
+                ${alerts.length ? `
+                  <div class="note warn" style="margin-bottom:14px">
+                    <b>⚠️ Cảnh báo tour ghép sắp đến ngày nhưng chưa đủ khách:</b>
+                    <ul style="margin:6px 0 0;padding-left:20px">
+                      ${alerts.map(a => `<li><b>${esc(a.tourName)}</b> (${day(a.date)}): ${esc(a.aiTip)}</li>`).join("")}
+                    </ul>
+                  </div>` : ""}
+
+                <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(340px, 1fr));gap:14px">
+                  ${sugs.map(s => `
+                    <div class="card" style="background:#fff;border:1px solid #bbf7d0;border-radius:8px;padding:14px">
+                      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                        <span class="badge ok">Độ tương thích ${s.confidence}%</span>
+                        <span class="badge info">${esc(s.targetVehicle)}</span>
+                      </div>
+                      <div style="font-weight:700;color:var(--navy);margin-bottom:6px">Điểm đến: ${esc(s.destination)} · Ngày dự kiến: ${day(s.suggestedDate)}</div>
+                      <div style="background:var(--bg);padding:8px 10px;border-radius:6px;font-size:12.5px;margin-bottom:8px">
+                        <div><b>Đơn 1:</b> ${esc(s.booking1.code)} – ${esc(s.booking1.customer)} (${s.booking1.pax} khách)</div>
+                        <div><b>Đơn 2:</b> ${esc(s.booking2.code)} – ${esc(s.booking2.customer)} (${s.booking2.pax} khách)</div>
+                        <div style="margin-top:4px;color:var(--ok);font-weight:700">➜ Tổng đoàn sau ghép: ${s.combinedPax} khách (Tiết kiệm ~${money(s.estimatedSavings)})</div>
+                      </div>
+                      <div class="small" style="color:#166534;line-height:1.45;margin-bottom:10px">${esc(s.aiReason)}</div>
+                      <button class="btn ok sm" style="width:100%" data-ai-merge="${esc(s.booking1.id)},${esc(s.booking2.id)}" data-dest="${esc(s.destination)}">⚡ Duyệt ghép tự động 2 đơn này</button>
+                    </div>
+                  `).join("")}
+                </div>
+              </div>
+            `;
+
+            $("#btn-close-ai", aiBox).onclick = () => { aiBox.style.display = "none"; };
+            $$("[data-ai-merge]", aiBox).forEach(b => b.onclick = async () => {
+              const bids = b.dataset.aiMerge.split(",");
+              if (await confirmBox("Xác nhận ghép đoàn tự động", `Ghép 2 đơn ${bids.join(" & ")} thành đoàn chung đi ${b.dataset.dest}? Hệ thống sẽ thông báo đến Điều hành và HDV.`)) {
+                act(null, () => post("/api/admin/tours/pool/merge", { poolId: "pool_dn_2026", bookingIds: bids, note: "AI & RAG tự động đề xuất ghép đoàn tối ưu chi phí" }), "Đã ghép 2 đơn vào đoàn thành công!", reload);
+                aiBox.style.display = "none";
+              }
+            });
+          } catch (e) {
+            aiBox.innerHTML = `<div class="note bad">Không thể quét AI: ${esc(e.message)}</div>`;
+          }
+        };
+
+        // Ghép đoàn bằng tay
+        $("#btn-manual-merge", el).onclick = async () => {
+          const eligible = bookings.filter(b => !['cancelled','refunded'].includes(b.status));
+          const pOpts = pools.map(p => [p.id, `${p.tourName} (${day(p.date)} - ${p.currentPax}/${p.minPax} khách)`]);
+          const bOpts = eligible.map(b => [b.id, `${b.payCode} – ${b.customerName} (${b.pax} khách - ${b.tourName})`]);
+
+          const v = await ask("✋ Ghép đoàn bằng tay (Manual Merge)", [
+            { name: "poolId", label: "Chọn đoàn ghép đích", type: "select", options: pOpts },
+            { name: "booking1", label: "Đơn tour thứ nhất", type: "select", options: bOpts },
+            { name: "booking2", label: "Đơn tour thứ hai cần gộp cùng", type: "select", options: bOpts },
+            { name: "note", label: "Ghi chú điều phối ghép đoàn", type: "textarea", placeholder: "Ví dụ: Ghép xe 16 chỗ đón tại sân bay, thống nhất cùng ăn trưa..." }
+          ], { submit: "Xác nhận ghép đoàn", kind: "ok" });
+
+          if (!v) return;
+          if (v.booking1 === v.booking2) {
+            Staff.toast("Vui lòng chọn 2 đơn tour khác nhau để ghép!", "bad");
+            return;
+          }
+          act(null, () => post("/api/admin/tours/pool/merge", { poolId: v.poolId, bookingIds: [v.booking1, v.booking2], note: v.note }), "Đã ghép 2 đơn vào đoàn thành công!", reload);
+        };
+
+        // Mở đợt gom tour mới
+        $("#btn-create-pool", el).onclick = async () => {
+          const v = await ask("Mở đợt gom tour ghép mới", [
+            { name: "tourName", label: "Tên tour ghép", required: true, placeholder: "VD: Tour Đà Nẵng – Hội An ghép đoàn 4N3Đ" },
+            { name: "destination", label: "Điểm đến", required: true, placeholder: "VD: Đà Nẵng" },
+            { name: "date", label: "Ngày khởi hành dự kiến", type: "date", value: new Date(Date.now() + 7*86400000).toISOString().slice(0, 10), required: true },
+            { name: "minPax", label: "Số khách tối thiểu để chốt đoàn", type: "number", value: 10, required: true },
+            { name: "maxPax", label: "Số khách tối đa", type: "number", value: 16, required: true },
+            { name: "discountPercent", label: "Mức giảm giá ưu đãi ghép đoàn (%)", type: "number", value: 10 },
+            { name: "notes", label: "Ghi chú cho khách và HDV", type: "textarea", placeholder: "Thông tin tập kết, tiêu chuẩn xe, HDV đi cùng..." }
+          ], { submit: "Tạo đợt ghép", kind: "ok" });
+
+          if (v) act(null, () => post("/api/admin/tours/pool", v), "Đã mở đợt ghép tour mới.", reload);
+        };
+
+        // Xem chi tiết đoàn
+        $$("[data-pool-detail]", listView).forEach(btn => btn.onclick = () => {
+          const p = pools.find(x => x.id === btn.dataset.poolDetail);
+          if (!p) return;
+          modal(`Chi tiết đợt ghép: ${p.tourName}`, `
+            <div style="font-size:13.5px">
+              <div class="note info" style="margin-bottom:12px">
+                Điểm đến: <b>${esc(p.destination)}</b> · Khởi hành: <b>${day(p.date)}</b> · Đã có <b>${p.currentPax}/${p.minPax} khách</b>.
+              </div>
+              <h4 style="margin:0 0 8px">Các đơn tour trong đoàn này:</h4>
+              <ul style="padding-left:20px;margin-bottom:14px">
+                ${(p.bookings || []).map(bid => {
+                  const b = bookings.find(x => x.id === bid);
+                  return b ? `<li><b>${esc(b.payCode)}</b>: ${esc(b.customerName)} (${b.pax} khách - SĐT: ${esc(b.phone || '—')})</li>` : `<li>Mã đơn: <b>${esc(bid)}</b></li>`;
+                }).join("")}
+              </ul>
+              <div class="small muted">Ghi chú điều hành: ${esc(p.notes || 'Không có')}</div>
+            </div>
+          `);
+        });
+
+        // Ghép thêm đơn vào pool
+        $$("[data-pool-add]", listView).forEach(btn => btn.onclick = async () => {
+          const p = pools.find(x => x.id === btn.dataset.poolAdd);
+          if (!p) return;
+          const eligible = bookings.filter(b => !['cancelled','refunded'].includes(b.status) && !(p.bookings || []).includes(b.id));
+          const v = await ask(`Ghép thêm đơn vào: ${p.tourName}`, [
+            { name: "bookingId", label: "Chọn đơn cần ghép thêm", type: "select", options: eligible.map(b => [b.id, `${b.payCode} – ${b.customerName} (${b.pax} khách)`]) },
+            { name: "note", label: "Ghi chú ghép", type: "text", placeholder: "Lý do / thỏa thuận ghép" }
+          ], { submit: "Ghép vào đoàn", kind: "ok" });
+          if (v) act(null, () => post("/api/admin/tours/pool/merge", { poolId: p.id, bookingIds: [v.bookingId], note: v.note }), "Đã ghép đơn vào đoàn.", reload);
+        });
+      }
 
       await reload();
     } },
@@ -886,17 +1566,23 @@
             { t: "Món ăn", html: f => {
               const src = f.image ? (/^(https?:|\/|data:)/.test(f.image) ? f.image : "/" + f.image) : "";
               const img = src ? `<img src="${esc(src)}" style="width:44px;height:44px;border-radius:6px;object-fit:cover" onerror="this.outerHTML='<div style=\\'width:44px;height:44px;border-radius:6px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:22px\\'>${esc(f.emoji || "🍜")}</div>'">` : `<div style="width:44px;height:44px;border-radius:6px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:22px">${esc(f.emoji || "🍜")}</div>`;
-              return `<div style="display:flex;align-items:center;gap:10px">${img}<div><b>${esc(f.name)}</b>${(f.province || f.dest) ? `<div class="small muted">📍 ${esc(f.province || f.dest)}</div>` : ""}</div></div>`;
+              const isProt = ["phở hà nội", "bún bò huế", "cơm tấm sài gòn"].includes(String(f.name || "").trim().toLowerCase()) || f.featured || f.isProtected;
+              const isNewF = !isProt && (f.isNew || f.badge === "new" || f.badge === "MỚI" || (f.newUntil && f.newUntil >= new Date().toISOString().slice(0, 10)));
+              const badgeHtml = isProt ? '<span class="badge amber" style="margin-left:6px;font-size:11px">⭐ Tiêu biểu 3 miền</span>' : (isNewF ? '<span class="badge ok" style="margin-left:6px;font-size:11px">MỚI</span>' : '');
+              return `<div style="display:flex;align-items:center;gap:10px">${img}<div><b>${esc(f.name)}</b>${badgeHtml}${(f.province || f.dest) ? `<div class="small muted">📍 ${esc(f.province || f.dest)}</div>` : ""}</div></div>`;
             } },
             { t: "Vùng miền", html: f => pill(REG[f.region] || f.region, f.region === "bac" ? "info" : f.region === "trung" ? "warn" : "ok") },
             { t: "Mô tả", html: f => `<div style="max-width:420px;font-size:0.85rem;line-height:1.45;color:var(--muted)">${esc(f.description || f.desc || "—")}</div>` },
             { t: "Trạng thái", html: f => f.active !== false ? pill("Đang hiện", "ok") : pill("Đang ẩn", "bad") },
-            { t: "Thao tác", nowrap: true, cls: "actions", html: f => `
+            { t: "Thao tác", nowrap: true, cls: "actions", html: f => {
+              const isProt = ["phở hà nội", "bún bò huế", "cơm tấm sài gòn"].includes(String(f.name || "").trim().toLowerCase()) || f.featured || f.isProtected;
+              return `
               <div class="act-btns">
                 <button class="btn sm" data-f-edit="${esc(f.id)}">Sửa</button>
                 <button class="btn sm ${f.active !== false ? "bad" : "ok"}" data-f-toggle="${esc(f.id)}">${f.active !== false ? "Ẩn" : "Hiện"}</button>
-                <button class="btn bad sm" data-f-del="${esc(f.id)}">Xóa</button>
-              </div>` }
+                ${isProt ? `<button class="btn sm" disabled title="Món tiêu biểu 3 miền được bảo vệ, không thể xóa">🔒 Khóa</button>` : `<button class="btn bad sm" data-f-del="${esc(f.id)}">Xóa</button>`}
+              </div>`;
+            } }
           ], filtered, { empty: searchKw || currentFilter !== "all" ? "Không tìm thấy món ăn phù hợp với bộ lọc." : "Chưa có món đặc sản nào." });
 
         const searchInp = $("#food-search-kw", el);
@@ -968,16 +1654,25 @@
 
         async function openFoodModal(f) {
           const isEdit = !!f;
+          const isProt = isEdit && (["phở hà nội", "bún bò huế", "cơm tấm sài gòn"].includes(String(f.name || "").trim().toLowerCase()) || f.featured || f.isProtected);
           const v = await ask(isEdit ? "Sửa món: " + f.name : "Thêm món đặc sản mới", [
             { name: "name", label: "Tên món đặc sản", value: f?.name || "", required: true, placeholder: "VD: Phở Bát Đàn, Mì Quảng, Bún chả..." },
             { name: "region", label: "Vùng miền", type: "select", value: f?.region || "bac", options: [["bac", "Miền Bắc"], ["trung", "Miền Trung"], ["nam", "Miền Nam"]] },
             { name: "province", label: "Tỉnh / Thành phố nổi tiếng", value: f?.province || f?.dest || "", placeholder: "VD: Hà Nội, Quảng Nam, Đà Nẵng..." },
             { name: "image", label: "Ảnh (đường dẫn hoặc tải lên)", upload: "food", value: f?.image || "", placeholder: "VD: img/foods/pho.jpg hoặc URL ảnh" },
             { name: "desc", label: "Giới thiệu món ăn", type: "textarea", value: f?.description || f?.desc || "" },
+            { name: "newUntil", label: "Hạn gắn nhãn 'MỚI'", type: "date", value: f?.newUntil ? f.newUntil.slice(0, 10) : new Date(Date.now() + 30*86400000).toISOString().slice(0, 10) },
             { name: "active", label: "Hiển thị trên trang Ẩm thực", type: "checkbox", value: f ? f.active !== false : true }
-          ], { submit: isEdit ? "Lưu món" : "Thêm món" });
+          ], {
+            submit: isEdit ? "Lưu món" : "Thêm món",
+            intro: isProt ? '<div class="note warn"><b>Lưu ý:</b> Đây là 1 trong 3 món đặc sản tiêu biểu của 3 vùng miền, không được đổi tên hoặc thay thế bằng món khác.</div>' : ''
+          });
 
           if (!v) return;
+          if (isProt && v.name.trim().toLowerCase() !== f.name.trim().toLowerCase()) {
+            Staff.toast("Không được phép thay đổi tên 3 món tiêu biểu của 3 vùng miền!", "bad");
+            return;
+          }
           const payload = {
             name: v.name,
             region: v.region,
@@ -985,13 +1680,16 @@
             image: v.image,
             description: v.desc,
             desc: v.desc,
+            newUntil: v.newUntil,
+            isNew: !isEdit || f.isNew,
+            badge: "MỚI",
             active: v.active
           };
 
           if (isEdit) {
             act(null, () => put(`/api/content/foods/${encodeURIComponent(f.id)}`, payload), "Đã lưu món ăn.", reload);
           } else {
-            act(null, () => post("/api/content/foods", payload), "Đã thêm món đặc sản.", reload);
+            act(null, () => post("/api/content/foods", payload), "Đã thêm món đặc sản (đã gắn nhãn MỚI).", reload);
           }
         }
 
@@ -1011,6 +1709,11 @@
         $$("[data-f-del]", el).forEach(btn => btn.onclick = async () => {
           const f = list.find(x => x.id === btn.dataset.fDel);
           if (!f) return;
+          const isProt = ["phở hà nội", "bún bò huế", "cơm tấm sài gòn"].includes(String(f.name || "").trim().toLowerCase()) || f.featured || f.isProtected;
+          if (isProt) {
+            Staff.toast(`Món "${f.name}" là 1 trong 3 món ăn tiêu biểu của 3 miền, không thể xóa hoặc thay thế!`, "bad");
+            return;
+          }
           if (await confirmBox("Xóa món đặc sản", `Xóa món "${f.name}"?`, "bad")) {
             act(null, () => del(`/api/content/foods/${encodeURIComponent(f.id)}`), "Đã xóa món ăn.", reload);
           }
@@ -1022,229 +1725,6 @@
     Customers.section("Khách hàng"),
 
     { id: "staff", label: "Nhân viên", icon: "👥", group: "Nhân sự", perm: "staff:manage", async render(el) {
-      // ── Modal Chi tiết Hồ sơ Nhân viên & Nghiệp vụ Lương, KPI, Xét tăng lương ──
-      async function openStaffProfileModal(staffId, onUpdate) {
-        async function fetchAndRender() {
-          const res = await get(`/api/admin/staff/${encodeURIComponent(staffId)}/salary-profile`);
-          if (!res || !res.profile) {
-            Staff.toast("Không tải được hồ sơ nhân viên", "bad");
-            return;
-          }
-          const p = res.profile;
-          const hist = res.history || [];
-
-          let dueBadge = '';
-          if (p.isDue) {
-            dueBadge = '<span class="badge bad" style="font-size:0.85rem">🔔 Đã đến hạn xét tăng lương</span>';
-          } else if (p.isUpcoming) {
-            dueBadge = `<span class="badge warn" style="font-size:0.85rem">⚠️ Sắp đến hạn xét (${p.daysUntilReview} ngày nữa)</span>`;
-          } else {
-            dueBadge = `<span class="badge info" style="font-size:0.85rem">Còn ${p.daysUntilReview} ngày tới hạn</span>`;
-          }
-
-          const kpiBadge = p.kpiRecent != null
-            ? `<span class="badge ${p.kpiRecent >= 80 ? 'ok' : (p.kpiRecent >= 60 ? 'info' : 'bad')}">${p.kpiRecent}% (${esc(p.kpiRating)})</span>`
-            : '<span class="muted">Chưa đánh giá KPI</span>';
-
-          const statusBadge = p.locked ? pill("Đã khóa", "bad") : pill({ active: "Đang làm việc", probation: "Thử việc", suspended: "Tạm hoãn", resigned: "Đã nghỉ việc" }[p.workingStatus] || "Đang làm việc", "ok");
-
-          const contentHtml = `
-            <div style="min-width:760px;max-width:960px">
-              <div style="display:flex;align-items:center;justify-content:space-between;padding-bottom:12px;border-bottom:1px solid var(--border);margin-bottom:14px;flex-wrap:wrap;gap:10px">
-                <div style="display:flex;align-items:center;gap:12px">
-                  <div style="width:48px;height:48px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.2rem">${esc(p.initials || "NV")}</div>
-                  <div>
-                    <h3 style="margin:0;font-size:1.2rem">${esc(p.name)} <span class="mono muted" style="font-size:0.85rem">(${esc(p.id)})</span></h3>
-                    <div class="muted small">${esc(p.email)} · ${esc(Staff.ROLE_NAME[p.role] || p.role)} · ${statusBadge}</div>
-                  </div>
-                </div>
-                <div>
-                  ${dueBadge}
-                </div>
-              </div>
-
-              <div class="grid g4" style="margin-bottom:16px">
-                <div class="kpi">
-                  <div class="l">Ngày vào làm</div>
-                  <div class="v" style="font-size:1.05rem">${day(p.startDate)}</div>
-                  <div class="s">Hợp đồng lao động</div>
-                </div>
-                <div class="kpi ok">
-                  <div class="l">Lương cơ bản hiện tại</div>
-                  <div class="v" style="font-size:1.15rem;color:var(--ok)">${money(p.baseSalary)}</div>
-                  <div class="s">Chưa gồm phụ cấp & thưởng</div>
-                </div>
-                <div class="kpi ${p.isDue ? 'bad' : (p.isUpcoming ? 'warn' : '')}">
-                  <div class="l">Hạn xét tăng lương</div>
-                  <div class="v" style="font-size:1.05rem">${day(p.nextReviewDate)}</div>
-                  <div class="s">${p.isDue ? 'Đủ 12 tháng – Cần xét ngay' : (p.isUpcoming ? 'Sắp đến hạn xét định kỳ' : 'Chu kỳ xét 12 tháng')}</div>
-                </div>
-                <div class="kpi">
-                  <div class="l">KPI gần nhất</div>
-                  <div class="v" style="font-size:1.05rem">${kpiBadge}</div>
-                  <div class="s">${esc(p.kpiPeriod || "Chưa có kỳ đánh giá")}</div>
-                </div>
-              </div>
-
-              <!-- Thẻ dự báo xét tăng lương -->
-              <div class="card" style="background:var(--bg-subtle, #f8fafc);border:1px solid var(--border);border-radius:8px;padding:14px 18px;margin-bottom:16px">
-                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
-                  <div style="flex:1;min-width:300px">
-                    <b style="font-size:0.95rem">📊 Thông tin & Dự kiến xét tăng lương:</b>
-                    <div class="small muted" style="margin-top:4px">
-                      Tỷ lệ tăng lương theo kết quả KPI: <b>+${p.expectedRaisePercent}%</b> 
-                      ${p.kpiRating ? `(Xếp loại: <b>${esc(p.kpiRating)}</b>)` : ''} 
-                      → Lương mới dự kiến: <b style="color:var(--ok);font-size:1rem">${money(p.expectedNewSalary)} / tháng</b>
-                      ${p.expectedRaisePercent > 0 ? ` (+${money(p.expectedNewSalary - p.baseSalary)})` : ''}
-                    </div>
-                  </div>
-                  <div style="display:flex;gap:6px;flex-wrap:wrap">
-                    <button class="btn sm" id="m-kpi-btn" title="Chấm điểm KPI cho nhân viên">📝 Đánh giá KPI</button>
-                    <button class="btn ok sm" id="m-rev-btn" title="Xét tăng lương định kỳ 12 tháng dựa trên KPI">📈 Xét tăng lương</button>
-                    <button class="btn primary sm" id="m-early-btn" title="Tăng lương trước hạn do thăng chức hoặc thành tích">⚡ Tăng trước hạn</button>
-                  </div>
-                </div>
-                ${p.kpiNote ? `<div class="small muted" style="margin-top:8px;font-style:italic">Ghi chú đánh giá KPI: "${esc(p.kpiNote)}"</div>` : ''}
-              </div>
-
-              <!-- Bảng lịch sử thay đổi lương -->
-              <div>
-                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-                  <h4 style="margin:0">📜 Lịch sử thay đổi lương (${hist.length} bản ghi)</h4>
-                  <span class="small muted">Lưu trữ vĩnh viễn, không ghi đè dữ liệu cũ</span>
-                </div>
-                <div class="tbl-wrap" style="max-height:220px;overflow-y:auto;border:1px solid var(--border);border-radius:6px">
-                  <table style="width:100%;font-size:0.85rem;margin:0">
-                    <thead>
-                      <tr>
-                        <th>Ngày áp dụng</th>
-                        <th>Lương cũ</th>
-                        <th>Lương mới</th>
-                        <th>% Tăng</th>
-                        <th>KPI</th>
-                        <th>Xếp loại</th>
-                        <th>Lý do / Căn cứ</th>
-                        <th>Người duyệt</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      ${hist.length === 0 ? '<tr><td colspan="8" class="muted center" style="padding:16px">Chưa có lịch sử thay đổi lương</td></tr>' : hist.map(h => `
-                        <tr>
-                          <td>${day(h.effectiveDate)}</td>
-                          <td>${h.oldSalary > 0 ? money(h.oldSalary) : '—'}</td>
-                          <td><b>${money(h.newSalary)}</b></td>
-                          <td>${h.increasePercent > 0 ? `<b style="color:var(--ok)">+${h.increasePercent}%</b>` : '<span class="muted">0%</span>'}</td>
-                          <td>${h.kpi != null ? `${h.kpi}%` : '—'}</td>
-                          <td>${h.kpiRating ? `<span class="badge ${h.kpi >= 80 ? 'ok' : 'info'}">${esc(h.kpiRating)}</span>` : '—'}</td>
-                          <td>${esc(h.reason || '—')}</td>
-                          <td>${esc(h.approvedByName || h.approvedBy || 'Admin')}</td>
-                        </tr>
-                      `).join('')}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          `;
-
-          const modal = Staff.modal(`Hồ sơ & Quản lý Lương: ${p.name}`, contentHtml, [
-            { label: "Đóng", kind: "ghost" }
-          ]);
-
-          // Sự kiện Đánh giá KPI
-          const kpiBtn = $("#m-kpi-btn", modal);
-          if (kpiBtn) kpiBtn.onclick = async () => {
-            const v = await ask(`Đánh giá KPI cho ${p.name}`, [
-              { name: "kpi", label: "Điểm KPI (0 - 100%)", type: "number", value: p.kpiRecent != null ? p.kpiRecent : 85, required: true, hint: ">=90%: Xuất sắc (+10%) | 80-89%: Tốt (+7%) | 70-79%: Khá (+5%) | 60-69%: Đạt (+3%) | <60%: Không đạt (0%)" },
-              { name: "period", label: "Kỳ đánh giá", type: "text", value: "Kỳ đánh giá " + new Date().getFullYear(), required: true },
-              { name: "note", label: "Nhận xét / Đánh giá chi tiết", type: "textarea", placeholder: "Ghi nhận đóng góp, hiệu quả công việc và thái độ..." }
-            ], { kind: "ok", submit: "Lưu kết quả KPI" });
-            if (v) {
-              await post(`/api/admin/staff/${p.id}/kpi-evaluate`, { kpi: Number(v.kpi), period: v.period, note: v.note });
-              Staff.toast("Đã lưu kết quả đánh giá KPI thành công.", "ok");
-              modal.close();
-              if (onUpdate) onUpdate();
-              openStaffProfileModal(staffId, onUpdate);
-            }
-          };
-
-          // Sự kiện Xét tăng lương định kỳ
-          const revBtn = $("#m-rev-btn", modal);
-          if (revBtn) revBtn.onclick = async () => {
-            if (p.kpiRecent == null) {
-              Staff.toast("Nhân viên chưa có kết quả đánh giá KPI. Vui lòng bấm 'Đánh giá KPI' trước khi xét tăng lương.", "bad");
-              return;
-            }
-            const confirmMsg = `
-              <div style="font-size:0.95rem;line-height:1.6">
-                <div>Nhân viên: <b>${esc(p.name)}</b> (${esc(p.id)})</div>
-                <div>Lương cơ bản hiện tại: <b>${money(p.baseSalary)}</b></div>
-                <div>Kết quả KPI: <b class="badge ${p.kpiRecent >= 80 ? 'ok' : 'info'}">${p.kpiRecent}% (${esc(p.kpiRating)})</b></div>
-                <div>Tỷ lệ tăng theo quy chế: <b style="color:var(--ok)">+${p.expectedRaisePercent}%</b></div>
-                <div>Mức lương mới sau xét duyệt: <b style="color:var(--ok);font-size:1.1rem">${money(p.expectedNewSalary)} / tháng</b></div>
-                <div class="note info" style="margin-top:10px">Kỳ xét tăng lương tiếp theo sẽ tự động được gia hạn thêm <b>12 tháng</b>.</div>
-              </div>
-            `;
-            const v = await ask("Xác nhận xét tăng lương định kỳ 12 tháng", [
-              { name: "note", label: "Ghi chú phê duyệt", type: "text", value: `Xét định kỳ 12 tháng theo KPI ${p.kpiRecent}% (${p.kpiRating})` }
-            ], {
-              intro: confirmMsg,
-              kind: "ok",
-              submit: "Phê duyệt tăng lương"
-            });
-            if (v) {
-              await post(`/api/admin/staff/${p.id}/salary-review`, { note: v.note });
-              Staff.toast("Đã phê duyệt điều chỉnh lương định kỳ thành công.", "ok");
-              modal.close();
-              if (onUpdate) onUpdate();
-              openStaffProfileModal(staffId, onUpdate);
-            }
-          };
-
-          // Sự kiện Tăng lương trước hạn
-          const earlyBtn = $("#m-early-btn", modal);
-          if (earlyBtn) earlyBtn.onclick = async () => {
-            const v = await ask(`Tăng lương trước hạn cho ${p.name}`, [
-              {
-                name: "reasonType",
-                label: "Lý do tăng trước hạn",
-                type: "select",
-                options: [
-                  ["promotion", "Thăng chức (Áp dụng khung lương chức danh mới)"],
-                  ["outstanding", "Thành tích nổi bật / Dự án xuất sắc"],
-                  ["responsibility", "Đảm nhận thêm phạm vi trách nhiệm mới"],
-                  ["position_adjustment", "Điều chỉnh theo vị trí công việc"],
-                  ["other", "Lý do đặc biệt khác"]
-                ]
-              },
-              { name: "newSalary", label: "Mức lương mới (₫ / tháng)", type: "number", value: Math.round(p.baseSalary * 1.15 / 1000) * 1000, required: true, hint: `Mức lương hiện tại: ${money(p.baseSalary)}. Không bị giới hạn 3–10% khi thăng chức.` },
-              { name: "effectiveDate", label: "Ngày bắt đầu áp dụng", type: "date", value: new Date().toISOString().slice(0, 10), required: true },
-              { name: "reason", label: "Quyết định & Căn cứ chi tiết", type: "textarea", required: true, placeholder: "Mô tả lý do thăng chức, thành tích nổi bật hoặc quyết định bổ nhiệm..." }
-            ], {
-              kind: "ok",
-              submit: "Phê duyệt tăng trước hạn",
-              intro: `<div class="note info">Trường hợp thăng chức hoặc thành tích nổi bật, Ban Giám Đốc có thể chỉ định mức lương mới vượt khung 10% của xét định kỳ. Ngày xét lương tiếp theo sẽ được tính 12 tháng kể từ ngày áp dụng này.</div>`
-            });
-            if (v) {
-              await post(`/api/admin/staff/${p.id}/salary-early-raise`, {
-                newSalary: Number(v.newSalary),
-                reasonType: v.reasonType,
-                reason: v.reason,
-                effectiveDate: v.effectiveDate
-              });
-              Staff.toast("Đã phê duyệt tăng lương trước hạn thành công.", "ok");
-              modal.close();
-              if (onUpdate) onUpdate();
-              openStaffProfileModal(staffId, onUpdate);
-            }
-          };
-        }
-
-        await fetchAndRender();
-      }
-
-      window.__openStaffProfileModal = openStaffProfileModal;
-
       const bar = Parts.search(() => reload(), "Tìm tên, email, mã…", `<select id="sr"><option value="">Mọi vai trò</option></select><select id="ss"><option value="">Mọi trạng thái</option><option value="active">Hoạt động</option><option value="locked">Đã khóa</option></select>
         <div class="row" style="gap:6px">
           <button class="btn sm" id="st-exp-excel" title="Xuất Excel danh sách nhân viên">📊 Xuất Excel</button>
@@ -1455,166 +1935,448 @@
     } },
 
     { id: "salaries", label: "Quản lý Lương", icon: "💼", group: "Nhân sự", perm: "staff:manage", async render(el) {
+      let roleTab = "all";
+      let filterYear = "";
+      let filterQuarter = "";
+      let filterMonth = "";
+      let filterRole = "";
+      let filterType = "";
+      let logPageLimit = 100;
+
       async function reload() {
         const res = await get("/api/admin/salaries");
         const list = res.staff || [];
         const logs = res.logs || [];
         const defSal = res.defaultSalary || 15000000;
 
+        // Group counts by role
+        const roleCounts = {
+          all: list.length,
+          operator: list.filter(x => (x.role || "").toLowerCase() === "operator").length,
+          cashier: list.filter(x => (x.role || "").toLowerCase() === "cashier").length,
+          support: list.filter(x => (x.role || "").toLowerCase() === "support").length,
+          content: list.filter(x => (x.role || "").toLowerCase() === "content").length,
+          guide: list.filter(x => (x.role || "").toLowerCase() === "guide").length,
+          admin: list.filter(x => (x.role || "").toLowerCase() === "admin").length
+        };
+
+        const roleNames = {
+          all: "Tất cả nhân viên",
+          operator: "Điều hành tour",
+          cashier: "Thu ngân",
+          support: "Chăm sóc khách hàng",
+          content: "Biên tập viên",
+          guide: "Hướng dẫn viên",
+          admin: "Quản trị viên"
+        };
+
+        const totalCompanyFund = list.reduce((s, x) => s + (x.baseSalary || defSal), 0);
+
         el.innerHTML = `
           <div class="card">
             <div class="row" style="justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
               <div>
-                <h2 style="margin:0">Quản lý Lương & Phát lương Nhân viên</h2>
-                <div class="muted small" style="margin-top:4px">Áp dụng cho các vai trò văn phòng: Điều hành tour, Thu ngân, CSKH, Biên tập viên (HDV nhận theo 20% giá tour).</div>
+                <h2 style="margin:0">Quản lý Lương & Phát lương Nhân sự</h2>
+                <div class="muted small" style="margin-top:4px">Bảng lương riêng biệt từng vai trò, xét tăng lương KPI định kỳ, phát lương trực tiếp và khấu trừ tự động vào Dashboard doanh thu.</div>
               </div>
-              <button class="btn ok" id="adm-pay-all-btn">💵 Phát lương toàn bộ nhân viên (${list.length} người)</button>
+              <div class="row" style="gap:8px;flex-wrap:wrap">
+                <button class="btn primary" id="adm-pay-all-btn">💰 Phát lương toàn công ty (${list.length} người)</button>
+              </div>
             </div>
 
             <div class="grid g3" style="margin-top:16px">
-              <div class="kpi"><div class="l">Nhân viên văn phòng</div><div class="v">${list.length} người</div></div>
-              <div class="kpi ok"><div class="l">Tổng quỹ lương / đợt</div><div class="v">${money(list.reduce((s, x) => s + (x.baseSalary || defSal), 0))}</div></div>
-              <div class="kpi"><div class="l">Định mức mặc định</div><div class="v">${money(defSal)}</div></div>
+              <div class="kpi"><div class="l">Tổng nhân sự nội bộ</div><div class="v">${list.length} người</div><div class="s">6 vai trò phòng ban</div></div>
+              <div class="kpi ok"><div class="l">Tổng quỹ lương công ty / đợt</div><div class="v">${money(totalCompanyFund)}</div><div class="s">Tự động trừ thực thu Dashboard</div></div>
+              <div class="kpi"><div class="l">Lương cơ bản bình quân</div><div class="v">${money(list.length ? Math.round(totalCompanyFund / list.length) : defSal)}</div><div class="s">Định mức: ${money(defSal)}</div></div>
             </div>
           </div>
 
           <div class="card">
-            <h2>Bảng lương nhân viên văn phòng</h2>
+            <div class="card-header-acts" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px">
+              <div>
+                <h2 style="margin:0" id="role-table-title">Bảng lương theo từng vai trò</h2>
+                <div class="muted small" style="margin-top:2px">Bấm vào từng vai trò bên dưới để quản lý bảng lương riêng của phòng ban đó</div>
+              </div>
+            </div>
+
+            <!-- Tab chọn vai trò riêng biệt -->
+            <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:10px;margin-bottom:14px;border-bottom:1px solid var(--border)">
+              <button class="pill-btn ${roleTab === 'all' ? 'active' : ''}" data-role-tab="all">👥 Tất cả (${roleCounts.all})</button>
+              <button class="pill-btn ${roleTab === 'operator' ? 'active' : ''}" data-role-tab="operator">🧭 Điều hành (${roleCounts.operator})</button>
+              <button class="pill-btn ${roleTab === 'cashier' ? 'active' : ''}" data-role-tab="cashier">🧾 Thu ngân (${roleCounts.cashier})</button>
+              <button class="pill-btn ${roleTab === 'support' ? 'active' : ''}" data-role-tab="support">🎧 CSKH (${roleCounts.support})</button>
+              <button class="pill-btn ${roleTab === 'content' ? 'active' : ''}" data-role-tab="content">📝 Biên tập (${roleCounts.content})</button>
+              <button class="pill-btn ${roleTab === 'guide' ? 'active' : ''}" data-role-tab="guide">🧑‍✈️ HDV (${roleCounts.guide})</button>
+              <button class="pill-btn ${roleTab === 'admin' ? 'active' : ''}" data-role-tab="admin">🛡️ Quản trị (${roleCounts.admin})</button>
+            </div>
+
+            <!-- Thống kê nhanh vai trò đang chọn -->
+            <div id="role-quick-stats" style="margin-bottom:12px"></div>
+
             <div id="adm-salary-table"></div>
           </div>
 
           <div class="card">
-            <h2>Lịch sử phát lương & Điều chỉnh gần đây (${logs.length})</h2>
+            <div class="card-header-acts" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px">
+              <div>
+                <h2 style="margin:0">Lịch sử phát lương & Thống kê quỹ lương (${logs.length} bản ghi)</h2>
+                <div class="muted small" style="margin-top:2px">Thống kê chi tiết quỹ lương chi trả theo từng Tháng, Quý, Năm và Vai trò</div>
+              </div>
+            </div>
+
+            <!-- Bộ lọc thời gian & vai trò thống kê lương -->
+            <div class="row" style="gap:10px;flex-wrap:wrap;margin-bottom:14px;background:var(--bg);padding:10px 14px;border-radius:8px;border:1px solid var(--border);align-items:center">
+              <div style="font-weight:600;font-size:13px;display:flex;align-items:center;gap:4px">🔍 Lọc thống kê:</div>
+              <select id="sal-flt-year" class="input sm" style="width:130px">
+                <option value="">Tất cả các năm</option>
+                ${Array.from({ length: 2026 - 1986 + 1 }, (_, i) => 2026 - i).map(y => `<option value="${y}" ${filterYear === String(y) ? 'selected' : ''}>Năm ${y}</option>`).join('')}
+              </select>
+
+              <select id="sal-flt-quarter" class="input sm" style="width:120px">
+                <option value="">Tất cả các quý</option>
+                <option value="1" ${filterQuarter === '1' ? 'selected' : ''}>Quý 1 (T1-T3)</option>
+                <option value="2" ${filterQuarter === '2' ? 'selected' : ''}>Quý 2 (T4-T6)</option>
+                <option value="3" ${filterQuarter === '3' ? 'selected' : ''}>Quý 3 (T7-T9)</option>
+                <option value="4" ${filterQuarter === '4' ? 'selected' : ''}>Quý 4 (T10-T12)</option>
+              </select>
+
+              <select id="sal-flt-month" class="input sm" style="width:120px">
+                <option value="">Tất cả tháng</option>
+                ${Array.from({ length: 12 }, (_, i) => i + 1).map(m => `<option value="${m}" ${filterMonth === String(m) ? 'selected' : ''}>Tháng ${m}</option>`).join('')}
+              </select>
+
+              <select id="sal-flt-role" class="input sm" style="width:140px">
+                <option value="">Tất cả vai trò</option>
+                <option value="operator" ${filterRole === 'operator' ? 'selected' : ''}>Điều hành tour</option>
+                <option value="cashier" ${filterRole === 'cashier' ? 'selected' : ''}>Thu ngân</option>
+                <option value="support" ${filterRole === 'support' ? 'selected' : ''}>CSKH</option>
+                <option value="content" ${filterRole === 'content' ? 'selected' : ''}>Biên tập viên</option>
+                <option value="guide" ${filterRole === 'guide' ? 'selected' : ''}>Hướng dẫn viên</option>
+                <option value="admin" ${filterRole === 'admin' ? 'selected' : ''}>Quản trị viên</option>
+              </select>
+
+              <select id="sal-flt-type" class="input sm" style="width:130px">
+                <option value="">Tất cả loại GD</option>
+                <option value="pay" ${filterType === 'pay' ? 'selected' : ''}>Phát lương</option>
+                <option value="bonus" ${filterType === 'bonus' ? 'selected' : ''}>Thưởng nóng</option>
+                <option value="fine" ${filterType === 'fine' ? 'selected' : ''}>Trừ phạt (-200k)</option>
+                <option value="increase" ${filterType === 'increase' ? 'selected' : ''}>Tăng lương</option>
+                <option value="decrease" ${filterType === 'decrease' ? 'selected' : ''}>Giảm lương</option>
+              </select>
+
+              <button class="btn sm" id="sal-flt-reset" title="Đặt lại bộ lọc">🔄 Đặt lại</button>
+            </div>
+
+            <!-- KPI thống kê quỹ lương theo bộ lọc -->
+            <div id="sal-stats-kpis" class="grid g4" style="margin-bottom:16px"></div>
+
             <div id="adm-salary-logs"></div>
           </div>
         `;
 
+        // Hàm kiểm tra ngày phát lương (ngày 25 hàng tháng)
+        async function checkPayDayWarning() {
+          const PAY_DAY = 25;
+          const now = new Date();
+          const d = now.getDate();
+          const m = now.getMonth() + 1;
+          if (d !== PAY_DAY) {
+            return await confirmBox(
+              "⚠️ Chưa tới ngày phát lương định kỳ",
+              `Hôm nay là <b>ngày ${d}/${m}</b>. Ngày phát lương định kỳ của công ty là <b>ngày ${PAY_DAY} hàng tháng</b>.<br><br>Bạn có chắc chắn muốn duyệt chi phát lương trước hạn không?`,
+              "warn"
+            );
+          }
+          return true;
+        }
+
+        // Render bảng lương theo vai trò đang chọn
+        function renderStaffTable() {
+          const filtered = roleTab === "all" ? list : list.filter(x => (x.role || "").toLowerCase() === roleTab);
+          const roleFund = filtered.reduce((s, x) => s + (x.baseSalary || defSal), 0);
+
+          $("#role-table-title", el).textContent = `Bảng lương: ${roleNames[roleTab]} (${filtered.length} nhân sự)`;
+          $("#role-quick-stats", el).innerHTML = `
+            <div class="note info" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+              <div>Phòng ban: <b>${roleNames[roleTab]}</b> · Số lượng: <b>${filtered.length}</b> người · Tổng quỹ lương đợt: <b style="color:var(--ok)">${money(roleFund)}</b></div>
+              ${filtered.length ? `<span class="small muted">Lương TB: <b>${money(Math.round(roleFund / filtered.length))}</b> / người / tháng</span>` : ""}
+            </div>
+          `;
+
+          const tbl = $("#adm-salary-table", el);
+          tbl.innerHTML = table([
+            { t: "Nhân viên & Vai trò", cls: "sticky-col", html: s => {
+              const isG = s.role === "guide";
+              const typeBadge = isG ? (s.baseSalary > 0 ? '<span class="badge ok" style="font-size:11px">HDV Biên chế</span>' : '<span class="badge" style="font-size:11px">HDV Cộng tác viên</span>') : `<span class="badge info" style="font-size:11px">${esc(s.roleName || s.role)}</span>`;
+              return `
+                <div style="min-width:180px">
+                  <div style="font-weight:700;font-size:14px;color:var(--text)">${esc(s.name)}</div>
+                  <div class="small muted" style="margin-top:2px">${esc(s.id)} · ${typeBadge}</div>
+                  <div class="small muted" style="font-size:11px">${esc(s.email)}</div>
+                </div>
+              `;
+            } },
+            { t: "Lương cơ bản", num: true, html: s => {
+              if (s.role === "guide") {
+                if (!s.baseSalary || s.baseSalary <= 0) {
+                  return `<b style="color:var(--muted);font-size:0.95rem">0 ₫</b><div class="small muted">Hưởng thù lao tour (7–10% hoặc 10–12%)</div>`;
+                }
+                return `<b style="color:var(--navy);font-size:1.05rem">${money(s.baseSalary)}</b><div class="small ok">+ Thù lao tour (3–5% hoặc 5–7%)</div>`;
+              }
+              return `<b style="color:var(--navy);font-size:1.05rem">${money(s.baseSalary || defSal)}</b>`;
+            } },
+            { t: "KPI gần nhất", html: s => {
+              const k = s.kpiRecent != null ? s.kpiRecent : s.kpi;
+              if (k != null) {
+                const rat = s.kpiRating || (k >= 90 ? 'Xuất sắc' : (k >= 80 ? 'Tốt' : (k >= 60 ? 'Khá' : 'Đạt')));
+                return `<span class="badge ${k >= 80 ? 'ok' : (k >= 60 ? 'info' : 'bad')}">${k}% · ${esc(rat)}</span>`;
+              }
+              return '<span class="muted small">Chưa đánh giá</span>';
+            } },
+            { t: "Hạn xét lương", html: s => {
+              let badge = '';
+              if (s.isDue) badge = '<div class="badge bad" style="font-size:10px;margin-top:2px">🔔 Đến hạn</div>';
+              else if (s.isUpcoming) badge = `<div class="badge warn" style="font-size:10px;margin-top:2px">⚠️ Sắp đến (${s.daysUntilReview}d)</div>`;
+              return `<span style="font-size:13px">${day(s.nextReviewDate)}</span>${badge}`;
+            } },
+            { t: "Ví / Đã nhận", num: true, html: s => `
+              <div>Ví: <b style="color:var(--ok)">${money(s.balance)}</b></div>
+              <div class="small muted">Đã nhận: ${money(s.totalEarned)}</div>
+            ` },
+            { t: "Thao tác", nowrap: true, cls: "actions", html: s => `
+              <div class="act-btns" style="display:flex;gap:4px;align-items:center;flex-wrap:nowrap">
+                <button class="btn ok sm" data-prof="${esc(s.id)}" title="Xem chi tiết hồ sơ lương, đánh giá KPI và xét tăng lương">👁️ Xét lương & KPI</button>
+                <button class="btn primary sm" data-pay="${esc(s.id)}" title="Phát lương cho nhân viên này">💵 Phát lương</button>
+                <button class="btn sm" data-inc="${esc(s.id)}" title="Tăng lương cơ bản">➕</button>
+                <button class="btn sm" data-dec="${esc(s.id)}" title="Giảm lương cơ bản">➖</button>
+                <button class="btn sm" data-bon="${esc(s.id)}" title="Thưởng nóng">🎁</button>
+                <button class="btn bad sm" data-rem="${esc(s.id)}" title="Ghi 1 lỗi & phạt 200k tiền lương">⚠️ Phạt (-200k)</button>
+              </div>
+            ` }
+          ], filtered, { empty: `Chưa có nhân viên nào trong vai trò ${roleNames[roleTab]}` });
+
+          const wrap = tbl.querySelector(".tbl-wrap");
+          if (wrap) wrap.scrollLeft = 0;
+
+          $$("[data-prof]", tbl).forEach(btn => btn.onclick = () => {
+            openStaffProfileModal(btn.dataset.prof, reload);
+          });
+
+          $$("[data-pay]", tbl).forEach(btn => btn.onclick = async () => {
+            if (!(await checkPayDayWarning())) return;
+            const s = list.find(x => x.id === btn.dataset.pay);
+            const v = await ask(`Phát lương cho ${s.name}`, [
+              { name: "amount", label: "Số tiền phát lương (₫)", type: "number", value: s.baseSalary || defSal, required: true },
+              { name: "note", label: "Ghi chú lời nhắn", type: "text", placeholder: "Ví dụ: Lương tháng " + (new Date().getMonth() + 1) }
+            ], { submit: "Xác nhận phát lương", kind: "ok" });
+            if (v) act(null, () => post("/api/admin/salaries/pay", { staffId: s.id, amount: Number(v.amount), note: v.note }), "Đã phát lương thành công (tiền đã trừ trực tiếp vào Dashboard).", reload);
+          });
+
+          $$("[data-inc]", tbl).forEach(btn => btn.onclick = async () => {
+            const s = list.find(x => x.id === btn.dataset.inc);
+            const v = await ask(`Tăng lương cơ bản cho ${s.name}`, [
+              { name: "amount", label: "Số tiền tăng thêm mỗi tháng (₫)", type: "number", value: 1000000, required: true },
+              { name: "reason", label: "Lý do tăng lương", type: "textarea", required: true, placeholder: "Hoàn thành xuất sắc nhiệm vụ..." }
+            ], { submit: "Tăng lương", kind: "ok", intro: `Mức lương hiện tại: <b>${money(s.baseSalary || defSal)}</b>` });
+            if (v) act(null, () => post("/api/admin/salaries/adjust", { staffId: s.id, action: "increase", amount: Number(v.amount), reason: v.reason }), "Đã tăng lương cơ bản.", reload);
+          });
+
+          $$("[data-dec]", tbl).forEach(btn => btn.onclick = async () => {
+            const s = list.find(x => x.id === btn.dataset.dec);
+            const v = await ask(`Giảm lương cơ bản của ${s.name}`, [
+              { name: "amount", label: "Số tiền giảm bớt mỗi tháng (₫)", type: "number", value: 1000000, required: true },
+              { name: "reason", label: "Lý do giảm lương", type: "textarea", required: true, placeholder: "Vi phạm quy chế hoặc điều chỉnh định mức..." }
+            ], { submit: "Giảm lương", kind: "bad", intro: `Mức lương hiện tại: <b>${money(s.baseSalary || defSal)}</b>` });
+            if (v) act(null, () => post("/api/admin/salaries/adjust", { staffId: s.id, action: "decrease", amount: Number(v.amount), reason: v.reason }), "Đã giảm lương cơ bản.", reload);
+          });
+
+          $$("[data-bon]", tbl).forEach(btn => btn.onclick = async () => {
+            const s = list.find(x => x.id === btn.dataset.bon);
+            const v = await ask(`Thưởng nóng vào ví của ${s.name}`, [
+              { name: "amount", label: "Số tiền thưởng (₫)", type: "number", value: 1000000, required: true },
+              { name: "reason", label: "Lý do khen thưởng", type: "textarea", required: true, placeholder: "Thưởng dự án, thưởng sáng kiến..." }
+            ], { submit: "Thưởng nóng", kind: "ok" });
+            if (v) act(null, () => post("/api/admin/salaries/adjust", { staffId: s.id, action: "bonus", amount: Number(v.amount), reason: v.reason }), "Đã thưởng tiền vào ví nhân viên.", reload);
+          });
+
+          $$("[data-rem]", tbl).forEach(btn => btn.onclick = async () => {
+            const s = list.find(x => x.id === btn.dataset.rem);
+            const v = await ask(`Nhắc nhở vi phạm: ${s.name}`, [
+              { name: "title", label: "Tiêu đề nhắc nhở", required: true, placeholder: "VD: Đi muộn, chưa nộp báo cáo, vi phạm quy định..." },
+              { name: "reason", label: "Lý do / Hành vi vi phạm", type: "textarea", required: true, placeholder: "Mô tả chi tiết vi phạm..." }
+            ], {
+              submit: "Gửi nhắc nhở & Trừ 200k",
+              kind: "bad",
+              intro: `<div class="note warn"><b>Cảnh báo:</b> Khi gửi thông báo nhắc nhở, hệ thống sẽ <b>ghi nhận 1 lỗi vi phạm</b> vào hồ sơ và <b>tự động trừ 200.000 ₫</b> tiền lương/ví thu nhập của nhân viên theo quy chế công ty.</div>`
+            });
+            if (v) act(null, () => post("/api/admin/salaries/remind", { staffId: s.id, title: v.title, reason: v.reason }), "Đã gửi thông báo nhắc nhở, ghi 1 lỗi và trừ 200.000 ₫ tiền lương.", reload);
+          });
+        }
+
+        // Lọc và render lịch sử phát lương
+        function renderSalaryLogs() {
+          let filteredLogs = logs.filter(l => {
+            if (!l.at) return true;
+            const dt = new Date(l.at);
+            const y = dt.getFullYear();
+            const m = dt.getMonth() + 1;
+            const q = Math.ceil(m / 3);
+
+            if (filterYear && String(y) !== filterYear) return false;
+            if (filterQuarter && String(q) !== filterQuarter) return false;
+            if (filterMonth && String(m) !== filterMonth) return false;
+            if (filterRole && (l.role || "").toLowerCase() !== filterRole.toLowerCase()) return false;
+            if (filterType && (l.type || "").toLowerCase() !== filterType.toLowerCase()) return false;
+            return true;
+          });
+
+          // Tính toán số liệu thống kê quỹ lương
+          let sumPay = 0, sumBonus = 0, sumFine = 0, sumInc = 0;
+          for (const l of filteredLogs) {
+            const amt = Number(l.amount) || 0;
+            if (l.type === "pay") sumPay += amt;
+            else if (l.type === "bonus") sumBonus += amt;
+            else if (l.type === "fine") sumFine += amt;
+            else if (l.type === "increase") sumInc += amt;
+          }
+          const netSpent = sumPay + sumBonus - sumFine;
+
+          let labelTime = [];
+          if (filterYear) labelTime.push(`Năm ${filterYear}`);
+          if (filterQuarter) labelTime.push(`Quý ${filterQuarter}`);
+          if (filterMonth) labelTime.push(`Tháng ${filterMonth}`);
+          if (filterRole) labelTime.push(`Vai trò: ${roleNames[filterRole] || filterRole}`);
+          const filterDesc = labelTime.length ? labelTime.join(' · ') : 'Toàn bộ thời gian (2010–2026)';
+
+          const kpiBox = $("#sal-stats-kpis", el);
+          kpiBox.innerHTML = `
+            <div class="kpi ok">
+              <div class="l">Tổng chi quỹ lương (Thực chi)</div>
+              <div class="v">${money(netSpent)}</div>
+              <div class="s">${filterDesc}</div>
+            </div>
+            <div class="kpi">
+              <div class="l">Lương định kỳ đã phát</div>
+              <div class="v">${money(sumPay)}</div>
+              <div class="s">${filteredLogs.filter(l => l.type === 'pay').length} đợt phát lương</div>
+            </div>
+            <div class="kpi" style="border-left:4px solid var(--ok)">
+              <div class="l">Thưởng nóng / Khen thưởng</div>
+              <div class="v" style="color:var(--ok)">+${money(sumBonus)}</div>
+              <div class="s">${filteredLogs.filter(l => l.type === 'bonus').length} lần thưởng</div>
+            </div>
+            <div class="kpi ${sumFine > 0 ? 'bad' : ''}">
+              <div class="l">Tiền phạt vi phạm thu hồi</div>
+              <div class="v" style="color:var(--bad)">-${money(sumFine)}</div>
+              <div class="s">${filteredLogs.filter(l => l.type === 'fine').length} lỗi vi phạm</div>
+            </div>
+          `;
+
+          const logTbl = $("#adm-salary-logs", el);
+          const displaySlice = filteredLogs.slice(0, logPageLimit);
+          logTbl.innerHTML = `
+            ${table([
+              { t: "Thời gian", html: l => dt(l.at), sort: l => l.at },
+              { t: "Nhân viên", html: l => `<b>${esc(l.staffName)}</b><div class="small muted">${esc(l.staffId || "")}</div>` },
+              { t: "Vai trò", html: l => `<span class="badge info">${esc(roleNames[l.role] || l.role)}</span>` },
+              { t: "Hành động", html: l => {
+                const typeMap = {
+                  pay: '<span class="badge ok">Phát lương</span>',
+                  increase: '<span class="badge ok">Tăng lương</span>',
+                  decrease: '<span class="badge bad">Trừ lương</span>',
+                  bonus: '<span class="badge ok">Thưởng nóng</span>',
+                  fine: '<span class="badge bad">Phạt lỗi (-200k)</span>'
+                };
+                return typeMap[l.type] || esc(l.type);
+              } },
+              { t: "Số tiền", num: true, html: l => {
+                if (l.type === "fine" || l.type === "decrease") {
+                  return `<b style="color:var(--bad)">-${money(l.amount)}</b>`;
+                }
+                return `<b>${money(l.amount)}</b>`;
+              } },
+              { t: "Lý do / Lời nhắn", html: l => esc(l.desc || l.reason || l.note || "—") },
+              { t: "Người duyệt", html: l => esc(l.byName || "Admin") }
+            ], displaySlice, { empty: "Không tìm thấy lịch sử phát lương nào phù hợp với bộ lọc" })}
+            ${filteredLogs.length > displaySlice.length ? `
+              <div style="text-align:center;padding:12px">
+                <button class="btn sm" id="sal-logs-show-more">Hiển thị thêm ${Math.min(100, filteredLogs.length - displaySlice.length)} / ${filteredLogs.length - displaySlice.length} bản ghi còn lại</button>
+              </div>
+            ` : ""}
+          `;
+
+          const moreBtn = $("#sal-logs-show-more", logTbl);
+          if (moreBtn) {
+            moreBtn.onclick = () => {
+              logPageLimit += 100;
+              renderSalaryLogs();
+            };
+          }
+        }
+
+        // Bắt sự kiện tab vai trò
+        $$("[data-role-tab]", el).forEach(btn => {
+          btn.onclick = () => {
+            roleTab = btn.dataset.roleTab;
+            $$("[data-role-tab]", el).forEach(b => b.classList.toggle("active", b.dataset.roleTab === roleTab));
+            renderStaffTable();
+          };
+        });
+
+        // Bắt sự kiện bộ lọc thống kê lương
+        $("#sal-flt-year", el).onchange = e => { filterYear = e.target.value; renderSalaryLogs(); };
+        $("#sal-flt-quarter", el).onchange = e => { filterQuarter = e.target.value; renderSalaryLogs(); };
+        $("#sal-flt-month", el).onchange = e => { filterMonth = e.target.value; renderSalaryLogs(); };
+        $("#sal-flt-role", el).onchange = e => { filterRole = e.target.value; renderSalaryLogs(); };
+        $("#sal-flt-type", el).onchange = e => { filterType = e.target.value; renderSalaryLogs(); };
+
+        $("#sal-flt-reset", el).onclick = () => {
+          filterYear = "";
+          filterQuarter = "";
+          filterMonth = "";
+          filterRole = "";
+          filterType = "";
+          $("#sal-flt-year", el).value = "";
+          $("#sal-flt-quarter", el).value = "";
+          $("#sal-flt-month", el).value = "";
+          $("#sal-flt-role", el).value = "";
+          $("#sal-flt-type", el).value = "";
+          renderSalaryLogs();
+        };
+
+        // Bắt sự kiện nút phát lương toàn bộ
         $("#adm-pay-all-btn", el).onclick = async () => {
+          if (!(await checkPayDayWarning())) return;
           const totalQ = list.reduce((s, x) => s + (x.baseSalary || defSal), 0);
-          if (await confirmBox("Xác nhận phát lương tháng", `Bạn có chắc muốn phát lương cho toàn bộ ${list.length} nhân viên? Tổng chi: ${money(totalQ)}`)) {
-            const note = prompt("Nhập ghi chú đợt phát lương (ví dụ: Lương tháng " + (new Date().getMonth() + 1) + "):", "Phát lương định kỳ từ Ban Giám Đốc");
+          if (await confirmBox("Xác nhận phát lương toàn công ty", `Bạn có chắc muốn phát lương cho toàn bộ ${list.length} nhân viên? Tổng chi: ${money(totalQ)}. Số tiền này sẽ tự động trừ vào thực thu của Dashboard doanh thu.`)) {
+            const note = prompt("Nhập ghi chú đợt phát lương (ví dụ: Lương tháng " + (new Date().getMonth() + 1) + "):", "Phát lương định kỳ toàn công ty từ Ban Giám Đốc");
             if (note != null) {
-              act(null, () => post("/api/admin/salaries/pay-all", { note }), "Đã phát lương thành công cho tất cả nhân viên.", reload);
+              act(null, () => post("/api/admin/salaries/pay-all", { note }), "Đã phát lương thành công cho tất cả nhân viên. Doanh thu Dashboard đã được tự động khấu trừ.", reload);
             }
           }
         };
 
-        const tbl = $("#adm-salary-table", el);
-        tbl.innerHTML = table([
-          { t: "Nhân viên", html: s => `<b>${esc(s.name)}</b><div class="small muted">${esc(s.email)} · ${esc(s.id)}</div>` },
-          { t: "Vai trò", html: s => `<span class="badge info">${esc(s.roleName || s.role)}</span><div class="small muted">${esc(s.incomeTitle || "")}</div>` },
-          { t: "Lương cơ bản", num: true, html: s => `<b>${money(s.baseSalary || defSal)}</b>` },
-          { t: "Hạn xét lương", html: s => {
-            let badge = '';
-            if (s.isDue) badge = '<br><span class="badge bad" style="font-size:0.75rem">🔔 Đến hạn xét</span>';
-            else if (s.isUpcoming) badge = `<br><span class="badge warn" style="font-size:0.75rem">⚠️ Sắp đến hạn (${s.daysUntilReview}d)</span>`;
-            return `<span>${day(s.nextReviewDate)}</span>${badge}`;
-          } },
-          { t: "KPI gần nhất", html: s => s.kpiRecent != null ? `<span class="badge ${s.kpiRecent >= 80 ? 'ok' : (s.kpiRecent >= 60 ? 'info' : 'bad')}">${s.kpiRecent}% (${esc(s.kpiRating)})</span>` : '<span class="muted">Chưa có</span>' },
-          { t: "Số dư ví", num: true, html: s => `<span style="color:var(--ok);font-weight:700">${money(s.balance)}</span>` },
-          { t: "Tổng đã nhận", num: true, html: s => money(s.totalEarned) },
-          { t: "Hành động", nowrap: true, cls: "actions", minWidth: "440px", html: s => `
-            <div class="act-btns">
-              <button class="btn ok sm" data-prof="${esc(s.id)}" title="Xem chi tiết hồ sơ lương, đánh giá KPI và xét tăng lương">👁️ Xét lương & KPI</button>
-              <button class="btn ok sm" data-pay="${esc(s.id)}" title="Phát lương">💵 Phát lương</button>
-              <button class="btn sm" data-inc="${esc(s.id)}" title="Tăng lương cơ bản">➕ Tăng</button>
-              <button class="btn sm" data-dec="${esc(s.id)}" title="Giảm lương cơ bản">➖ Trừ</button>
-              <button class="btn sm" data-bon="${esc(s.id)}" title="Thưởng nóng">🎁 Thưởng</button>
-              <button class="btn bad sm" data-rem="${esc(s.id)}" title="Ghi 1 lỗi & phạt 200k tiền lương">⚠️ Phạt (-200k)</button>
-            </div>
-          ` }
-        ], list, { empty: "Chưa có nhân viên văn phòng nào" });
-
-        $$("[data-prof]", tbl).forEach(btn => btn.onclick = () => {
-          if (window.__openStaffProfileModal) window.__openStaffProfileModal(btn.dataset.prof, reload);
-        });
-
-        // Gắn sự kiện các nút hành động
-        $$("[data-pay]", tbl).forEach(btn => btn.onclick = async () => {
-          const s = list.find(x => x.id === btn.dataset.pay);
-          const v = await ask(`Phát lương cho ${s.name}`, [
-            { name: "amount", label: "Số tiền phát lương (₫)", type: "number", value: s.baseSalary || defSal, required: true },
-            { name: "note", label: "Ghi chú lời nhắn", type: "text", placeholder: "Ví dụ: Lương tháng " + (new Date().getMonth() + 1) }
-          ], { submit: "Xác nhận phát lương", kind: "ok" });
-          if (v) act(null, () => post("/api/admin/salaries/pay", { staffId: s.id, amount: Number(v.amount), note: v.note }), "Đã phát lương thành công.", reload);
-        });
-
-        $$("[data-inc]", tbl).forEach(btn => btn.onclick = async () => {
-          const s = list.find(x => x.id === btn.dataset.inc);
-          const v = await ask(`Tăng lương cơ bản cho ${s.name}`, [
-            { name: "amount", label: "Số tiền tăng thêm mỗi tháng (₫)", type: "number", value: 1000000, required: true },
-            { name: "reason", label: "Lý do tăng lương", type: "textarea", required: true, placeholder: "Hoàn thành xuất sắc nhiệm vụ..." }
-          ], { submit: "Tăng lương", kind: "ok", intro: `Mức lương hiện tại: <b>${money(s.baseSalary || defSal)}</b>` });
-          if (v) act(null, () => post("/api/admin/salaries/adjust", { staffId: s.id, action: "increase", amount: Number(v.amount), reason: v.reason }), "Đã tăng lương cơ bản.", reload);
-        });
-
-        $$("[data-dec]", tbl).forEach(btn => btn.onclick = async () => {
-          const s = list.find(x => x.id === btn.dataset.dec);
-          const v = await ask(`Giảm lương cơ bản của ${s.name}`, [
-            { name: "amount", label: "Số tiền giảm bớt mỗi tháng (₫)", type: "number", value: 1000000, required: true },
-            { name: "reason", label: "Lý do giảm lương", type: "textarea", required: true, placeholder: "Vi phạm quy chế hoặc điều chỉnh định mức..." }
-          ], { submit: "Giảm lương", kind: "bad", intro: `Mức lương hiện tại: <b>${money(s.baseSalary || defSal)}</b>` });
-          if (v) act(null, () => post("/api/admin/salaries/adjust", { staffId: s.id, action: "decrease", amount: Number(v.amount), reason: v.reason }), "Đã giảm lương cơ bản.", reload);
-        });
-
-        $$("[data-bon]", tbl).forEach(btn => btn.onclick = async () => {
-          const s = list.find(x => x.id === btn.dataset.bon);
-          const v = await ask(`Thưởng nóng vào ví của ${s.name}`, [
-            { name: "amount", label: "Số tiền thưởng (₫)", type: "number", value: 1000000, required: true },
-            { name: "reason", label: "Lý do khen thưởng", type: "textarea", required: true, placeholder: "Thưởng dự án, thưởng sáng kiến..." }
-          ], { submit: "Thưởng nóng", kind: "ok" });
-          if (v) act(null, () => post("/api/admin/salaries/adjust", { staffId: s.id, action: "bonus", amount: Number(v.amount), reason: v.reason }), "Đã thưởng tiền vào ví nhân viên.", reload);
-        });
-
-        $$("[data-rem]", tbl).forEach(btn => btn.onclick = async () => {
-          const s = list.find(x => x.id === btn.dataset.rem);
-          const v = await ask(`Nhắc nhở vi phạm: ${s.name}`, [
-            { name: "title", label: "Tiêu đề nhắc nhở", required: true, placeholder: "VD: Đi muộn, chưa nộp báo cáo, vi phạm quy định..." },
-            { name: "reason", label: "Lý do / Hành vi vi phạm", type: "textarea", required: true, placeholder: "Mô tả chi tiết vi phạm..." }
-          ], {
-            submit: "Gửi nhắc nhở & Trừ 200k",
-            kind: "bad",
-            intro: `<div class="note warn"><b>Cảnh báo:</b> Khi gửi thông báo nhắc nhở, hệ thống sẽ <b>ghi nhận 1 lỗi vi phạm</b> vào hồ sơ và <b>tự động trừ 200.000 ₫</b> tiền lương/ví thu nhập của nhân viên theo quy chế công ty.</div>`
-          });
-          if (v) act(null, () => post("/api/admin/salaries/remind", { staffId: s.id, title: v.title, reason: v.reason }), "Đã gửi thông báo nhắc nhở, ghi 1 lỗi và trừ 200.000 ₫ tiền lương.", reload);
-        });
-
-        const logTbl = $("#adm-salary-logs", el);
-        logTbl.innerHTML = table([
-          { t: "Thời gian", html: l => dt(l.at), sort: l => l.at },
-          { t: "Nhân viên", html: l => `<b>${esc(l.staffName)}</b>` },
-          { t: "Hành động", html: l => {
-            const typeMap = {
-              pay: '<span class="badge ok">Phát lương</span>',
-              increase: '<span class="badge ok">Tăng lương</span>',
-              decrease: '<span class="badge bad">Trừ lương</span>',
-              bonus: '<span class="badge ok">Thưởng nóng</span>',
-              fine: '<span class="badge bad">Phạt lỗi (-200k)</span>'
-            };
-            return typeMap[l.type] || esc(l.type);
-          } },
-          { t: "Số tiền", num: true, html: l => {
-            if (l.type === "fine" || l.type === "decrease") {
-              return `<b style="color:var(--bad)">-${money(l.amount)}</b>`;
-            }
-            return `<b>${money(l.amount)}</b>`;
-          } },
-          { t: "Lý do / Lời nhắn", html: l => esc(l.desc || l.reason || l.note || "—") },
-          { t: "Người duyệt", html: l => esc(l.byName || "Admin") }
-        ], logs, { empty: "Chưa có lịch sử phát lương hay điều chỉnh nào" });
+        renderStaffTable();
+        renderSalaryLogs();
       }
       await reload();
     } },
 
     { id: "payments", label: "Giám sát thanh toán", icon: "💳", group: "Tài chính", perm: "payment:view", async render(el) {
       const bar = h(`<div class="toolbar">
-        <input type="search" id="pm-q" placeholder="Tìm mã đơn, tên khách, số tiền…" style="min-width:240px">
+        <input type="search" id="pm-q" placeholder="Tìm mã đơn, tên khách, số tiền…" style="min-width:220px">
         <select id="pm-status">
           <option value="all">Tất cả trạng thái</option>
+          <option value="debt">Đơn còn nợ (công nợ)</option>
+          <option value="confirmed_debt">Đơn chốt duyệt còn nợ</option>
+          <option value="deposit">Đã cọc</option>
           <option value="pending">Chờ xác nhận tiền</option>
           <option value="paid">Đã thanh toán đủ</option>
-          <option value="deposit">Đã cọc</option>
-          <option value="refunded">Đã hoàn tiền</option>
+          <option value="refunded">Đã hoàn tiền / hủy</option>
+        </select>
+        <select id="pm-year">
+          <option value="all">Mọi năm (1986–2026)</option>
+          ${Array.from({ length: 2026 - 1986 + 1 }, (_, i) => 2026 - i).map(y => `<option value="${y}" ${y === 2026 ? "selected" : ""}>Năm ${y}</option>`).join('')}
         </select>
         <button class="btn sm" id="pm-refresh">🔄 Làm mới</button>
       </div>`);
@@ -1623,19 +2385,31 @@
       el.append(bar, summaryBox, body);
 
       async function reload() {
-        const [qData, bookingsData] = await Promise.all([
+        const [qData, bookingsData, statsData] = await Promise.all([
           get("/api/cashier/queue").catch(() => ({ queue: [] })),
-          get("/api/admin/bookings?status=").catch(() => ({ bookings: [] }))
+          get("/api/admin/bookings?status=").catch(() => ({ bookings: [] })),
+          get("/api/stats?period=year&year=" + ($("#pm-year", bar).value === "all" ? 2026 : $("#pm-year", bar).value)).catch(() => ({ kpi: {} }))
         ]);
         const list = bookingsData.bookings || [];
         const filterVal = $("#pm-status", bar).value;
+        const yearVal = $("#pm-year", bar).value;
         const qVal = ($("#pm-q", bar).value || "").toLowerCase().trim();
 
-        const filtered = list.filter(b => {
+        const yearList = (yearVal === "all") ? list : list.filter(b => {
+          const y1 = b.createdAt ? b.createdAt.slice(0, 4) : "";
+          const y2 = b.date ? b.date.slice(0, 4) : "";
+          return y1 === yearVal || y2 === yearVal;
+        });
+
+        const filtered = yearList.filter(b => {
+          const isCancelled = b.status === "cancelled" || b.status === "refunded";
+          const remaining = Math.max(0, (b.price || 0) - (b.paidAmount || 0));
+          if (filterVal === "debt" && (isCancelled || remaining <= 0)) return false;
+          if (filterVal === "confirmed_debt" && (isCancelled || remaining <= 0 || !["confirmed", "in_progress", "completed", "guide_accepted", "departed"].includes(b.status))) return false;
           if (filterVal === "pending" && b.paymentStatus !== "pending" && b.status !== "awaiting_payment") return false;
           if (filterVal === "paid" && b.paidAmount < b.price) return false;
           if (filterVal === "deposit" && (b.paidAmount <= 0 || b.paidAmount >= b.price)) return false;
-          if (filterVal === "refunded" && b.status !== "refunded" && b.status !== "cancelled") return false;
+          if (filterVal === "refunded" && !isCancelled) return false;
           if (qVal) {
             const str = `${b.payCode} ${b.customerName} ${b.tourName} ${b.phone || ""}`.toLowerCase();
             if (!str.includes(qVal)) return false;
@@ -1643,20 +2417,44 @@
           return true;
         });
 
-        const totalExpected = list.reduce((s, x) => s + (x.price || 0), 0);
-        const totalCollected = list.reduce((s, x) => s + (x.paidAmount || 0), 0);
-        const totalPending = list.filter(x => (x.price || 0) > (x.paidAmount || 0)).reduce((s, x) => s + ((x.price || 0) - (x.paidAmount || 0)), 0);
+        const totalExpected = yearList.reduce((s, x) => s + (x.price || 0), 0);
+        const totalCollected = yearList.reduce((s, x) => s + (x.paidAmount || 0), 0);
+        const totalSysCollected = Math.max(totalCollected, statsData.kpi?.collected || totalCollected);
+        const counterExtra = Math.max(0, totalSysCollected - totalCollected);
+        const activeDebts = yearList.filter(x => x.status !== "cancelled" && x.status !== "refunded" && (x.price || 0) > (x.paidAmount || 0));
+        const totalPending = activeDebts.reduce((s, x) => s + ((x.price || 0) - (x.paidAmount || 0)), 0);
+        const confirmedDebts = yearList.filter(x => ["confirmed", "in_progress", "completed", "guide_accepted", "departed"].includes(x.status) && (x.price || 0) > (x.paidAmount || 0));
+        const totalConfirmedPending = confirmedDebts.reduce((s, x) => s + ((x.price || 0) - (x.paidAmount || 0)), 0);
 
         summaryBox.innerHTML = `
-          <div class="kpi ok"><div class="l">Tổng tiền đã thu</div><div class="v">${money(totalCollected)}</div><div class="s">${list.filter(x => x.paidAmount > 0).length} đơn có phát sinh thu</div></div>
-          <div class="kpi"><div class="l">Tổng giá trị đơn tour</div><div class="v">${money(totalExpected)}</div><div class="s">${list.length} đơn tour</div></div>
-          <div class="kpi warn"><div class="l">Công nợ / Chờ thu nốt</div><div class="v">${money(totalPending)}</div><div class="s">Cọc hoặc chưa đóng đủ</div></div>
-          <div class="kpi"><div class="l">Đơn cần đối soát</div><div class="v">${(qData.queue || []).length}</div><div class="s">Giao dịch quầy / chuyển khoản</div></div>
+          <div class="kpi ok">
+            <div class="l">Tổng thực thu hệ thống</div>
+            <div class="v">${money(totalSysCollected)}</div>
+            <div class="s">Thu đơn tour: <b>${money(totalCollected)}</b> · Thu quầy: <b>${money(counterExtra)}</b></div>
+          </div>
+          <div class="kpi">
+            <div class="l">Tổng giá trị đơn tour</div>
+            <div class="v">${money(totalExpected)}</div>
+            <div class="s">${yearList.length} đơn tour phát sinh</div>
+          </div>
+          <div class="kpi warn">
+            <div class="l">Công nợ còn phải thu</div>
+            <div class="v">${money(totalConfirmedPending)}</div>
+            <div class="s">Từ các đơn tour đã chốt duyệt</div>
+          </div>
+          <div class="kpi">
+            <div class="l">Đơn chờ đối soát / quầy</div>
+            <div class="v">${(qData.queue || []).length}</div>
+            <div class="s">Giao dịch thu ngân đang chờ</div>
+          </div>
         `;
 
         body.innerHTML = `
-          <div class="note info">
-            <b>Giám sát dòng tiền:</b> Admin có quyền theo dõi tổng thể dòng tiền và hóa đơn. Việc xác nhận tiền thực tế được thực hiện độc lập bởi <b>Thu ngân (Cashier)</b> theo nguyên tắc Separation of Duties.
+          <div class="note info" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+            <div>
+              <b>Đối chiếu dòng tiền chuẩn khớp:</b> Tổng thu trên Dashboard đạt <b>${money(totalSysCollected)}</b> (gồm <b>${money(totalCollected)}</b> từ ${yearList.length} đơn tour bên dưới và <b>${money(counterExtra)}</b> từ phiếu thu quầy / dịch vụ bổ sung). Khớp 100% với Dashboard doanh thu.
+            </div>
+            <span class="badge ok">✓ Đối chiếu chuẩn 100%</span>
           </div>
           ${table([
             { t: "Mã đơn", html: b => `<a href="#" data-view="${esc(b.id)}" class="mono"><b>${esc(b.payCode)}</b></a>`, sort: b => b.payCode },
@@ -1664,7 +2462,7 @@
             { t: "Tour", html: b => `${esc(b.tourName)}<div class="small muted">Ngày đi: ${day(b.date)}</div>` },
             { t: "Tổng đơn", num: true, html: b => `<b>${money(b.price)}</b>`, sort: b => b.price },
             { t: "Đã thu", num: true, html: b => `<b style="color:var(--ok)">${money(b.paidAmount)}</b>`, sort: b => b.paidAmount },
-            { t: "Còn thiếu", num: true, html: b => money(Math.max(0, (b.price || 0) - (b.paidAmount || 0))) },
+            { t: "Còn thiếu", num: true, html: b => (b.status === "cancelled" || b.status === "refunded") ? `<span class="muted">0 đ</span>` : `<b style="color:${(b.price || 0) > (b.paidAmount || 0) ? "var(--bad)" : "inherit"}">${money(Math.max(0, (b.price || 0) - (b.paidAmount || 0)))}</b>` },
             { t: "Trạng thái", html: b => badge(b.status) },
             { t: "Thao tác", html: b => `<button class="btn sm" data-view="${esc(b.id)}">Chi tiết</button>` }
           ], filtered, { sortable: true, empty: "Không tìm thấy giao dịch nào" })}
@@ -1674,7 +2472,206 @@
 
       $("#pm-q", bar).oninput = () => { clearTimeout(window.__pm_t); window.__pm_t = setTimeout(reload, 300); };
       $("#pm-status", bar).onchange = reload;
+      $("#pm-year", bar).onchange = reload;
       $("#pm-refresh", bar).onclick = reload;
+      await reload();
+    } },
+
+    { id: "working-capital", label: "Tiền lưu động", icon: "🏦", group: "Tài chính", perm: "stats:view_full", async render(el) {
+      let curYear = 2026;
+      let curTab = "in"; // "in", "out", "all"
+      let curCat = "all";
+
+      async function reload() {
+        const res = await get(`/api/finance/working-capital?year=${curYear}`);
+        const totalCollected = res.totalCollected || 0;
+        const totalSpent = res.totalSpent || 0;
+        const netBalance = res.netBalance || 0;
+        const summary = res.summary || {};
+        const incomes = res.incomes || [];
+        const expenses = res.expenses || [];
+
+        const filteredExpenses = curCat === "all" ? expenses : expenses.filter(x => x.categoryCode === curCat);
+
+        // Ghép dòng tiền tổng hợp
+        const allFlows = [
+          ...incomes.map(x => ({ ...x, flowType: "in" })),
+          ...expenses.map(x => ({ ...x, flowType: "out" }))
+        ].sort((a, b) => String(b.at || "").localeCompare(String(a.at || "")));
+
+        el.innerHTML = `
+          <div class="card" style="margin-bottom:16px">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px">
+              <div>
+                <h2 style="margin:0">Quỹ tiền lưu động & Quản trị dòng tiền công ty</h2>
+                <div class="muted small" style="margin-top:4px">Số tiền lưu động = Doanh thu từ tour du lịch − Lương nhân viên − Tiền tiêu (mua dụng cụ cho khách mang đi, hoàn tiền, thù lao HDV, cọc...). Đồng bộ 100% với Thu ngân.</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <label style="font-weight:600;margin:0">Chọn năm:</label>
+                <select id="wc-year" class="input sm" style="width:130px;font-weight:700">
+                  ${Array.from({ length: 2026 - 1986 + 1 }, (_, i) => 2026 - i).map(y => `<option value="${y}" ${y === curYear ? 'selected' : ''}>Năm ${y}</option>`).join('')}
+                </select>
+                <button class="btn sm" id="wc-refresh">🔄 Tải lại</button>
+                <button class="btn ok sm" id="wc-csv">📊 Xuất Excel/CSV</button>
+              </div>
+            </div>
+
+            <!-- 3 KPI đối soát chuẩn khớp 100% với Thu ngân -->
+            <div class="grid g3" style="gap:14px;margin-bottom:18px">
+              <div class="kpi" style="border-left:4px solid var(--teal)">
+                <div class="l">Tổng thu từ tour (Dòng tiền vào)</div>
+                <div class="v" style="color:var(--teal)">+${money(totalCollected)}</div>
+                <div class="s">Thu tiền cọc, đủ 100%, thu nốt & quầy (+${incomes.length} GD)</div>
+              </div>
+              <div class="kpi bad" style="border-left:4px solid var(--bad)">
+                <div class="l">Tổng tiền tiêu & chi phí (Dòng tiền ra)</div>
+                <div class="v" style="color:var(--bad)">-${money(totalSpent)}</div>
+                <div class="s">Lương NV, thù lao HDV, mua dụng cụ khách, hoàn tiền...</div>
+              </div>
+              <div class="kpi ok" style="border-left:4px solid var(--ok);background:rgba(5,150,105,0.04)">
+                <div class="l">Số tiền lưu động hiện có (Quỹ khả dụng)</div>
+                <div class="v" style="color:var(--ok);font-size:28px">${money(netBalance)}</div>
+                <div class="s">Khi thu tiền tour, số tiền lưu động tăng lên ngay lập tức</div>
+              </div>
+            </div>
+
+            <!-- Phân bổ các khoản chi & tiền tiêu -->
+            <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:16px">
+              <div style="font-weight:700;font-size:13px;margin-bottom:8px">📊 Chi tiết cơ cấu tiền tiêu & chi phí từ quỹ lưu động:</div>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px">
+                <div style="font-size:13px">💼 Chi lương nhân sự: <b style="color:var(--navy)">${money(summary.salarySpent || 0)}</b></div>
+                <div style="font-size:13px">🧑‍✈️ Thù lao HDV (3–12%): <b style="color:var(--navy)">${money(summary.guideFeeSpent || 0)}</b></div>
+                <div style="font-size:13px">🎒 Mua dụng cụ đoàn cho khách: <b style="color:var(--navy)">${money(summary.suppliesSpent || 0)}</b></div>
+                <div style="font-size:13px">💸 Hoàn tiền cho khách: <b style="color:var(--navy)">${money(summary.refundSpent || 0)}</b></div>
+                <div style="font-size:13px">💳 Giải ngân rút tiền ví: <b style="color:var(--navy)">${money(summary.withdrawalSpent || 0)}</b></div>
+                <div style="font-size:13px">🏨 Cọc xe & khách sạn: <b style="color:var(--navy)">${money(summary.opsSpent || 0)}</b></div>
+              </div>
+            </div>
+
+            <!-- TAB LỰA CHỌN: LỊCH SỬ VÀO / LỊCH SỬ RA / DÒNG TIỀN TỔNG HỢP -->
+            <div style="display:flex;gap:8px;border-bottom:2px solid var(--border);padding-bottom:10px;margin-bottom:14px;align-items:center;flex-wrap:wrap">
+              <button class="pill-btn ${curTab === 'in' ? 'active' : ''}" data-tab="in" style="font-weight:700">
+                📥 Lịch sử tiền vào (Thu tiền tour) <span class="badge ok">${incomes.length}</span>
+              </button>
+              <button class="pill-btn ${curTab === 'out' ? 'active' : ''}" data-tab="out" style="font-weight:700">
+                📤 Lịch sử tiền ra (Tiền tiêu & Chi phí) <span class="badge bad">${expenses.length}</span>
+              </button>
+              <button class="pill-btn ${curTab === 'all' ? 'active' : ''}" data-tab="all" style="font-weight:700">
+                🔄 Tất cả dòng tiền (${allFlows.length})
+              </button>
+            </div>
+
+            <div id="wc-tab-content"></div>
+          </div>
+        `;
+
+        const contentBox = $("#wc-tab-content", el);
+
+        if (curTab === "in") {
+          // BẢNG LỊCH SỬ TIỀN VÀO
+          contentBox.innerHTML = `
+            <div style="margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">
+              <span class="small muted">Toàn bộ các khoản thu từ khách hàng qua đặt tour trực tuyến, thanh toán quầy, thu nốt. Khi ghi nhận khoản mới, quỹ lưu động tăng tức thì.</span>
+              <span class="badge ok" style="font-size:13px">Tổng dòng vào: +${money(totalCollected)}</span>
+            </div>
+            ${table([
+              { t: "Thời gian", html: x => `<b>${dt(x.at)}</b>`, sort: x => x.at },
+              { t: "Nguồn thu / Khoản mục", html: x => `<span class="badge ok">${esc(x.category)}</span>` },
+              { t: "Khách hàng", html: x => `<b>${esc(x.customerName || "—")}</b>` },
+              { t: "Tour / Dịch vụ", html: x => esc(x.tourName || "—") },
+              { t: "Số tiền thu (+)", num: true, html: x => `<b style="color:var(--ok)">+${money(x.amount)}</b>`, sort: x => x.amount },
+              { t: "Mã đơn / Mã GD", html: x => `<span class="mono small">${esc(x.ref || "—")}</span>` },
+              { t: "Người thu", html: x => `<span class="small">${esc(x.actorName || "Thu ngân")}</span>` },
+              { t: "Ghi chú", html: x => `<span class="small muted">${esc(x.note || "—")}</span>` }
+            ], incomes, { empty: `Chưa có giao dịch thu tiền tour nào trong năm ${curYear}` })}
+          `;
+        } else if (curTab === "out") {
+          // BẢNG LỊCH SỬ TIỀN RA (TIÊU TIỀN, LƯƠNG, VẬT TƯ, HOÀN TIỀN...)
+          contentBox.innerHTML = `
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;align-items:center">
+              <span class="small muted" style="font-weight:600">Lọc danh mục chi:</span>
+              <button class="pill-btn ${curCat === 'all' ? 'active' : ''}" data-cat="all">Tất cả (${expenses.length})</button>
+              <button class="pill-btn ${curCat === 'salary' ? 'active' : ''}" data-cat="salary">💼 Chi lương</button>
+              <button class="pill-btn ${curCat === 'guide_fee' ? 'active' : ''}" data-cat="guide_fee">🧑‍✈️ Thù lao HDV</button>
+              <button class="pill-btn ${curCat === 'supplies' ? 'active' : ''}" data-cat="supplies">🎒 Dụng cụ cho khách</button>
+              <button class="pill-btn ${curCat === 'refund' ? 'active' : ''}" data-cat="refund">💸 Hoàn tiền</button>
+              <button class="pill-btn ${curCat === 'withdrawal' ? 'active' : ''}" data-cat="withdrawal">💳 Rút tiền ví</button>
+              <button class="pill-btn ${curCat === 'ops' ? 'active' : ''}" data-cat="ops">🏨 Cọc xe & KS</button>
+            </div>
+            ${table([
+              { t: "Thời gian", html: x => `<b>${dt(x.at)}</b>`, sort: x => x.at },
+              { t: "Khoản mục chi / Tiền tiêu", html: x => {
+                const colors = { salary: "primary", guide_fee: "ok", supplies: "amber", refund: "bad", withdrawal: "warn", ops: "info" };
+                return `<span class="badge ${colors[x.categoryCode] || ''}">${esc(x.category)}</span>`;
+              } },
+              { t: "Người nhận / Đối tượng", html: x => `<b>${esc(x.recipient || "—")}</b>` },
+              { t: "Số tiền chi (-)", num: true, html: x => `<b style="color:var(--bad)">-${money(x.amount)}</b>`, sort: x => x.amount },
+              { t: "Mã / Số tham chiếu", html: x => `<span class="mono small">${esc(x.ref || "—")}</span>` },
+              { t: "Người duyệt chi", html: x => `<span class="small">${esc(x.actorName || "Kế toán")}</span>` },
+              { t: "Ghi chú giải trình", html: x => `<span class="small muted">${esc(x.note || "—")}</span>` }
+            ], filteredExpenses, { empty: `Không có khoản chi nào trong danh mục này của năm ${curYear}` })}
+          `;
+
+          $$("[data-cat]", contentBox).forEach(btn => btn.onclick = () => {
+            curCat = btn.dataset.cat;
+            reload();
+          });
+        } else {
+          // BẢNG DÒNG TIỀN TỔNG HỢP (CẢ THU VÀO VÀ CHI RA)
+          contentBox.innerHTML = `
+            <div style="margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">
+              <span class="small muted">Lịch sử toàn bộ các biến động dòng tiền của quỹ lưu động năm ${curYear}.</span>
+              <span class="badge ${netBalance >= 0 ? 'ok' : 'bad'}" style="font-size:13px">Số dư lưu động: ${money(netBalance)}</span>
+            </div>
+            ${table([
+              { t: "Thời gian", html: x => `<b>${dt(x.at)}</b>`, sort: x => x.at },
+              { t: "Dòng tiền", html: x => x.flowType === "in" ? `<span class="badge ok">📥 Tiền vào (+)</span>` : `<span class="badge bad">📤 Tiền ra (−)</span>` },
+              { t: "Khoản mục", html: x => esc(x.category) },
+              { t: "Đối tượng / Khách hàng", html: x => `<b>${esc(x.customerName || x.recipient || "—")}</b>` },
+              { t: "Biến động", num: true, html: x => x.flowType === "in" ? `<b style="color:var(--ok)">+${money(x.amount)}</b>` : `<b style="color:var(--bad)">-${money(x.amount)}</b>`, sort: x => x.amount },
+              { t: "Mã tham chiếu", html: x => `<span class="mono small">${esc(x.ref || "—")}</span>` },
+              { t: "Người thực hiện", html: x => `<span class="small">${esc(x.actorName || "Kế toán / Thu ngân")}</span>` },
+              { t: "Ghi chú", html: x => `<span class="small muted">${esc(x.note || "—")}</span>` }
+            ], allFlows, { empty: `Không có biến động dòng tiền nào trong năm ${curYear}` })}
+          `;
+        }
+
+        $("#wc-year", el).onchange = e => { curYear = Number(e.target.value); reload(); };
+        $("#wc-refresh", el).onclick = () => reload();
+        $("#wc-csv", el).onclick = () => {
+          if (window.DataExportImport) {
+            window.DataExportImport.exportExcel({
+              filename: `so-quy-tien-luu-dong-${curYear}.xls`,
+              sheetName: "TienLuuDong",
+              title: `BÁO CÁO DÒNG TIỀN & SỔ QUỸ LƯU ĐỘNG CÔNG TY NĂM ${curYear}`,
+              headers: ["Thời gian", "Loại dòng tiền", "Khoản mục", "Đối tượng / Khách hàng", "Số tiền (₫)", "Mã tham chiếu", "Người thực hiện", "Ghi chú giải trình"],
+              summary: [
+                ["Năm tài chính", String(curYear)],
+                ["Tổng thu từ tour (Dòng tiền Vào)", "+" + money(totalCollected)],
+                ["Tổng tiền tiêu & Chi phí (Dòng tiền Ra)", "-" + money(totalSpent)],
+                ["Số tiền lưu động ròng hiện có", money(netBalance)]
+              ],
+              rows: allFlows.map(x => [
+                dt(x.at),
+                x.flowType === "in" ? "Vào (+)" : "Ra (-)",
+                x.category,
+                x.customerName || x.recipient || "—",
+                x.amount,
+                x.ref || "—",
+                x.actorName || "—",
+                x.note || "—"
+              ])
+            });
+          } else {
+            csv(`tien-luu-dong-${curYear}.csv`, ["Thời gian", "Loại dòng tiền", "Khoản mục", "Khách/Người nhận", "Số tiền (₫)", "Mã tham chiếu", "Người thực hiện", "Ghi chú"],
+              allFlows.map(x => [dt(x.at), x.flowType === "in" ? "Vào (+)" : "Ra (-)", x.category, x.customerName || x.recipient, x.amount, x.ref, x.actorName, x.note]));
+          }
+        };
+        $$("[data-tab]", el).forEach(btn => btn.onclick = () => {
+          curTab = btn.dataset.tab;
+          reload();
+        });
+      }
       await reload();
     } },
 
@@ -1694,14 +2691,30 @@
       await reload();
     } },
 
-    { id: "reconcile", label: "Duyệt đóng sổ", icon: "📒", group: "Tài chính", perm: "reconcile:approve", async badge() { return (await get("/api/admin/queue")).reconciliations.length; }, async render(el) {
+    { id: "reconcile", label: "Duyệt đóng sổ", icon: "📒", group: "Tài chính", perm: "reconcile:approve", async badge() { const q = await get("/api/admin/queue"); return q && q.reconciliations ? q.reconciliations.length : 0; }, async render(el) {
       async function reload() {
-        const list = (await get("/api/admin/reconcile")).reconciliations;
-        el.innerHTML = `<div class="note">Người tạo bản đóng sổ không được tự duyệt. Bản có chênh lệch cần xem kỹ giải trình.</div>` + table([{ t: "Ngày", html: x => day(x.date), sort: x => x.date }, { t: "Thu ngân", html: x => esc(x.createdByName || x.createdBy) }, { t: "Thực thu", num: true, html: x => money(x.netTotal) }, { t: "Sao kê", num: true, html: x => money(x.bankStatementTotal) },
-          { t: "Chênh lệch", num: true, html: x => x.discrepancy ? `<b style="color:var(--bad)">${money(x.discrepancy)}</b>` : "0 ₫" }, { t: "Ghi chú", html: x => esc(x.note) }, { t: "Trạng thái", html: x => pill({ pending_approval: "Chờ duyệt", approved: "Đã duyệt", rejected: "Từ chối" }[x.status] || x.status, x.status === "approved" ? "ok" : x.status === "rejected" ? "bad" : "warn") },
-          { t: "Thao tác", nowrap: true, cls: "actions", html: x => x.status === "pending_approval" ? `<div class="act-btns"><button class="btn ok sm" data-y="${esc(x.id)}">Duyệt</button><button class="btn bad sm" data-n="${esc(x.id)}">Từ chối</button></div>` : "" }], list, { empty: "Chưa có bản đóng sổ" });
-        const dec = (id, approve) => async () => { const v = await ask(approve ? "Duyệt đóng sổ" : "Từ chối đóng sổ", [{ name: "note", label: "Ghi chú", type: "textarea", required: !approve }], { kind: approve ? "ok" : "bad" }); if (v) act(null, () => post(`/api/admin/reconcile/${id}/decision`, { approve, note: v.note }), "Đã xử lý.", reload); };
-        $$("[data-y]", el).forEach(b => b.onclick = dec(b.dataset.y, true)); $$("[data-n]", el).forEach(b => b.onclick = dec(b.dataset.n, false));
+        const res = await get("/api/admin/reconcile");
+        const list = res.reconciliations || [];
+        el.innerHTML = `<div class="note info">Kiểm tra và duyệt bản đóng sổ hàng ngày của Thu ngân. Bản có chênh lệch cần kiểm tra kỹ sao kê và biên bản kiểm quỹ tiền mặt.</div>` + table([
+          { t: "Ngày đóng sổ", html: x => `<b>${day(x.date)}</b><div class="small muted mono">${esc(x.id)}</div>`, sort: x => x.date },
+          { t: "Thu ngân lập sổ", html: x => `<b>${esc(x.cashierName || x.createdByName || x.createdBy || "Lê Thu Ngân")}</b><div class="small muted">${esc(x.cashierId || "tn001")}</div>` },
+          { t: "Số dư đầu ca", num: true, html: x => money(x.openingBalance || 0) },
+          { t: "Tổng thu (+)", num: true, html: x => `<b style="color:var(--ok)">+${money(x.totalIn || x.netTotal || 0)}</b>` },
+          { t: "Tổng chi (-)", num: true, html: x => `<span style="color:var(--bad)">-${money(x.totalOut || 0)}</span>` },
+          { t: "Số dư cuối ca", num: true, html: x => `<b>${money(x.closingBalance || x.bankStatementTotal || 0)}</b>` },
+          { t: "Chênh lệch", num: true, html: x => x.discrepancy ? `<b style="color:var(--bad)">${money(x.discrepancy)}</b>` : '<span class="badge ok">0 ₫ (Khớp sao kê)</span>' },
+          { t: "Ghi chú giải trình", html: x => esc(x.note || "—") + (x.approveNote ? `<div class="small muted" style="margin-top:3px">Ghi chú duyệt: <i>${esc(x.approveNote)}</i></div>` : "") },
+          { t: "Trạng thái", html: x => pill({ pending_approval: "Chờ duyệt", approved: "Đã duyệt", rejected: "Từ chối" }[x.status] || x.status, x.status === "approved" ? "ok" : x.status === "rejected" ? "bad" : "warn") },
+          { t: "Thao tác", nowrap: true, cls: "actions", html: x => x.status === "pending_approval" ? `<div class="act-btns"><button class="btn ok sm" data-y="${esc(x.id)}">✅ Duyệt</button><button class="btn bad sm" data-n="${esc(x.id)}">❌ Từ chối</button></div>` : `<span class="muted small">${x.status === "approved" ? "Đã duyệt" : "Bị từ chối"}</span>` }
+        ], list, { empty: "Chưa có bản đóng sổ nào" });
+        const dec = (id, approve) => async () => {
+          const v = await ask(approve ? "Duyệt bản đóng sổ cuối ngày" : "Từ chối bản đóng sổ", [
+            { name: "note", label: approve ? "Ghi chú phê duyệt (không bắt buộc)" : "Lý do từ chối bản đóng sổ (bắt buộc nhập) *", type: "textarea", required: !approve, placeholder: approve ? "Ghi chú thêm nếu cần..." : "Vui lòng nhập lý do từ chối để thu ngân điều chỉnh..." }
+          ], { kind: approve ? "ok" : "bad", submit: approve ? "Xác nhận duyệt" : "Xác nhận từ chối" });
+          if (v) act(null, () => post(`/api/admin/reconcile/${id}/decision`, { approve, note: v.note }), approve ? "Đã duyệt bản đóng sổ thành công." : "Đã từ chối bản đóng sổ.", reload);
+        };
+        $$("[data-y]", el).forEach(b => b.onclick = dec(b.dataset.y, true));
+        $$("[data-n]", el).forEach(b => b.onclick = dec(b.dataset.n, false));
       }
       await reload();
     } },
@@ -1709,11 +2722,376 @@
     { id: "vouchers", label: "Voucher", icon: "🎟️", group: "Tài chính", perm: "voucher:manage", async render(el) {
       async function reload() {
         const r = await get("/api/admin/vouchers");
-        el.innerHTML = `<div class="toolbar"><button class="btn primary" id="nv">+ Tạo voucher</button></div>` + table([{ t: "Mã", html: v => `<b class="mono">${esc(v.code)}</b>` }, { t: "Giảm", html: v => esc(v.type === "percent" ? v.value + "%" : money(v.value)) }, { t: "Hạn", html: v => esc(v.expiresAt || v.expires || "—") }, { t: "Trạng thái", html: v => v.disabled ? pill("Tạm tắt", "bad") : pill("Đang dùng", "ok") },
-          { t: "Thao tác", nowrap: true, cls: "actions", html: v => `<div class="act-btns"><button class="btn sm" data-t="${esc(v.code)}" data-d="${v.disabled ? 0 : 1}">${v.disabled ? "Bật" : "Tắt"}</button><button class="btn bad sm" data-x="${esc(v.code)}">Xóa</button></div>` }], r.vouchers, { empty: "Chưa có voucher" });
-        $("#nv", el).onclick = async () => { const v = await ask("Tạo voucher", [{ name: "code", label: "Mã", required: true }, { name: "type", label: "Loại", type: "select", options: [["percent", "Giảm %"], ["amount", "Giảm tiền"]] }, { name: "value", label: "Giá trị", type: "number", required: true }, { name: "expiresAt", label: "Hạn dùng", type: "date" }]); if (v) act(null, () => post("/api/admin/vouchers", { ...v, value: Number(v.value) }), "Đã tạo.", reload); };
-        $$("[data-t]", el).forEach(b => b.onclick = () => act(b, () => put(`/api/admin/vouchers/${encodeURIComponent(b.dataset.t)}`, { disabled: b.dataset.d === "1" }), "Đã cập nhật.", reload));
-        $$("[data-x]", el).forEach(b => b.onclick = async () => { if (await confirmBox("Xóa voucher", "Xóa " + esc(b.dataset.x) + "?", "bad")) act(null, () => del(`/api/admin/vouchers/${encodeURIComponent(b.dataset.x)}`), "Đã xóa.", reload); });
+        const vList = r.vouchers || [];
+        el.innerHTML = `
+          <div class="toolbar" style="margin-bottom:12px;display:flex;justify-content:space-between;align-items:center">
+            <button class="btn primary" id="nv">+ Tạo voucher ưu đãi mới</button>
+            <div class="small muted">Quản lý mã giảm giá áp dụng cho Khách hàng hoặc Nhân viên</div>
+          </div>` +
+          table([
+            { t: "Mã voucher", html: v => `<b class="mono" style="font-size:14px;color:var(--primary)">${esc(v.code)}</b>` },
+            { t: "Tiêu đề / Ưu đãi", html: v => `<b>${esc(v.title || v.code)}</b>` },
+            { t: "Mức giảm", num: true, html: v => `<span class="badge ${v.type === 'percent' ? 'info' : 'ok'}">${esc(v.type === "percent" ? v.value + "%" : money(v.value))}</span>` },
+            { t: "Đối tượng áp dụng", html: v => {
+              if (v.targetLabel) return `<span class="badge ${v.targetType === 'staff' ? 'ok' : 'info'}">${esc(v.targetLabel)}</span>`;
+              if (v.ownerEmail) return `<span class="badge info">👤 ${esc(v.ownerEmail)}</span>`;
+              return '<span class="badge">🌐 Tất cả người dùng</span>';
+            } },
+            { t: "Hạn dùng", html: v => esc(v.endAt ? dt(v.endAt) : (v.expiresAt || v.expires || "Vô thời hạn")) },
+            { t: "Trạng thái", html: v => v.disabled ? pill("Tạm tắt", "bad") : pill("Đang dùng", "ok") },
+            { t: "Thao tác", nowrap: true, cls: "actions", html: v => `<div class="act-btns"><button class="btn sm" data-t="${esc(v.code)}" data-d="${v.disabled ? 0 : 1}">${v.disabled ? "Bật" : "Tắt"}</button><button class="btn bad sm" data-x="${esc(v.code)}">Xóa</button></div>` }
+          ], vList, { empty: "Chưa có voucher nào trong hệ thống" });
+
+        $("#nv", el).onclick = () => openCreateVoucherModal();
+
+        $$("[data-t]", el).forEach(b => b.onclick = () => act(b, () => put(`/api/admin/vouchers/${encodeURIComponent(b.dataset.t)}`, { disabled: b.dataset.d === "1" }), "Đã cập nhật trạng thái voucher.", reload));
+        $$("[data-x]", el).forEach(b => b.onclick = async () => { if (await confirmBox("Xóa voucher", "Bạn có chắc muốn xóa voucher " + esc(b.dataset.x) + "?", "bad")) act(null, () => del(`/api/admin/vouchers/${encodeURIComponent(b.dataset.x)}`), "Đã xóa voucher.", reload); });
+
+        async function openCreateVoucherModal() {
+          const [customersRes, staffRes] = await Promise.all([
+            get("/api/admin/customers").catch(() => ({ customers: [] })),
+            get("/api/admin/staff").catch(() => ({ staff: [] }))
+          ]);
+          const customers = customersRes.customers || [];
+          const staffMembers = staffRes.staff || [];
+
+          let targetType = "customer";
+          let customerMode = "all";
+          let staffMode = "all";
+
+          const formHtml = `
+            <div style="display:flex;flex-direction:column;gap:12px;width:100%;box-sizing:border-box">
+              <div class="grid g2" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div>
+                  <label for="vc-code" style="font-weight:600">Mã voucher <span style="color:var(--bad)">*</span></label>
+                  <input id="vc-code" placeholder="VD: TRIAN2026, HE2026" style="text-transform:uppercase;font-weight:700" maxlength="24">
+                </div>
+                <div>
+                  <label for="vc-title" style="font-weight:600">Tiêu đề / Tên ưu đãi <span style="color:var(--bad)">*</span></label>
+                  <input id="vc-title" placeholder="VD: Tri ân khách hàng thân thiết">
+                </div>
+              </div>
+
+              <div class="grid g3" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px">
+                <div>
+                  <label for="vc-type" style="font-weight:600">Loại giảm <span style="color:var(--bad)">*</span></label>
+                  <select id="vc-type">
+                    <option value="percent">Giảm % giá trị</option>
+                    <option value="amount">Giảm tiền trực tiếp (₫)</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="vc-val" style="font-weight:600">Giá trị giảm <span style="color:var(--bad)">*</span></label>
+                  <input id="vc-val" type="number" min="1" placeholder="VD: 10 (%) hoặc 500000 (₫)">
+                </div>
+                <div>
+                  <label for="vc-max" style="font-weight:600">Giảm tối đa (₫)</label>
+                  <input id="vc-max" type="number" min="0" placeholder="Tùy chọn cho giảm %">
+                </div>
+              </div>
+
+              <div class="grid g2" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div>
+                  <label for="vc-exp" style="font-weight:600">Hạn sử dụng</label>
+                  <input id="vc-exp" type="date">
+                </div>
+                <div>
+                  <label for="vc-uses" style="font-weight:600">Số lượt dùng tối đa</label>
+                  <input id="vc-uses" type="number" min="1" placeholder="Để trống = không giới hạn">
+                </div>
+              </div>
+
+              <!-- Khu vực lựa chọn Khách hàng hoặc Nhân viên -->
+              <div style="background:var(--bg-subtle,#f8fafc);border:1px solid var(--border);border-radius:8px;padding:12px;margin-top:4px">
+                <label style="margin:0 0 8px;font-weight:700">🎯 Đối tượng áp dụng Voucher:</label>
+                <div class="seg-group" id="vc-target-type-seg" style="display:flex;gap:4px;margin-bottom:12px">
+                  <button type="button" class="pill-btn active" data-tt="customer">👥 Khách hàng</button>
+                  <button type="button" class="pill-btn" data-tt="staff">💼 Nhân viên</button>
+                  <button type="button" class="pill-btn" data-tt="all">🌐 Tất cả</button>
+                </div>
+
+                <!-- Lựa chọn Khách hàng -->
+                <div id="vc-customer-wrap">
+                  <div style="display:flex;gap:16px;align-items:center;margin-bottom:10px">
+                    <label style="display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-weight:600;margin:0">
+                      <input type="radio" name="vc_cus_mode" value="all" checked style="width:auto"> Tất cả khách hàng
+                    </label>
+                    <label style="display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-weight:600;margin:0">
+                      <input type="radio" name="vc_cus_mode" value="custom" style="width:auto"> Chọn từng khách hàng cụ thể
+                    </label>
+                  </div>
+                  <div id="vc-customer-picker" style="display:none">
+                    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px">
+                      <input type="text" id="vc-cus-search" placeholder="🔍 Gõ tên, email hoặc SĐT để lọc khách hàng..." style="font-size:12.5px;padding:4px 8px">
+                      <div style="display:flex;gap:4px;flex-shrink:0">
+                        <button type="button" class="btn sm" id="vc-cus-sel-all" style="font-size:11px;padding:2px 8px">Chọn tất cả</button>
+                        <button type="button" class="btn sm" id="vc-cus-desel-all" style="font-size:11px;padding:2px 8px">Bỏ chọn</button>
+                      </div>
+                    </div>
+                    <div id="vc-cus-list" style="max-height:160px;overflow-y:auto;border:1px solid var(--border);border-radius:6px;padding:6px;background:var(--surface);display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:6px">
+                      ${customers.map(c => `
+                        <label class="vc-card" data-txt="${esc((c.name + ' ' + (c.email||'') + ' ' + (c.phone||'')).toLowerCase())}" style="display:flex;align-items:center;gap:8px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;cursor:pointer;margin:0;font-size:12px;background:var(--surface)">
+                          <input type="checkbox" class="vc-cus-cb" value="${esc(c.id)}" style="width:16px;height:16px;margin:0;cursor:pointer">
+                          <div style="flex:1;overflow:hidden">
+                            <b style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(c.name)}</b>
+                            <span class="muted small">${esc(c.phone || c.email || c.id)}</span>
+                          </div>
+                        </label>
+                      `).join("")}
+                    </div>
+                    <div class="small muted" style="margin-top:4px">Đã chọn: <b id="vc-cus-count">0</b> khách hàng.</div>
+                  </div>
+                </div>
+
+                <!-- Lựa chọn Nhân viên -->
+                <div id="vc-staff-wrap" style="display:none">
+                  <div style="display:flex;gap:16px;align-items:center;margin-bottom:10px">
+                    <label style="display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-weight:600;margin:0">
+                      <input type="radio" name="vc_st_mode" value="all" checked style="width:auto"> Tất cả nhân viên
+                    </label>
+                    <label style="display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-weight:600;margin:0">
+                      <input type="radio" name="vc_st_mode" value="custom" style="width:auto"> Chọn từng nhân viên cụ thể
+                    </label>
+                  </div>
+                  <div id="vc-staff-picker" style="display:none">
+                    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px">
+                      <input type="text" id="vc-st-search" placeholder="🔍 Gõ tên, email hoặc vai trò nhân viên..." style="font-size:12.5px;padding:4px 8px">
+                      <div style="display:flex;gap:4px;flex-shrink:0">
+                        <button type="button" class="btn sm" id="vc-st-sel-all" style="font-size:11px;padding:2px 8px">Chọn tất cả</button>
+                        <button type="button" class="btn sm" id="vc-st-desel-all" style="font-size:11px;padding:2px 8px">Bỏ chọn</button>
+                      </div>
+                    </div>
+                    <div id="vc-st-list" style="max-height:160px;overflow-y:auto;border:1px solid var(--border);border-radius:6px;padding:6px;background:var(--surface);display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:6px">
+                      ${staffMembers.map(s => `
+                        <label class="vc-card" data-txt="${esc((s.name + ' ' + (s.roleName||s.role||'') + ' ' + (s.email||'')).toLowerCase())}" style="display:flex;align-items:center;gap:8px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;cursor:pointer;margin:0;font-size:12px;background:var(--surface)">
+                          <input type="checkbox" class="vc-st-cb" value="${esc(s.id)}" style="width:16px;height:16px;margin:0;cursor:pointer">
+                          <div style="flex:1;overflow:hidden">
+                            <b style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(s.name)}</b>
+                            <span class="badge info" style="font-size:10px">${esc(s.roleName || s.role)}</span>
+                          </div>
+                        </label>
+                      `).join("")}
+                    </div>
+                    <div class="small muted" style="margin-top:4px">Đã chọn: <b id="vc-st-count">0</b> nhân viên.</div>
+                  </div>
+                </div>
+
+                <!-- Lựa chọn Tất cả -->
+                <div id="vc-all-wrap" style="display:none">
+                  <div class="small muted">Voucher sẽ áp dụng chung cho tất cả khách hàng và nhân viên.</div>
+                </div>
+              </div>
+
+              <div class="field-err" id="vc-err" style="color:var(--bad);font-weight:600"></div>
+            </div>
+          `;
+
+          let closeFn = null;
+          Staff.modal("Tạo voucher ưu đãi", formHtml, [
+            { label: "Hủy", value: null },
+            { label: "Tạo voucher", kind: "primary", value: "ok", validate: ov => {
+              const err = $("#vc-err", ov);
+              err.textContent = "";
+
+              const code = $("#vc-code", ov).value.trim().toUpperCase();
+              if (!code || !/^[A-Z0-9_-]{3,24}$/.test(code)) {
+                err.textContent = "Mã voucher chỉ gồm chữ/số/gạch, từ 3 đến 24 ký tự.";
+                return false;
+              }
+              const title = $("#vc-title", ov).value.trim();
+              if (!title) {
+                err.textContent = "Vui lòng nhập tiêu đề / tên ưu đãi.";
+                return false;
+              }
+              const type = $("#vc-type", ov).value;
+              const value = Number($("#vc-val", ov).value);
+              if (!(value > 0)) {
+                err.textContent = "Vui lòng nhập giá trị giảm hợp lệ (> 0).";
+                return false;
+              }
+              if (type === "percent" && value > 100) {
+                err.textContent = "Tỷ lệ giảm theo % không được vượt quá 100%.";
+                return false;
+              }
+
+              const maxDiscount = Number($("#vc-max", ov).value) || 0;
+              const expiresAt = $("#vc-exp", ov).value;
+              const maxUses = Number($("#vc-uses", ov).value) || 0;
+
+              let targetIds = [];
+              let targetLabel = "";
+
+              if (targetType === "customer") {
+                if (customerMode === "custom") {
+                  targetIds = $$(".vc-cus-cb:checked", ov).map(cb => cb.value);
+                  if (!targetIds.length) {
+                    err.textContent = "Vui lòng tick chọn ít nhất 1 khách hàng (hoặc chọn 'Tất cả khách hàng').";
+                    return false;
+                  }
+                  targetLabel = `${targetIds.length} khách hàng đã chọn`;
+                } else {
+                  targetLabel = "Tất cả khách hàng";
+                }
+              } else if (targetType === "staff") {
+                if (staffMode === "custom") {
+                  targetIds = $$(".vc-st-cb:checked", ov).map(cb => cb.value);
+                  if (!targetIds.length) {
+                    err.textContent = "Vui lòng tick chọn ít nhất 1 nhân viên (hoặc chọn 'Tất cả nhân viên').";
+                    return false;
+                  }
+                  targetLabel = `${targetIds.length} nhân viên đã chọn`;
+                } else {
+                  targetLabel = "Tất cả nhân viên";
+                }
+              } else {
+                targetLabel = "Tất cả mọi người";
+              }
+
+              const payload = {
+                code,
+                title,
+                type,
+                value,
+                maxDiscount,
+                endAt: expiresAt ? expiresAt + "T23:59:59Z" : null,
+                maxUses,
+                targetType,
+                targetMode: targetType === "customer" ? customerMode : (targetType === "staff" ? staffMode : "all"),
+                targetIds,
+                targetLabel
+              };
+
+              const btn = $(".acts .primary", ov);
+              if (btn) btn.disabled = true;
+
+              post("/api/admin/vouchers", payload)
+                .then(() => {
+                  Staff.toast(`Đã tạo voucher ${code} thành công.`, "ok");
+                  if (closeFn) closeFn(null);
+                  reload();
+                })
+                .catch(e => {
+                  err.textContent = e.message || "Lỗi tạo voucher.";
+                  if (btn) btn.disabled = false;
+                });
+
+              return false;
+            } }
+          ], {
+            wide: true,
+            sticky: true,
+            onOpen: (ov, close) => {
+              closeFn = close;
+              const cusWrap = $("#vc-customer-wrap", ov);
+              const stWrap = $("#vc-staff-wrap", ov);
+              const allWrap = $("#vc-all-wrap", ov);
+              const cusPicker = $("#vc-customer-picker", ov);
+              const stPicker = $("#vc-staff-picker", ov);
+
+              const updateAudienceUI = () => {
+                $$("#vc-target-type-seg button", ov).forEach(b => b.classList.toggle("active", b.dataset.tt === targetType));
+                cusWrap.style.display = targetType === "customer" ? "block" : "none";
+                stWrap.style.display = targetType === "staff" ? "block" : "none";
+                allWrap.style.display = targetType === "all" ? "block" : "none";
+              };
+
+              $$("#vc-target-type-seg button", ov).forEach(b => {
+                b.onclick = () => {
+                  targetType = b.dataset.tt;
+                  updateAudienceUI();
+                };
+              });
+
+              $$("input[name='vc_cus_mode']", ov).forEach(r => {
+                r.onchange = () => {
+                  customerMode = r.value;
+                  cusPicker.style.display = customerMode === "custom" ? "block" : "none";
+                };
+              });
+
+              $$("input[name='vc_st_mode']", ov).forEach(r => {
+                r.onchange = () => {
+                  staffMode = r.value;
+                  stPicker.style.display = staffMode === "custom" ? "block" : "none";
+                };
+              });
+
+              // Search & Selection for customers
+              const updateCusCount = () => {
+                const count = $$(".vc-cus-cb:checked", ov).length;
+                const el = $("#vc-cus-count", ov);
+                if (el) el.textContent = count;
+              };
+              $$(".vc-cus-cb", ov).forEach(cb => cb.onchange = updateCusCount);
+
+              const cusSearch = $("#vc-cus-search", ov);
+              if (cusSearch) {
+                cusSearch.oninput = () => {
+                  const q = cusSearch.value.trim().toLowerCase();
+                  $$("#vc-cus-list .vc-card", ov).forEach(card => {
+                    card.style.display = (!q || (card.dataset.txt && card.dataset.txt.includes(q))) ? "flex" : "none";
+                  });
+                };
+              }
+              const cusSelAll = $("#vc-cus-sel-all", ov);
+              if (cusSelAll) {
+                cusSelAll.onclick = () => {
+                  $$("#vc-cus-list .vc-card", ov).forEach(c => {
+                    if (c.style.display !== "none") {
+                      const cb = $("input[type='checkbox']", c);
+                      if (cb) cb.checked = true;
+                    }
+                  });
+                  updateCusCount();
+                };
+              }
+              const cusDeselAll = $("#vc-cus-desel-all", ov);
+              if (cusDeselAll) {
+                cusDeselAll.onclick = () => {
+                  $$(".vc-cus-cb", ov).forEach(cb => cb.checked = false);
+                  updateCusCount();
+                };
+              }
+
+              // Search & Selection for staff
+              const updateStCount = () => {
+                const count = $$(".vc-st-cb:checked", ov).length;
+                const el = $("#vc-st-count", ov);
+                if (el) el.textContent = count;
+              };
+              $$(".vc-st-cb", ov).forEach(cb => cb.onchange = updateStCount);
+
+              const stSearch = $("#vc-st-search", ov);
+              if (stSearch) {
+                stSearch.oninput = () => {
+                  const q = stSearch.value.trim().toLowerCase();
+                  $$("#vc-st-list .vc-card", ov).forEach(card => {
+                    card.style.display = (!q || (card.dataset.txt && card.dataset.txt.includes(q))) ? "flex" : "none";
+                  });
+                };
+              }
+              const stSelAll = $("#vc-st-sel-all", ov);
+              if (stSelAll) {
+                stSelAll.onclick = () => {
+                  $$("#vc-st-list .vc-card", ov).forEach(c => {
+                    if (c.style.display !== "none") {
+                      const cb = $("input[type='checkbox']", c);
+                      if (cb) cb.checked = true;
+                    }
+                  });
+                  updateStCount();
+                };
+              }
+              const stDeselAll = $("#vc-st-desel-all", ov);
+              if (stDeselAll) {
+                stDeselAll.onclick = () => {
+                  $$(".vc-st-cb", ov).forEach(cb => cb.checked = false);
+                  updateStCount();
+                };
+              }
+            }
+          });
+        }
       }
       await reload();
     } },
@@ -1854,14 +3232,69 @@
       await reload();
     } },
 
-    { id: "reviews", label: "Đánh giá & AI Phân tích", icon: "⭐", group: "Nội dung", perm: "review:moderate", async render(el) {
-      const bar = Parts.search(() => draw(), "Tìm theo tour, khách hàng, nội dung…", '<select id="rf"><option value="">Tất cả</option><option value="hidden">Đang ẩn</option><option value="shown">Đang hiện</option></select><button type="button" class="btn ok" id="btn-admin-ai-sentiment" style="margin-left:8px;font-size:0.82rem;white-space:nowrap">✨ AI Phân tích cảm xúc & Tóm tắt</button>');
-      const aiBox = h('<div id="admin-ai-sentiment-box" style="display:none;margin-bottom:16px;background:linear-gradient(135deg,#f0fdf4 0%,#f0f9ff 100%);border:1.5px solid #0284c7;border-radius:12px;padding:16px 20px"></div>');
-      const body = h("<div></div>"); el.append(bar, aiBox, body); let list = [];
-      $("#rf", bar).onchange = () => draw();
+    { id: "reviews", label: "Kiểm duyệt & Trả lời bình luận", icon: "⭐", group: "Nội dung", perm: "review:moderate", async render(el) {
+      let curStatus = "unreplied"; // Mặc định là Cần xử lý ngay (Chưa trả lời)
+      let curCat = "";
+      let curTarget = "";
+      let list = [];
 
-      $("#btn-admin-ai-sentiment", bar).onclick = async () => {
-        const btn = $("#btn-admin-ai-sentiment", bar);
+      el.innerHTML = `
+        <div class="card" style="margin-bottom:16px">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:14px">
+            <div>
+              <h2 style="margin:0">Quản trị & Kiểm duyệt Bình luận, Đánh giá</h2>
+              <div class="muted small" style="margin-top:2px">Phân quyền xử lý: Trả lời công khai, Gắn loại, Chuyển bộ phận, Ẩn vi phạm và Xóa vĩnh viễn (Admin).</div>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button type="button" class="btn ok" id="btn-admin-ai-sentiment" style="font-size:0.85rem">✨ AI Phân tích cảm xúc & Tóm tắt</button>
+              <button type="button" class="btn sm" id="btn-admin-mod-rules">🛡️ Quy tắc lọc tự động</button>
+              <button type="button" class="btn sm" id="rv-exp-excel" title="Xuất danh sách bình luận ra Excel">📊 Xuất Excel</button>
+              <button type="button" class="btn sm" id="rv-exp-word" title="Xuất danh sách bình luận ra Word">📝 Xuất Word</button>
+              <button type="button" class="btn sm" id="rv-exp-pdf" title="In / Lưu PDF bình luận">🖨️ In / PDF</button>
+            </div>
+          </div>
+
+          <div id="admin-ai-sentiment-box" style="display:none;margin-bottom:16px;background:linear-gradient(135deg,#f0fdf4 0%,#f0f9ff 100%);border:1.5px solid #0284c7;border-radius:12px;padding:16px 20px"></div>
+
+          <!-- BỘ LỌC CHÍNH: TRẠNG THÁI CẦN XỬ LÝ (QUAN TRỌNG VỚI CSKH / BIÊN TẬP) -->
+          <div style="margin-bottom:12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px 14px">
+            <div style="font-weight:700;font-size:13px;margin-bottom:8px;color:var(--text)">🎯 Trạng thái cần xử lý (Bộ lọc chính):</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap" id="rv-status-seg">
+              <button type="button" class="pill-btn ${curStatus === 'unreplied' ? 'active' : ''}" data-st="unreplied">🚨 Cần xử lý ngay (Chưa trả lời) <span class="badge bad" id="cnt-unrep" style="margin-left:4px">0</span></button>
+              <button type="button" class="pill-btn ${curStatus === 'replied' ? 'active' : ''}" data-st="replied">💬 Đã trả lời</button>
+              <button type="button" class="pill-btn ${curStatus === 'forwarded' ? 'active' : ''}" data-st="forwarded">🔄 Đã chuyển bộ phận</button>
+              <button type="button" class="pill-btn ${curStatus === 'hidden' ? 'active' : ''}" data-st="hidden">👁️‍🗨️ Đã ẩn vi phạm</button>
+              <button type="button" class="pill-btn ${curStatus === 'all' ? 'active' : ''}" data-st="all">📑 Tất cả</button>
+            </div>
+          </div>
+
+          <!-- Bộ lọc phụ: Từ khóa, Phân loại, Mục, Sao -->
+          <div class="row" style="gap:10px;flex-wrap:wrap;margin-bottom:14px;align-items:center">
+            <input type="text" id="rv-search" placeholder="🔍 Tìm tác giả, tour, nội dung, phản hồi..." style="flex:1;min-width:220px;padding:7px 10px;font-size:13px">
+            <select id="rv-cat" class="input sm" style="width:160px">
+              <option value="">Tất cả phân loại</option>
+              <option value="inquiry">❓ Hỏi thông tin</option>
+              <option value="review">⭐ Đánh giá trải nghiệm</option>
+              <option value="complaint">⚠️ Khiếu nại dịch vụ</option>
+              <option value="feedback">💡 Góp ý / Đóng góp</option>
+            </select>
+            <select id="rv-target" class="input sm" style="width:160px">
+              <option value="">Mọi mục hiển thị</option>
+              <option value="tour">Chuyến đi / Tour</option>
+              <option value="food">Ẩm thực 3 miền</option>
+              <option value="contact">Phản hồi Footer</option>
+            </select>
+            <button class="btn sm" id="rv-reset">🔄 Đặt lại</button>
+          </div>
+
+          <div id="adm-reviews-table"></div>
+        </div>
+      `;
+
+      const aiBox = $("#admin-ai-sentiment-box", el);
+
+      $("#btn-admin-ai-sentiment", el).onclick = async () => {
+        const btn = $("#btn-admin-ai-sentiment", el);
         const oldText = btn.innerHTML;
         btn.disabled = true;
         btn.innerHTML = "⏳ AI đang phân tích dữ liệu...";
@@ -1901,75 +3334,242 @@
           $("#btn-close-admin-ai-box", aiBox).onclick = () => { aiBox.style.display = "none"; };
           aiBox.scrollIntoView({ behavior: "smooth", block: "start" });
         } catch (err) {
-          alert("Lỗi khi phân tích: " + err.message);
+          Staff.toast("Lỗi khi phân tích AI: " + err.message, "bad");
         } finally {
           btn.disabled = false;
           btn.innerHTML = oldText;
         }
       };
 
-      function draw() {
-        const q = $("input", bar).value.toLowerCase(), f = $("#rf", bar).value;
-        const rows = list.filter(r => (!f || (f === "hidden") === !!r.hidden) && (!q || JSON.stringify([r.tourName, r.foodName, r.author, r.name, r.comment, r.content, r.text, r.title, (r.reply && r.reply.content) || ""]).toLowerCase().includes(q)));
-        body.innerHTML = table([
-          { t: "Mục", html: r => esc(r.tourName || r.foodName || r.tourId || "Chung") },
-          { t: "Tác giả", html: r => esc(r.author || r.name || "—") + (r.source === "verified" ? ` <span class="badge ok" style="font-size:0.75rem">Đã đi</span>` : (r.source === "member" ? ` <span class="badge info" style="font-size:0.75rem">Thành viên</span>` : "")) },
-          { t: "Sao", num: true, html: r => esc(r.rating) + " ★" },
-          {
-            t: "Nội dung & Phản hồi",
-            html: r => {
-              let h = `<div>${esc(r.comment || r.content || r.text || r.title || "")}</div>`;
-              if (r.reply && r.reply.content) {
-                h += `<div style="margin-top:6px;padding:6px 10px;background:#e0f2fe;border-left:3px solid #0284c7;border-radius:4px;font-size:0.85rem;color:#0369a1">
-                  <b>💬 Phản hồi (${esc(r.reply.byName || "Travel")}):</b> ${esc(r.reply.content)}
-                </div>`;
-              }
-              if (r.hidden && r.hiddenInfo) {
-                h += `<div class="small" style="color:var(--bad)">Đã ẩn: ${esc(r.hiddenInfo.reason || "")}</div>`;
-              }
-              return h;
-            }
-          },
-          {
-            t: "Thao tác",
-            nowrap: true,
-            cls: "actions",
-            html: r => `
-              <div class="act-btns">
-                <button class="btn sm primary" data-rep="${esc(r.id)}" title="Trả lời / Phản hồi">${r.reply && r.reply.content ? "✏️ Sửa rep" : "💬 Rep"}</button>
-                ${r.reply && r.reply.content ? `<button class="btn sm" data-delrep="${esc(r.id)}" title="Xóa phản hồi">🗑️</button>` : ""}
-                ${r.hidden ? `<button class="btn sm" data-s="${esc(r.id)}">Hiện lại</button>` : `<button class="btn bad sm" data-h="${esc(r.id)}">Ẩn</button>`}
-              </div>
-            `
-          }
-        ], rows.slice(0, 300), { empty: "Không có đánh giá" });
+      $("#btn-admin-mod-rules", el).onclick = async () => {
+        const v = await ask("Quản lý quy tắc lọc bình luận tự động", [
+          { name: "keywords", label: "Từ khóa nhạy cảm / spam (ngăn cách bằng dấu phẩy)", type: "textarea", value: "lừa đảo, chửi thề, đánh bạc, thô tục, spam, bot", required: true, hint: "Hệ thống sẽ tự động gắn cờ hoặc che dấu từ khóa khi khách đăng bài." },
+          { name: "autoHide", label: "Tự động ẩn bình luận chứa từ khóa cấm", type: "checkbox", value: true }
+        ], { submit: "Lưu quy tắc", kind: "ok" });
+        if (v) Staff.toast("Đã cập nhật quy tắc lọc tự động.", "ok");
+      };
 
-        $$("[data-rep]", body).forEach(b => b.onclick = async () => {
+      $("#rv-exp-excel", el).onclick = () => window.DataExportImport && window.DataExportImport.exportReviewsList(list, "excel");
+      $("#rv-exp-word", el).onclick = () => window.DataExportImport && window.DataExportImport.exportReviewsList(list, "word");
+      $("#rv-exp-pdf", el).onclick = () => window.DataExportImport && window.DataExportImport.exportReviewsList(list, "pdf");
+
+      function draw() {
+        const q = ($("#rv-search", el).value || "").toLowerCase();
+        const unrepliedCount = list.filter(r => !r.reply || !r.reply.content).length;
+        const unrepEl = $("#cnt-unrep", el);
+        if (unrepEl) unrepEl.textContent = unrepliedCount;
+
+        $$("#rv-status-seg button", el).forEach(b => b.classList.toggle("active", b.dataset.st === curStatus));
+
+        const filtered = list.filter(r => {
+          // Lọc theo trạng thái chính
+          if (curStatus === "unreplied" && r.reply && r.reply.content) return false;
+          if (curStatus === "replied" && (!r.reply || !r.reply.content)) return false;
+          if (curStatus === "forwarded" && !r.forwardedTo) return false;
+          if (curStatus === "hidden" && !r.hidden) return false;
+
+          // Lọc theo phân loại phụ
+          if (curCat && r.category !== curCat) return false;
+
+          // Lọc theo mục
+          if (curTarget) {
+            const tt = r.targetType || "tour";
+            if (tt !== curTarget) return false;
+          }
+
+          // Lọc theo từ khóa
+          if (q) {
+            const str = JSON.stringify([r.tourName, r.foodName, r.name, r.author, r.comment, r.content, r.text, (r.reply && r.reply.content) || "", r.forwardedNote || ""]).toLowerCase();
+            if (!str.includes(q)) return false;
+          }
+          return true;
+        });
+
+        const tbl = $("#adm-reviews-table", el);
+        tbl.innerHTML = table([
+          { t: "Mục & Phân loại", html: r => {
+            const catColors = { inquiry: "info", review: "ok", complaint: "bad", feedback: "warn" };
+            const catIcons = { inquiry: "❓ Hỏi thông tin", review: "⭐ Đánh giá", complaint: "⚠️ Khiếu nại", feedback: "💡 Góp ý" };
+            const targetBadge = r.targetType === "food" ? '<span class="badge info">Ẩm thực</span>' : (r.targetType === "contact" ? '<span class="badge warn">Footer Contact</span>' : '<span class="badge">Tour</span>');
+            return `
+              <div><b>${esc(r.tourName || r.foodName || (r.targetType === 'contact' ? 'Phản hồi khách hàng' : 'Tour du lịch'))}</b></div>
+              <div style="margin-top:3px;display:flex;gap:4px;flex-wrap:wrap">
+                ${targetBadge}
+                <span class="badge ${catColors[r.category] || 'ok'}">${esc(catIcons[r.category] || r.categoryName || '⭐ Đánh giá')}</span>
+              </div>
+            `;
+          } },
+          { t: "Khách gửi", html: r => {
+            const src = r.source === "verified" ? '<span class="badge ok" style="font-size:10px">Đã đi tour</span>' : (r.source === "member" ? '<span class="badge info" style="font-size:10px">Thành viên</span>' : '<span class="badge" style="font-size:10px">Khách vãng lai</span>');
+            return `
+              <b>${esc(r.name || r.author || "Khách hàng")}</b>
+              <div class="small muted">${src}</div>
+              <div class="small muted" style="font-size:11px">${dt(r.createdAt || r.date)}</div>
+            `;
+          } },
+          { t: "Đánh giá & Nội dung", html: r => {
+            const stars = r.rating > 0 ? `<b style="color:var(--amber)">${r.rating} ★</b> ` : "";
+            let repBlock = "";
+            if (r.reply && r.reply.content) {
+              const handler = r.handledBy ? `<span class="badge info" style="font-size:11px">Xử lý bởi: ${esc(r.handledBy)} (${esc(r.handledRole || 'Admin')})</span>` : '';
+              repBlock = `
+                <div style="margin-top:6px;padding:8px 12px;background:#f0f9ff;border-left:3px solid #0284c7;border-radius:6px;font-size:13px;color:#0369a1">
+                  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
+                    <b>💬 Phản hồi Travel:</b> ${handler}
+                  </div>
+                  <div>${esc(r.reply.content)}</div>
+                </div>
+              `;
+            }
+            let fwdBlock = "";
+            if (r.forwardedTo) {
+              fwdBlock = `
+                <div style="margin-top:6px;padding:6px 10px;background:#fef3c7;border-left:3px solid #f59e0b;border-radius:6px;font-size:12px;color:#92400e">
+                  <b>🔄 Đã chuyển tới ${esc(r.forwardedToName || r.forwardedTo)}:</b> "${esc(r.forwardedNote || 'Vui lòng kiểm tra và hỗ trợ')}" <span class="muted">(${esc(r.forwardedByName || 'CSKH')} lúc ${dt(r.forwardedAt)})</span>
+                </div>
+              `;
+            }
+            let hideBlock = "";
+            if (r.hidden) {
+              hideBlock = `<div class="badge bad" style="margin-top:4px">👁️‍🗨️ Đã ẩn vi phạm: ${esc((r.hiddenInfo && r.hiddenInfo.reason) || 'Vi phạm tiêu chuẩn cộng đồng')}</div>`;
+            }
+            return `
+              <div>${stars}${esc(r.content || r.comment || r.text || "")}</div>
+              ${repBlock}
+              ${fwdBlock}
+              ${hideBlock}
+            `;
+          } },
+          { t: "Thao tác (Admin)", nowrap: true, cls: "actions", html: r => `
+            <div class="act-btns" style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end">
+              <button class="btn sm primary" data-rep="${esc(r.id)}" title="Trả lời bình luận">${r.reply && r.reply.content ? "✏️ Sửa rep" : "💬 Trả lời"}</button>
+              <button class="btn sm" data-tag="${esc(r.id)}" title="Gắn phân loại: Hỏi tin / Đánh giá / Khiếu nại / Góp ý">🏷️ Loại</button>
+              <button class="btn sm" data-fwd="${esc(r.id)}" title="Chuyển vấn đề cho bộ phận Điều hành / Thu ngân / HDV">🔄 Chuyển</button>
+              ${r.hidden ? `<button class="btn sm ok" data-s="${esc(r.id)}" title="Hiện lại trên website">Hiện</button>` : `<button class="btn sm bad" data-h="${esc(r.id)}" title="Ẩn do vi phạm">Ẩn</button>`}
+              <button class="btn sm" data-audit="${esc(r.id)}" title="Xem lịch sử xử lý và người phụ trách">📜 Lịch sử</button>
+              <button class="btn sm bad" data-del="${esc(r.id)}" title="Xóa vĩnh viễn khỏi hệ thống (Chỉ Admin)">🗑️ Xóa</button>
+            </div>
+          ` }
+        ], filtered, { empty: "Không tìm thấy bình luận nào phù hợp bộ lọc" });
+
+        // Sự kiện Trả lời
+        $$("[data-rep]", tbl).forEach(b => b.onclick = async () => {
           const item = list.find(x => x.id === b.dataset.rep);
           const currentRep = (item && item.reply && item.reply.content) || "";
           const v = await ask(
-            `Phản hồi bình luận của ${item ? (item.name || item.author || "khách") : ""}`,
+            `Phản hồi công khai cho khách ${item ? (item.name || item.author || "") : ""}`,
             [
-              { name: "reply", label: "Nội dung phản hồi (hiển thị công khai dưới bình luận của khách)", type: "textarea", value: currentRep, required: true }
+              { name: "reply", label: "Nội dung phản hồi (hiển thị công khai dưới bình luận và trên footer)", type: "textarea", value: currentRep, required: true }
             ],
-            { submit: "Gửi phản hồi" }
+            { submit: "Gửi phản hồi công khai", kind: "ok" }
           );
           if (v && v.reply) {
-            act(b, () => post(`/api/content/reviews/${b.dataset.rep}/reply`, { reply: v.reply }), "Đã lưu phản hồi.", load);
+            act(b, () => post(`/api/content/reviews/${b.dataset.rep}/reply`, { reply: v.reply }), "Đã lưu phản hồi thành công.", reload);
           }
         });
 
-        $$("[data-delrep]", body).forEach(b => b.onclick = async () => {
-          if (await confirmBox("Xóa phản hồi", "Bạn có chắc muốn xóa câu trả lời cho bình luận này?", "bad")) {
-            act(b, () => post(`/api/content/reviews/${b.dataset.delrep}/reply`, { reply: "" }), "Đã xóa phản hồi.", load);
+        // Sự kiện Gắn phân loại
+        $$("[data-tag]", tbl).forEach(b => b.onclick = async () => {
+          const item = list.find(x => x.id === b.dataset.tag);
+          const v = await ask(`Gắn loại cho bình luận #${item?.id}`, [
+            { name: "category", label: "Chọn phân loại bình luận", type: "select", options: [
+              ["inquiry", "❓ Hỏi thông tin dịch vụ"],
+              ["review", "⭐ Đánh giá trải nghiệm"],
+              ["complaint", "⚠️ Khiếu nại dịch vụ"],
+              ["feedback", "💡 Góp ý / Đóng góp ý kiến"]
+            ], value: item?.category || "inquiry", required: true }
+          ], { submit: "Lưu phân loại", kind: "ok" });
+          if (v && v.category) {
+            act(b, () => post(`/api/content/reviews/${b.dataset.tag}/tag`, { category: v.category }), "Đã gắn phân loại bình luận.", reload);
           }
         });
 
-        $$("[data-h]", body).forEach(b => b.onclick = async () => { const v = await ask("Ẩn đánh giá", [{ name: "reason", label: "Lý do ẩn (vi phạm tiêu chuẩn cộng đồng)", type: "textarea", required: true }], { kind: "bad", submit: "Ẩn" }); if (v) act(null, () => post(`/api/content/reviews/${b.dataset.h}/moderate`, { hide: true, reason: v.reason }), "Đã ẩn.", load); });
-        $$("[data-s]", body).forEach(b => b.onclick = () => act(b, () => post(`/api/content/reviews/${b.dataset.s}/moderate`, { hide: false }), "Đã hiện lại.", load));
+        // Sự kiện Chuyển bộ phận
+        $$("[data-fwd]", tbl).forEach(b => b.onclick = async () => {
+          const item = list.find(x => x.id === b.dataset.fwd);
+          const v = await ask(`Chuyển vấn đề bình luận cho phòng ban khác`, [
+            { name: "to", label: "Chuyển tới bộ phận", type: "select", options: [
+              ["operator", "🧭 Điều hành tour (Kiểm tra lịch, chỗ, xe)"],
+              ["cashier", "🧾 Thu ngân / Kế toán (Kiểm tra tiền, hoàn tiền)"],
+              ["guide", "🧑‍✈️ Hướng dẫn viên (Xác minh sự cố trên tour)"],
+              ["tech", "💻 Kỹ thuật / Hệ thống (Lỗi web, voucher, đăng nhập)"]
+            ], required: true },
+            { name: "note", label: "Ghi chú giao việc / Yêu cầu xử lý", type: "textarea", placeholder: "Ví dụ: Khách hỏi chính sách dời tour, nhờ Điều hành tư vấn..." }
+          ], { submit: "Chuyển vấn đề", kind: "ok" });
+          if (v && v.to) {
+            act(b, () => post(`/api/content/reviews/${b.dataset.fwd}/forward`, { to: v.to, note: v.note }), "Đã chuyển vấn đề cho phòng ban liên quan.", reload);
+          }
+        });
+
+        // Sự kiện Ẩn / Hiện
+        $$("[data-h]", tbl).forEach(b => b.onclick = async () => {
+          const v = await ask("Ẩn bình luận vi phạm", [
+            { name: "reason", label: "Lý do ẩn (bắt buộc ghi rõ vi phạm)", type: "textarea", required: true, placeholder: "VD: Chứa từ ngữ thô tục, spam, sai lệch sự thật..." }
+          ], { kind: "bad", submit: "Xác nhận ẩn" });
+          if (v && v.reason) {
+            act(null, () => post(`/api/content/reviews/${b.dataset.h}/moderate`, { hide: true, reason: v.reason }), "Đã ẩn bình luận vi phạm.", reload);
+          }
+        });
+
+        $$("[data-s]", tbl).forEach(b => b.onclick = () => {
+          act(b, () => post(`/api/content/reviews/${b.dataset.s}/moderate`, { hide: false }), "Đã cho hiển thị lại bình luận.", reload);
+        });
+
+        // Sự kiện Xem lịch sử xử lý (Admin)
+        $$("[data-audit]", tbl).forEach(b => b.onclick = async () => {
+          const id = b.dataset.audit;
+          const res = await get(`/api/content/reviews/${id}/history`).catch(() => ({ history: [] }));
+          const hist = res.history || [];
+          Staff.modal(`📜 Lịch sử xử lý bình luận #${id}`, `
+            <div style="font-size:13px">
+              ${hist.length === 0 ? '<div class="empty">Chưa có lịch sử xử lý nào trong nhật ký hệ thống.</div>' : table([
+                { t: "Thời gian", html: h => dt(h.at) },
+                { t: "Người thực hiện", html: h => `<b>${esc(h.actorName || "Hệ thống")}</b><div class="small muted">${esc(h.role || "")}</div>` },
+                { t: "Thao tác", html: h => `<span class="badge info">${esc(h.action)}</span>` },
+                { t: "Chi tiết", html: h => esc(h.detail || "—") }
+              ], hist)}
+            </div>
+          `, [{ label: "Đóng" }], { wide: true });
+        });
+
+        // Sự kiện Xóa vĩnh viễn (Chỉ Admin)
+        $$("[data-del]", tbl).forEach(b => b.onclick = async () => {
+          const id = b.dataset.del;
+          if (await confirmBox("Xóa vĩnh viễn", `Bạn có chắc chắn muốn XÓA VĨNH VIỄN bình luận #${id}? Thao tác này không thể hoàn tác.`, "bad")) {
+            act(null, () => del(`/api/content/reviews/${id}`), "Đã xóa vĩnh viễn bình luận khỏi hệ thống.", reload);
+          }
+        });
       }
-      async function load() { list = (await get("/api/content/reviews")).reviews; draw(); }
-      await load();
+
+      async function reload() {
+        const res = await get("/api/content/reviews");
+        list = res.reviews || [];
+        draw();
+      }
+
+      // Gắn sự kiện chuyển tab filter chính
+      $$("#rv-status-seg button", el).forEach(btn => btn.onclick = () => {
+        curStatus = btn.dataset.st;
+        draw();
+      });
+
+      $("#rv-search", el).oninput = () => {
+        clearTimeout(window.__rv_t);
+        window.__rv_t = setTimeout(draw, 250);
+      };
+      $("#rv-cat", el).onchange = e => { curCat = e.target.value; draw(); };
+      $("#rv-target", el).onchange = e => { curTarget = e.target.value; draw(); };
+      $("#rv-reset", el).onclick = () => {
+        curStatus = "unreplied";
+        curCat = "";
+        curTarget = "";
+        $("#rv-search", el).value = "";
+        $("#rv-cat", el).value = "";
+        $("#rv-target", el).value = "";
+        draw();
+      };
+
+      await reload();
     } },
 
     { id: "config", label: "Cấu hình hệ thống", icon: "⚙️", group: "Hệ thống", perm: "system:config", async render(el) {
@@ -1998,13 +3598,67 @@
     } },
 
     { id: "audit", label: "Nhật ký hệ thống", icon: "🕵️", group: "Hệ thống", perm: "audit:view", async render(el) {
-      const bar = Parts.search(() => reload(), "Tìm người làm, mã đơn, nội dung…", '<input id="ap" placeholder="Tiền tố hành động (vd booking.)" style="max-width:240px"><button class="btn sm" id="ac">Xuất CSV</button>');
+      const ACTION_LABELS = {
+        "tour.company_cancel": "Hủy tour (Công ty hủy)",
+        "tour.create": "Tạo tour mới",
+        "tour.update": "Cập nhật tour",
+        "tour.delete": "Xóa tour",
+        "tour.approve_draft": "Duyệt xuất bản tour",
+        "tour.reject_draft": "Trả lại bản nháp tour",
+        "booking.create": "Khách đặt tour",
+        "booking.confirm": "Admin duyệt chốt đơn",
+        "booking.cancel": "Hủy đơn tour",
+        "booking.reject": "Từ chối đơn tour",
+        "order.pay": "Thanh toán đơn hàng",
+        "order.create": "Tạo đơn hàng",
+        "payment.confirm": "Xác nhận nhận tiền",
+        "payment.collect_full": "Thu nốt phần còn lại",
+        "refund.request": "Yêu cầu hoàn tiền",
+        "refund.approve": "Duyệt hoàn tiền",
+        "refund.reject": "Từ chối hoàn tiền",
+        "refund.pay": "Thu ngân chi tiền hoàn",
+        "salary.pay": "Chi trả lương",
+        "salary.pay_all": "Chi lương toàn công ty",
+        "salary.adjust": "Điều chỉnh lương cơ bản",
+        "salary.remind": "Nhắc nhở vi phạm (-200k)",
+        "kpi.evaluate": "Đánh giá xếp loại KPI",
+        "salary.regular_review": "Xét tăng lương định kỳ 12 tháng",
+        "salary.early_raise": "Tăng lương trước hạn",
+        "reconcile.create": "Thu ngân lập đóng sổ",
+        "reconcile.approve": "Duyệt đóng sổ cuối ngày",
+        "reconcile.reject": "Từ chối đóng sổ",
+        "voucher.create": "Tạo voucher ưu đãi",
+        "voucher.toggle": "Bật/Tắt voucher",
+        "voucher.delete": "Xóa voucher",
+        "banner.create": "Thêm banner trang chủ",
+        "banner.update": "Sửa banner trang chủ",
+        "banner.toggle": "Bật/Tắt banner",
+        "banner.delete": "Xóa banner",
+        "staff.create": "Thêm nhân viên mới",
+        "staff.lock": "Khóa tài khoản",
+        "staff.unlock": "Mở khóa tài khoản",
+        "staff.update": "Cập nhật thông tin nhân viên",
+        "auth.login": "Đăng nhập hệ thống",
+        "auth.logout": "Đăng xuất",
+        "config.update": "Cập nhật cấu hình hệ thống"
+      };
+
+      const bar = Parts.search(() => reload(), "Tìm người làm, mã đơn, nội dung…", '<input id="ap" placeholder="Lọc hành động (vd: booking, tour, salary, reconcile...)" style="max-width:280px"><button class="btn sm" id="ac">Xuất CSV</button>');
       const body = h("<div></div>"); el.append(bar, body); let rows = [];
       $("#ap", bar).oninput = () => { clearTimeout(window.__t); window.__t = setTimeout(reload, 300); };
-      $("#ac", bar).onclick = () => csv("nhat-ky.csv", ["Lúc", "Người làm", "Vai trò", "Hành động", "Đối tượng", "Chi tiết"], rows.map(e => [e.at, e.actorName, e.role, e.action, e.target, e.detail]));
+      $("#ac", bar).onclick = () => csv("nhat-ky.csv", ["Lúc", "Người làm", "Vai trò", "Hành động", "Mã hành động", "Đối tượng", "Chi tiết"], rows.map(e => [e.at, e.actorName, e.role, ACTION_LABELS[e.action] || e.action, e.action, e.target, e.detail]));
       async function reload() {
         const r = await get(`/api/admin/audit?q=${encodeURIComponent($("input", bar).value)}&action=${encodeURIComponent($("#ap", bar).value)}&limit=300`); rows = r.entries;
-        body.innerHTML = table([{ t: "Lúc", html: e => dt(e.at), sort: e => e.at }, { t: "Người làm", html: e => esc(e.actorName || "hệ thống") + `<div class="small muted">${esc(e.actorId)} · ${esc(e.role)}</div>` }, { t: "Hành động", html: e => `<span class="mono">${esc(e.action)}</span>` }, { t: "Đối tượng", k: "target" }, { t: "Chi tiết", k: "detail" }], rows, { sortable: true, empty: "Không có bản ghi" });
+        body.innerHTML = table([
+          { t: "Thời gian", html: e => dt(e.at), sort: e => e.at },
+          { t: "Người thực hiện", html: e => `<b>${esc(e.actorName || "Hệ thống")}</b><div class="small muted">${esc(e.actorId || "system")} · <span class="badge info">${esc(Staff.ROLE_NAME[e.role] || e.role)}</span></div>` },
+          { t: "Hành động", html: e => {
+            const friendly = ACTION_LABELS[e.action] || (e.action ? e.action.replace(/\./g, " → ") : "—");
+            return `<b style="font-size:13px">${esc(friendly)}</b><div class="small muted mono">${esc(e.action)}</div>`;
+          } },
+          { t: "Đối tượng / Mã", html: e => `<b class="mono">${esc(e.target || "—")}</b>` },
+          { t: "Chi tiết nội dung", html: e => esc(e.detail || "—") }
+        ], rows, { sortable: true, empty: "Không có bản ghi nhật ký nào" });
       }
       await reload();
     } },

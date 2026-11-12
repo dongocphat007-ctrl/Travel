@@ -229,6 +229,9 @@ public class ContentOps {
                 t.put("createdAt", Times.iso(core.now()));
                 t.put("isNew", true);
                 t.put("badge", "new");
+                if (!patch.containsKey("newUntil")) {
+                    t.put("newUntil", core.today().plusDays(30).toString());
+                }
                 t.put("active", true);
                 t.putAll(patch);
                 t.put("updatedAt", Times.iso(core.now()));
@@ -264,6 +267,11 @@ public class ContentOps {
         patch.put("price", Math.round(price));
         patch.put("isNew", true);
         patch.put("badge", "new");
+        if (in.containsKey("newUntil") && in.get("newUntil") != null && !String.valueOf(in.get("newUntil")).isBlank()) {
+            patch.put("newUntil", Maps.str(in, "newUntil").trim());
+        } else {
+            patch.put("newUntil", core.today().plusDays(30).toString());
+        }
 
         if (in.containsKey("subtitle")) patch.put("subtitle", in.get("subtitle"));
         if (in.containsKey("description")) patch.put("description", in.get("description"));
@@ -450,6 +458,10 @@ public class ContentOps {
         }
     }
 
+    public static final Set<String> PROTECTED_FOOD_NAMES = Set.of(
+            "phở hà nội", "bún bò huế", "cơm tấm sài gòn"
+    );
+
     public Map<String, Object> saveFood(Actor by, String id, Map<String, Object> in) {
         String name = Maps.str(in, "name").trim(), region = Maps.str(in, "region").trim();
         if (name.length() < 2 || name.length() > 80) throw HttpError.bad("Tên món 2–80 ký tự", "name");
@@ -462,8 +474,15 @@ public class ContentOps {
             if (id != null && !id.isEmpty()) {
                 for (Map<String, Object> x : all) if (id.equals(Maps.str(x, "id"))) f = x;
                 if (f == null) throw HttpError.notFound("Không tìm thấy món");
+                String oldName = Maps.str(f, "name").trim().toLowerCase();
+                if (PROTECTED_FOOD_NAMES.contains(oldName) && !name.equalsIgnoreCase(oldName)) {
+                    throw HttpError.bad("Không được đổi tên hoặc thay thế 3 món ăn tiêu biểu của 3 vùng miền (Phở Hà Nội, Bún bò Huế, Cơm tấm Sài Gòn)", "name");
+                }
             } else {
                 f = Maps.of("id", Ids.newId("food"), "createdAt", Times.iso(core.now()));
+                f.put("isNew", true);
+                f.put("badge", "MỚI");
+                f.put("newUntil", core.today().plusDays(30).toString());
                 all.add(f);
             }
             f.put("name", name);
@@ -475,6 +494,9 @@ public class ContentOps {
             f.put("province", Maps.str(in, "province").trim());
             f.put("image", img);
             f.put("active", !Boolean.FALSE.equals(in.get("active")));
+            if (in.containsKey("newUntil")) {
+                f.put("newUntil", Maps.str(in, "newUntil"));
+            }
             f.put("updatedBy", by.id());
             f.put("updatedAt", Times.iso(core.now()));
             out[0] = f;
@@ -484,6 +506,16 @@ public class ContentOps {
     }
 
     public void deleteFood(Actor by, String id) {
+        Map<String, Object> target = null;
+        for (Map<String, Object> f : db.list("foods")) {
+            if (id.equals(Maps.str(f, "id"))) { target = f; break; }
+        }
+        if (target != null) {
+            String name = Maps.str(target, "name").trim().toLowerCase();
+            if (PROTECTED_FOOD_NAMES.contains(name) || Maps.bool(target, "isProtected") || Maps.bool(target, "featured")) {
+                throw HttpError.bad("Không thể xóa 3 món ăn tiêu biểu của 3 vùng miền (Phở Hà Nội, Bún bò Huế, Cơm tấm Sài Gòn)", "name");
+            }
+        }
         boolean[] hit = {false};
         db.edit("foods", all -> hit[0] = all.removeIf(f -> id.equals(Maps.str(f, "id"))));
         if (!hit[0]) throw HttpError.notFound("Không tìm thấy món");
@@ -514,6 +546,39 @@ public class ContentOps {
         Map<String, Object> res = reviews.replyReview(by, reviewId, reply);
         core.audit.log(by.id(), by.name(), by.role(), "review.reply", reviewId, reply == null ? "" : reply.trim());
         return res;
+    }
+
+    /** Gắn phân loại cho bình luận (Hỏi thông tin, Đánh giá, Khiếu nại, Góp ý) */
+    public Map<String, Object> tagReview(Actor by, String reviewId, String category) {
+        Map<String, Object> res = reviews.tagReview(by, reviewId, category);
+        core.audit.log(by.id(), by.name(), by.role(), "review.tag", reviewId, "Phân loại: " + category);
+        return res;
+    }
+
+    /** Chuyển vấn đề bình luận cho bộ phận khác xử lý */
+    public Map<String, Object> forwardReview(Actor by, String reviewId, String toRole, String note) {
+        Map<String, Object> res = reviews.forwardReview(by, reviewId, toRole, note);
+        core.audit.log(by.id(), by.name(), by.role(), "review.forward", reviewId, "Chuyển: " + toRole + " (" + note + ")");
+        return res;
+    }
+
+    /** Xóa vĩnh viễn bình luận (chỉ Admin) */
+    public Map<String, Object> deleteReview(Actor by, String reviewId) {
+        Map<String, Object> res = reviews.deleteReview(by, reviewId);
+        core.audit.log(by.id(), by.name(), by.role(), "review.delete", reviewId, "Xóa vĩnh viễn");
+        return res;
+    }
+
+    /** Lịch sử xử lý bình luận từ nhật ký hệ thống */
+    public List<Map<String, Object>> reviewAuditHistory(String reviewId) {
+        List<Map<String, Object>> out = new ArrayList<>();
+        for (Map<String, Object> a : core.db.list("audit")) {
+            if (reviewId.equals(a.get("target"))) {
+                out.add(a);
+            }
+        }
+        out.sort((a, b) -> Maps.str(b, "at").compareTo(Maps.str(a, "at")));
+        return out;
     }
 
     // ───────────────────────── ghim tour nổi bật (7.5) ─────────────────────────

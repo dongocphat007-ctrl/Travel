@@ -345,15 +345,22 @@ const FoodModule = (() => {
       </div>
       <div class="food-section-label">Các món đặc trưng (${r.foods.length} món)</div>
       <div class="food-grid">
-        ${r.foods.map((f, i) => `
-          <div class="food-card">
-            <div class="food-card-img food-img-bg" data-food-img="${i}"><span class="fi-emoji" style="font-size:2.5rem">${f.emoji}</span><span class="food-img-label">${f.region}</span></div>
+        ${r.foods.map((f, i) => {
+          const isNewFood = !!(f.isNew || f.badge === "new" || f.badge === "MỚI" || (f.newUntil && f.newUntil >= new Date().toISOString().slice(0, 10)));
+          return `
+          <div class="food-card" style="position:relative">
+            <div class="food-card-img food-img-bg" data-food-img="${i}">
+              <span class="fi-emoji" style="font-size:2.5rem">${f.emoji || "🍜"}</span>
+              <span class="food-img-label">${f.region || ""}</span>
+              ${isNewFood ? '<span class="food-badge-new" style="position:absolute;top:8px;right:8px;background:#ef4444;color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;box-shadow:0 2px 6px rgba(0,0,0,0.2);letter-spacing:0.5px;z-index:2">MỚI</span>' : ''}
+            </div>
             <div class="food-card-body">
               <div class="food-card-name">${f.name}</div>
-              <div class="food-card-desc">${f.desc}</div>
-              <div class="food-card-tags">${f.tags.map(t=>`<span class="food-tag food-tag-${region}">${t}</span>`).join("")}</div>
+              <div class="food-card-desc">${f.desc || f.description || ""}</div>
+              <div class="food-card-tags">${(f.tags || []).map(t=>`<span class="food-tag food-tag-${region}">${t}</span>`).join("")}</div>
             </div>
-          </div>`).join("")}
+          </div>`;
+        }).join("")}
       </div>
       
       <div id="food-reviews-section" class="food-reviews-box" style="margin-top:36px;padding:24px;background:var(--card,#fff);border-radius:14px;border:1px solid var(--border,#e2e8f0);box-shadow:0 4px 12px rgba(0,0,0,0.03)">
@@ -373,7 +380,7 @@ const FoodModule = (() => {
     if (!fb || !lb) return;
 
     // 1. Render form
-    const isLogged = window.Auth && Auth.currentUser && Auth.currentUser();
+    const isLogged = !!(window.Auth && (typeof Auth.currentUser === "function" ? Auth.currentUser() : (typeof Auth.getUser === "function" ? Auth.getUser() : null)));
     if (!isLogged) {
       fb.innerHTML = '<div style="padding:16px 20px;background:var(--card-subtle,#f8f9fa);border:1px dashed var(--border,#cbd5e1);border-radius:10px;text-align:center">' +
         '<p style="margin-bottom:10px;color:var(--text);font-size:0.92rem">Đăng nhập tài khoản để gửi bình luận và đánh giá các món đặc sản.</p>' +

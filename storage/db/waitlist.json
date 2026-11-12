@@ -1,0 +1,74 @@
+[
+  {
+    "id": "wl_001",
+    "tourId": "101",
+    "tourName": "Hà Nội – Hạ Long 3N2Đ",
+    "date": "2026-11-15",
+    "name": "Nguyễn Thị Thu Trang",
+    "phone": "0908123456",
+    "email": "trang.nguyen@gmail.com",
+    "pax": 2,
+    "status": "waiting",
+    "createdAt": "2026-11-08T09:00:00Z"
+  },
+  {
+    "id": "wl_002",
+    "tourId": "102",
+    "tourName": "Sa Pa – Fansipan Huyền Thoại 3N2Đ",
+    "date": "2026-11-16",
+    "name": "Trần Hữu Nam",
+    "phone": "0908234567",
+    "email": "nam.tran@gmail.com",
+    "pax": 4,
+    "status": "waiting",
+    "createdAt": "2026-11-08T11:30:00Z"
+  },
+  {
+    "id": "wl_003",
+    "tourId": "103",
+    "tourName": "Đà Nẵng – Hội An – Bà Nà Hills 4N3Đ",
+    "date": "2026-11-17",
+    "name": "Lê Hồng Ánh",
+    "phone": "0908345678",
+    "email": "anh.le@gmail.com",
+    "pax": 3,
+    "status": "waiting",
+    "createdAt": "2026-11-09T14:00:00Z"
+  },
+  {
+    "id": "wl_004",
+    "tourId": "105",
+    "tourName": "Phú Quốc – Thiên Đường Đảo Ngọc 3N2Đ",
+    "date": "2026-11-18",
+    "name": "Phạm Gia Huy",
+    "phone": "0908456789",
+    "email": "huy.pham@gmail.com",
+    "pax": 2,
+    "status": "waiting",
+    "createdAt": "2026-11-09T16:15:00Z"
+  },
+  {
+    "id": "wl_005",
+    "tourId": "104",
+    "tourName": "Đà Lạt – Thành Phố Ngàn Hoa 3N2Đ",
+    "date": "2026-11-20",
+    "name": "Vũ Bảo Ngọc",
+    "phone": "0908567890",
+    "email": "ngoc.vu@gmail.com",
+    "pax": 5,
+    "status": "waiting",
+    "createdAt": "2026-11-10T08:30:00Z"
+  },
+  {
+    "id": "wl_006",
+    "tourId": "106",
+    "tourName": "TP.HCM – Miền Tây Sông Nước 2N1Đ",
+    "date": "2026-11-22",
+    "name": "Hoàng Minh Trí",
+    "phone": "0908678901",
+    "email": "tri.hoang@gmail.com",
+    "pax": 2,
+    "status": "waiting",
+    "createdAt": "2026-11-10T09:45:00Z"
+  }
+]

@@ -113,7 +113,16 @@ function syncAdminTours() {
         _prov: t.province ? [t.province] : undefined
       };
     });
-  TOUR_SAMPLES = extras.concat(TOUR_SAMPLES.filter(function(t){ return !t._admin && !localIds[String(t.id)]; }));
+  var finalSeen = {};
+  var finalDedup = [];
+  extras.concat(TOUR_SAMPLES.filter(function(t){ return !t._admin && !localIds[String(t.id)]; })).forEach(function(t){
+    var tid = String(t.id);
+    if (!finalSeen[tid]) {
+      finalSeen[tid] = true;
+      finalDedup.push(t);
+    }
+  });
+  TOUR_SAMPLES = finalDedup;
 }
 
 // Cập nhật số tour ở các nút lọc nhóm (gọi lại khi giao diện trang chủ được nạp sau dữ liệu)
@@ -135,9 +144,21 @@ function rebuildTours() {
   var tag = function(src){ return function(t){ return Object.assign({ src: src }, t); }; };
   var sample = [].concat(_groups.bac || [], _groups.trung || [], _groups.nam || [])
     .sort(function(a, b){ return (a.ord || 0) - (b.ord || 0); });
-  TOUR_SAMPLES = ((_core && _core.tours) || []).map(tag("sample"))
+  var combined = ((_core && _core.tours) || []).map(tag("sample"))
     .concat(sample.map(tag("sample")))
     .concat((_groups.intl || []).map(tag("intl")));
+
+  // Khử trùng lặp tuyệt đối theo id (ngăn triệt để lỗi 1 tour hiện 2 lần khi ẩn/hiện)
+  var seen = {};
+  var dedup = [];
+  combined.forEach(function(t){
+    var tid = String(t.id);
+    if (!seen[tid]) {
+      seen[tid] = true;
+      dedup.push(t);
+    }
+  });
+  TOUR_SAMPLES = dedup;
   syncAdminTours._raw = null;
   syncAdminTours();
 }
@@ -240,8 +261,8 @@ function getFilteredTours() {
   else if (sortMode === "desc") list.sort(function(a,b){ return b.displayPrice - a.displayPrice; });
   else {
     list.sort(function(a, b){
-      var aNew = (a.isNew || a.badge === "new" || String(a.id).startsWith("tour_")) ? 1 : 0;
-      var bNew = (b.isNew || b.badge === "new" || String(b.id).startsWith("tour_")) ? 1 : 0;
+      var aNew = isTourNew(a) ? 1 : 0;
+      var bNew = isTourNew(b) ? 1 : 0;
       if (aNew !== bNew) return bNew - aNew;
       return (a.ord || 0) - (b.ord || 0);
     });
@@ -249,13 +270,30 @@ function getFilteredTours() {
   return list;
 }
 
+function isTourNew(t) {
+  if (!t) return false;
+  var today = new Date().toISOString().slice(0, 10);
+  if (t.newUntil) {
+    return String(t.newUntil).slice(0, 10) >= today;
+  }
+  if (t.isNew || t.badge === "new" || String(t.id).startsWith("tour_")) {
+    if (t.createdAt) {
+      var created = new Date(t.createdAt);
+      var daysDiff = (Date.now() - created.getTime()) / (1000 * 3600 * 24);
+      return daysDiff <= 30; // Hết hạn nhãn MỚI sau 30 ngày kể từ ngày tạo
+    }
+    return true;
+  }
+  return false;
+}
+
 function tourCardHtml(t) {
   // Mỗi tour là một tấm vé: thân vé (tuyến, tên, mô tả, dữ kiện) + cuống vé (mã, giá, nút).
   var guided = t.guide === "guided";
-  var isNewTour = !!(t.isNew || t.badge === "new" || String(t.id).startsWith("tour_"));
+  var isNewTour = isTourNew(t);
   var facts = [];
   if (isNewTour) {
-    facts.push('<span class="tc-fact is-new" style="background:#ef4444;color:#fff;font-weight:700">MỚI</span>');
+    facts.push('<span class="tc-fact is-new" style="background:#ef4444;color:#fff;font-weight:700" title="Tour mới">MỚI</span>');
   }
   if (t.duration) facts.push('<span class="tc-fact">' + escH(t.duration) + "</span>");
   facts.push('<span class="tc-fact' + (guided ? " is-guided" : "") + '">' + (guided ? "Có hướng dẫn viên" : "Tự túc") + "</span>");
@@ -544,6 +582,11 @@ document.addEventListener("click", function(e){
   }
 });
 
+// Tự động đóng mobile nav khi bấm chọn bất kỳ mục nào
+document.querySelectorAll("#nav-right-btns .nav-btn, #nav-auth-area").forEach(function(btn){
+  btn.addEventListener("click", function(){ setMobileNavOpen(false); });
+});
+
 // Đóng menu di động sau khi chọn một mục
 document.getElementById("nav-right-btns")?.addEventListener("click", function(e){
   if (e.target.closest(".nav-btn, #nav-login-btn")) setMobileNavOpen(false);
@@ -577,6 +620,55 @@ document.getElementById("hero-create-btn")?.addEventListener("click", function()
   });
 })();
 
+// Hiển thị tour ghép đoàn đang gom khách trên trang chủ
+function renderTourPools() {
+  var root = document.getElementById("homeTourPoolList");
+  if (!root) return;
+  fetch("/api/tours/pool", { credentials: "same-origin" })
+    .then(function(r) { return r.ok ? r.json() : null; })
+    .then(function(data) {
+      if (!data || !Array.isArray(data.pools) || !data.pools.length) {
+        var sec = document.getElementById("sec-tour-pools");
+        if (sec) sec.style.display = "none";
+        return;
+      }
+      var sec = document.getElementById("sec-tour-pools");
+      if (sec) sec.style.display = "";
+      root.innerHTML = data.pools.map(function(p) {
+        var cur = p.currentPax || 0;
+        var min = p.minPax || 6;
+        var max = p.maxPax || 16;
+        var pct = Math.min(100, Math.round((cur / max) * 100));
+        var isReady = cur >= min;
+        var needed = Math.max(0, min - cur);
+        var disc = p.discountPercent ? '<span class="badge" style="background:#ef4444;color:#fff;font-size:11px;padding:2px 6px;border-radius:4px;font-weight:700">Giảm ' + p.discountPercent + '%</span>' : '';
+        return '<div class="card" style="border:1px solid var(--border,#e2e8f0);border-radius:12px;padding:14px;background:var(--surface,#fff);box-shadow:0 2px 8px rgba(0,0,0,0.04);display:flex;flex-direction:column;justify-content:space-between">'
+          + '<div>'
+          + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'
+          + '<span class="badge info" style="font-size:11px;padding:2px 6px;border-radius:4px">' + escH(p.destination || "Ghép đoàn") + '</span>'
+          + disc
+          + '</div>'
+          + '<h3 style="margin:0 0 6px;font-size:15px;line-height:1.4"><a href="#/tour/' + escH(p.tourId || "") + '" style="color:inherit;text-decoration:none">' + escH(p.tourName) + '</a></h3>'
+          + '<div class="small muted" style="margin-bottom:10px">📅 Khởi hành: <b>' + (p.date ? p.date.slice(0, 10).split('-').reverse().join('/') : 'Linh hoạt') + '</b></div>'
+          + '<div style="margin-bottom:10px">'
+          + '<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">'
+          + '<span>Đã gom: <b>' + cur + '/' + max + ' khách</b></span>'
+          + '<span style="color:' + (isReady ? '#10b981' : '#f59e0b') + ';font-weight:600">' + (isReady ? '✅ Đủ điều kiện khởi hành' : 'Thiếu ' + needed + ' khách') + '</span>'
+          + '</div>'
+          + '<div style="background:#f1f5f9;height:7px;border-radius:99px;overflow:hidden">'
+          + '<div style="background:' + (isReady ? '#10b981' : '#f59e0b') + ';height:100%;width:' + pct + '%;border-radius:99px"></div>'
+          + '</div>'
+          + '</div>'
+          + '</div>'
+          + '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:10px;border-top:1px dashed var(--border,#e2e8f0)">'
+          + '<span style="font-size:12px;color:var(--text-sub,#64748b)">' + escH(p.targetVehicle || "Xe du lịch") + '</span>'
+          + '<a href="#/tour/' + escH(p.tourId || "") + '" class="btn btn-primary sm" style="font-size:12px;padding:4px 10px;border-radius:6px;text-decoration:none">Tham gia ghép →</a>'
+          + '</div>'
+          + '</div>';
+      }).join('');
+    }).catch(function() {});
+}
+
 // Init home section renders (called after all scripts load)
 window._initHomeSection = function(){
   var drawAll = function(){
@@ -584,6 +676,7 @@ window._initHomeSection = function(){
     renderAdvFilter();
     renderRegionFilter();
     renderTours(false);
+    renderTourPools();
   };
   loadCoreData().then(function(){
     if (!TOUR_SAMPLES.length) return;

@@ -26,21 +26,38 @@
   }
   function replies(rootId, list) {
     const arr = Array.isArray(list) ? list : [];
-    const logged = !!(window.Auth && Auth.currentUser && Auth.currentUser());
+    const logged = !!(window.Auth && (typeof Auth.currentUser === "function" ? Auth.currentUser() : (typeof Auth.getUser === "function" ? Auth.getUser() : null)));
     const byId = new Map(arr.map((r) => [String(r.id), r]));
     const items = arr.map((r) => {
       const target = r.replyToId && byId.get(String(r.replyToId));
-      return '<div class="review-community-reply"><b>' + esc(r.name || "Thành viên") + '</b>' + (target ? '<small> · trả lời ' + esc(target.name || "Thành viên") + '</small>' : '') + '<p>' + esc(r.content || "") + '</p>' + gallery(r.images) + (logged ? '<button type="button" class="review-reply-link" data-root="' + esc(rootId) + '" data-reply-to="' + esc(r.id) + '">Trả lời</button>' : '<button type="button" class="review-login-reply">Đăng nhập để trả lời</button>') + '</div>';
+      return '<div class="review-community-reply"><b>' + esc(r.name || "Thành viên") + '</b>' + (target ? '<small> · trả lời ' + esc(target.name || "Thành viên") + '</small>' : '') + '<p>' + esc(r.content || "") + '</p>' + gallery(r.images) + (logged ? '<button type="button" class="review-reply-link" data-root="' + esc(rootId) + '" data-reply-to="' + esc(r.id) + '">💬 Trả lời</button>' : '<button type="button" class="review-login-reply">Đăng nhập để trả lời</button>') + '</div>';
     }).join("");
-    return '<div class="review-community-thread">' + items + (logged ? form(rootId, "") : '<button type="button" class="review-login-reply">Đăng nhập để trả lời</button>') + '</div>';
+    const actions = logged
+      ? '<button type="button" class="review-reply-link" data-root="' + esc(rootId) + '" data-reply-to="" style="font-weight:600;margin-top:6px;display:inline-flex;align-items:center;gap:4px">💬 Viết phản hồi / Hỏi thăm ý kiến</button>'
+      : '<button type="button" class="review-login-reply" style="font-weight:600;margin-top:6px">Đăng nhập để phản hồi hoặc hỏi thăm</button>';
+    return '<div class="review-community-thread">' + items + actions + '</div>';
   }
   function form(rootId, replyTo) {
-    return '<form class="review-community-form" data-root="' + esc(rootId) + '" data-reply-to="' + esc(replyTo) + '"><textarea name="content" maxlength="1000" minlength="3" required placeholder="Viết phản hồi… (3–1000 ký tự)"></textarea><div class="review-community-tools"><label>Ảnh (tối đa 5) <input name="images" type="file" accept="image/png,image/jpeg,image/webp,image/gif" multiple></label><button class="btn btn-outline" type="submit">Gửi phản hồi</button><span role="status"></span></div></form>';
+    return '<form class="review-community-form" data-root="' + esc(rootId) + '" data-reply-to="' + esc(replyTo) + '">' +
+      '<textarea name="content" maxlength="1000" minlength="3" required placeholder="' + (replyTo ? 'Viết câu trả lời của bạn… (3–1000 ký tự)' : 'Hỏi thăm ý kiến hoặc phản hồi bình luận này… (3–1000 ký tự)') + '"></textarea>' +
+      '<div class="review-community-tools">' +
+      '<label style="cursor:pointer">📷 Ảnh (tối đa 5) <input name="images" type="file" accept="image/png,image/jpeg,image/webp,image/gif" multiple style="display:inline-block"></label>' +
+      '<div style="margin-left:auto;display:flex;gap:6px;align-items:center">' +
+      '<button class="btn btn-outline btn-sm review-cancel-btn" type="button">Hủy</button>' +
+      '<button class="btn btn-primary btn-sm" type="submit">Gửi phản hồi</button>' +
+      '</div>' +
+      '<span role="status" style="width:100%"></span>' +
+      '</div></form>';
   }
   document.addEventListener("click", (e) => {
     if (e.target.closest(".review-login-reply")) {
-      if (window.Auth && Auth.openLoginModal) Auth.openLoginModal();
+      if (typeof showLoginModal === "function") showLoginModal();
+      else if (window.Auth && Auth.openLoginModal) Auth.openLoginModal();
       else window.location.href = "#/login";
+      return;
+    }
+    if (e.target.closest(".review-cancel-btn")) {
+      e.target.closest(".review-replying")?.remove();
       return;
     }
     const b = e.target.closest(".review-reply-link"); if (!b) return;
@@ -57,6 +74,7 @@
       const images = await upload(f.elements.images.files);
       const res = await Api.post("/api/reviews/" + encodeURIComponent(f.dataset.root) + "/replies", { content: f.elements.content.value.trim(), replyToId: f.dataset.replyTo || undefined, images });
       if (!res || !res.ok) throw new Error(res && res.data && res.data.msg || "Không gửi được phản hồi.");
+      if (typeof showToast === "function") showToast("Đã gửi phản hồi thành công!", "success");
       window.dispatchEvent(new CustomEvent("review-community:posted", { detail: { rootId: f.dataset.root } }));
     } catch (err) { status.textContent = err.message || "Không gửi được phản hồi."; button.disabled = false; }
   });

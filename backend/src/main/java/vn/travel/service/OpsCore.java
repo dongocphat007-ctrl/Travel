@@ -144,12 +144,42 @@ public class OpsCore {
     // ───────────────────────── hướng dẫn viên ─────────────────────────
     public List<Map<String, Object>> guideProfiles() { return db.list("guides"); }
 
-    /** Đưa id tài khoản (hdv001) hoặc id hồ sơ (g_hn01) về id hồ sơ HDV. */
+    /** Đưa id tài khoản (hdv001) hoặc id hồ sơ (g_hn01, g1) về id hồ sơ HDV (g1, g2,...). */
     public String canonGuide(String raw) {
-        if (raw == null || raw.isEmpty()) return "";
-        for (Map<String, Object> g : guideProfiles()) if (raw.equals(Maps.str(g, "id"))) return raw;
+        if (raw == null || raw.trim().isEmpty()) return "";
+        raw = raw.trim();
+        List<Map<String, Object>> profiles = guideProfiles();
+        for (Map<String, Object> g : profiles) {
+            if (raw.equalsIgnoreCase(Maps.str(g, "id"))) return Maps.str(g, "id");
+        }
         Map<String, Object> a = accounts.byId(raw);
-        if (a != null && !Maps.str(a, "guideId").isEmpty()) return Maps.str(a, "guideId");
+        if (a != null) {
+            String gid = Maps.str(a, "guideId");
+            if (gid.isEmpty()) {
+                Map<String, Object> gp = Maps.map(a.get("guideProfile"));
+                if (gp != null) gid = Maps.str(gp, "guideId");
+            }
+            if (!gid.isEmpty()) {
+                for (Map<String, Object> g : profiles) {
+                    if (gid.equalsIgnoreCase(Maps.str(g, "id"))) return Maps.str(g, "id");
+                }
+            }
+        }
+        if (raw.toLowerCase().startsWith("hdv")) {
+            try {
+                int num = Integer.parseInt(raw.substring(3));
+                String candidate = "g" + num;
+                for (Map<String, Object> g : profiles) {
+                    if (candidate.equalsIgnoreCase(Maps.str(g, "id"))) return Maps.str(g, "id");
+                }
+            } catch (Exception ignored) {}
+        }
+        if (a != null) {
+            String accName = Maps.str(a, "name");
+            for (Map<String, Object> g : profiles) {
+                if (accName.equalsIgnoreCase(Maps.str(g, "name"))) return Maps.str(g, "id");
+            }
+        }
         return raw;
     }
 
@@ -264,7 +294,7 @@ public class OpsCore {
         b.put("status", to);
         b.put("statusAt", Times.iso(nowMillis));
         if (Flow.CONFIRMED.equals(to)) {
-            b.putIfAbsent("confirmedAt", Times.iso(nowMillis));
+            b.put("confirmedAt", Times.iso(nowMillis));
         }
         Flow.addHistory(b, "status", from, to, actor.id(), actor.name(), actor.role(), note, nowMillis);
     }

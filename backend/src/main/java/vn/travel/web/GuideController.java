@@ -107,7 +107,7 @@ public class GuideController {
 
     @PostMapping("/api/guide/tours/{id}/report")
     public Map<String, Object> submitReport(@PathVariable String id, @RequestBody(required = false) Map<String, Object> body, HttpServletRequest req) {
-        return guide.submitReport(current.requirePermission(req, Permission.TRIP_REPORT), id, Api.s(body, "note"));
+        return guide.submitReport(current.requirePermission(req, Permission.TRIP_REPORT), id, body != null ? body : Map.of());
     }
 
     @GetMapping("/api/guide/schedule")

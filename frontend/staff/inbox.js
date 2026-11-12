@@ -35,32 +35,39 @@ const Inbox = (() => {
 
       <div id="cm-recipient-mode-wrap" style="margin-bottom:12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px">
         <label style="margin:0 0 8px;font-weight:700">🎯 Đối tượng nhận tin:</label>
-        <div class="row" style="gap:14px">
-          <label style="display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-weight:600;margin:0">
-            <input type="radio" name="cm-target-type" value="all" id="cm-tgt-all">
-            <span>📢 Tất cả mọi người (Toàn bộ nhân sự)</span>
-          </label>
-          <label style="display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-weight:600;margin:0">
-            <input type="radio" name="cm-target-type" value="roles" id="cm-tgt-roles" checked>
-            <span>👥 Gửi theo vai trò</span>
-          </label>
-          <label style="display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-weight:600;margin:0">
-            <input type="radio" name="cm-target-type" value="personal" id="cm-tgt-personal">
-            <span>👤 Gửi riêng cá nhân</span>
-          </label>
+        <div class="seg-group" id="cm-target-type-seg" style="display:flex;gap:4px">
+          <button type="button" class="pill-btn" data-tt="all">📢 Tất cả mọi người</button>
+          <button type="button" class="pill-btn active" data-tt="roles">👥 Gửi theo vai trò</button>
+          <button type="button" class="pill-btn" data-tt="personal">👤 Gửi riêng cá nhân</button>
         </div>
       </div>
 
       <div id="cm-role-group" style="margin-bottom:12px">
-        <label style="margin-bottom:6px">Chọn các vai trò nhận tin <span class="req-star">*</span></label>
-        <div class="chips" id="cm-roles">${roles.map(r => `<label class="chip"><input type="checkbox" value="${esc(r.key)}" ${(preset.roles || []).includes(r.key) ? "checked" : ""}> ${esc(r.name)} <span class="muted">(${r.count})</span></label>`).join("")}</div>
+        <label style="margin-bottom:6px">Chọn các vai trò nhận tin (tick ô vuông) <span class="req-star">*</span></label>
+        <div class="chips" id="cm-roles">${roles.map(r => `<label class="chip" style="cursor:pointer;display:inline-flex;align-items:center;gap:6px"><input type="checkbox" value="${esc(r.key)}" ${(preset.roles || []).includes(r.key) ? "checked" : ""} style="width:15px;height:15px;cursor:pointer"> <span>${esc(r.name)}</span> <span class="muted">(${r.count})</span></label>`).join("")}</div>
       </div>
 
       <div id="cm-people-group" style="margin-bottom:12px;display:none">
-        <label for="cm-people-search" style="margin-bottom:4px">Tìm và chọn người nhận cụ thể (riêng tài khoản đó nhận) <span class="req-star">*</span></label>
-        <input type="text" id="cm-people-search" placeholder="Gõ tên hoặc vai trò để lọc nhanh người nhận..." style="margin-bottom:6px;padding:6px 10px;font-size:13px">
-        <select id="cm-people" multiple size="6" style="border-radius:6px">${dir.people.map(p => `<option value="${esc(p.id)}" data-txt="${esc((p.roleName + ' ' + p.name).toLowerCase())}" ${(preset.users || []).includes(p.id) ? "selected" : ""}>${esc(p.roleName)} – ${esc(p.name)}</option>`).join("")}</select>
-        <div class="small muted" style="margin-top:4px" id="cm-people-tip">Giữ phím <b>Ctrl</b> (hoặc <b>⌘</b>) để chọn nhiều người. Chỉ riêng người được chọn mới nhận được tin.</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;flex-wrap:wrap;gap:6px">
+          <label style="margin:0;font-weight:600">Chọn nhân sự nhận tin (tick ô vuông) <span class="req-star">*</span></label>
+          <div style="display:flex;gap:6px">
+            <button type="button" class="btn sm" id="cm-select-all-people" style="font-size:11px;padding:2px 8px">Chọn tất cả</button>
+            <button type="button" class="btn sm" id="cm-deselect-all-people" style="font-size:11px;padding:2px 8px">Bỏ chọn</button>
+          </div>
+        </div>
+        <input type="text" id="cm-people-search" placeholder="🔍 Gõ tên hoặc vai trò để lọc nhanh người nhận..." style="margin-bottom:6px;padding:6px 10px;font-size:13px">
+        <div class="people-checklist" id="cm-people-list" style="max-height:190px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;padding:8px;display:grid;grid-template-columns:repeat(auto-fill, minmax(220px, 1fr));gap:6px;background:var(--surface)">
+          ${dir.people.map(p => `
+            <label class="cm-person-card" data-txt="${esc((p.roleName + ' ' + p.name).toLowerCase())}" style="display:flex;align-items:center;gap:8px;padding:6px 10px;border:1px solid var(--border);border-radius:6px;cursor:pointer;background:var(--surface);margin:0">
+              <input type="checkbox" class="cm-person-cb" value="${esc(p.id)}" ${(preset.users || []).includes(p.id) ? "checked" : ""} style="width:16px;height:16px;margin:0;accent-color:var(--primary);cursor:pointer">
+              <div style="flex:1;overflow:hidden">
+                <div style="font-weight:600;font-size:13px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden">${esc(p.name)}</div>
+                <div class="small muted">${esc(p.roleName)}</div>
+              </div>
+            </label>
+          `).join("")}
+        </div>
+        <div class="small muted" style="margin-top:4px" id="cm-people-tip">Đã chọn: <b id="cm-selected-count">0</b> nhân sự.</div>
       </div>
 
       <div style="margin-bottom:10px">
@@ -81,6 +88,7 @@ const Inbox = (() => {
     `;
 
     let kind = preset.kind === "reminder" && canRemind ? "reminder" : (canAnn && preset.kind !== "chat" ? "announcement" : "chat");
+    let currentTargetType = "roles";
     let closeFn = null;
 
     await modal(canRemind ? "Soạn thông báo / Nhắc nhở" : (canAnn ? "Soạn thông báo" : "Soạn tin nhắn"), body, [
@@ -89,14 +97,14 @@ const Inbox = (() => {
         const err = $("#cm-err", ov);
         err.textContent = "";
 
-        const targetType = ($("input[name='cm-target-type']:checked", ov) || {}).value || "roles";
+        const targetType = currentTargetType;
         let targetRoles = [];
         let targetUsers = [];
 
         if (kind === "reminder") {
-          targetUsers = Array.from($("#cm-people", ov).selectedOptions).map(o => o.value);
+          targetUsers = $$(".cm-person-cb:checked", ov).map(i => i.value);
           if (targetUsers.length !== 1) {
-            err.textContent = "Thông báo nhắc nhở chỉ gửi cho 1 nhân viên cụ thể (hãy chọn đúng 1 người trong danh sách).";
+            err.textContent = "Thông báo nhắc nhở chỉ gửi cho 1 nhân viên vi phạm cụ thể (vui lòng tick chọn đúng 1 người).";
             return false;
           }
         } else {
@@ -105,13 +113,13 @@ const Inbox = (() => {
           } else if (targetType === "roles") {
             targetRoles = $$("#cm-roles input:checked", ov).map(i => i.value);
             if (!targetRoles.length) {
-              err.textContent = "Vui lòng chọn ít nhất một vai trò nhận tin (hoặc chọn 'Tất cả mọi người').";
+              err.textContent = "Vui lòng tick chọn ít nhất một vai trò nhận tin (hoặc chọn 'Tất cả mọi người').";
               return false;
             }
           } else {
-            targetUsers = Array.from($("#cm-people", ov).selectedOptions).map(o => o.value);
+            targetUsers = $$(".cm-person-cb:checked", ov).map(i => i.value);
             if (!targetUsers.length) {
-              err.textContent = "Vui lòng chọn ít nhất một người nhận riêng từ danh sách.";
+              err.textContent = "Vui lòng tick chọn ít nhất một nhân viên nhận riêng.";
               return false;
             }
           }
@@ -165,14 +173,21 @@ const Inbox = (() => {
       const peopleGrp = $("#cm-people-group", ov);
       const recWrap = $("#cm-recipient-mode-wrap", ov);
       const peopleTip = $("#cm-people-tip", ov);
+      const selCountEl = $("#cm-selected-count", ov);
+
+      const updateCount = () => {
+        const checked = $$(".cm-person-cb:checked", ov).length;
+        if (selCountEl) selCountEl.textContent = checked;
+      };
 
       const updateTargetVisibility = () => {
-        const val = ($("input[name='cm-target-type']:checked", ov) || {}).value || "roles";
+        const val = currentTargetType;
+        $$("#cm-target-type-seg button", ov).forEach(b => b.classList.toggle("active", b.dataset.tt === val));
         if (kind === "reminder") {
           if (roleGrp) roleGrp.style.display = "none";
           if (peopleGrp) peopleGrp.style.display = "block";
           if (recWrap) recWrap.style.display = "none";
-          if (peopleTip) peopleTip.innerHTML = "<b class='bad'>Lưu ý:</b> Chọn đúng 1 nhân viên vi phạm để gửi nhắc nhở và tự động trừ 200k lương.";
+          if (peopleTip) peopleTip.innerHTML = "<b class='bad'>Lưu ý:</b> Tick chọn đúng 1 nhân viên vi phạm để gửi nhắc nhở và tự động trừ 200k lương.";
         } else {
           if (recWrap) recWrap.style.display = "block";
           if (val === "all") {
@@ -184,20 +199,49 @@ const Inbox = (() => {
           } else {
             if (roleGrp) roleGrp.style.display = "none";
             if (peopleGrp) peopleGrp.style.display = "block";
-            if (peopleTip) peopleTip.innerHTML = "Giữ phím <b>Ctrl</b> (hoặc <b>⌘</b>) để chọn nhiều người. <b>Chỉ riêng tài khoản được chọn mới nhận được tin.</b>";
+            if (peopleTip) peopleTip.innerHTML = "Đã chọn: <b id='cm-selected-count'>" + $$(".cm-person-cb:checked", ov).length + "</b> nhân sự. <b>Chỉ riêng các tài khoản được tick mới nhận được tin.</b>";
           }
         }
+        updateCount();
       };
 
-      $$("input[name='cm-target-type']", ov).forEach(r => r.onchange = updateTargetVisibility);
+      $$("#cm-target-type-seg button", ov).forEach(b => {
+        b.onclick = () => {
+          currentTargetType = b.dataset.tt;
+          updateTargetVisibility();
+        };
+      });
+
+      $$(".cm-person-cb", ov).forEach(cb => cb.onchange = updateCount);
+
+      const selAllBtn = $("#cm-select-all-people", ov);
+      if (selAllBtn) {
+        selAllBtn.onclick = () => {
+          $$(".cm-person-card", ov).forEach(c => {
+            if (c.style.display !== "none") {
+              const cb = $("input", c);
+              if (cb) cb.checked = true;
+            }
+          });
+          updateCount();
+        };
+      }
+
+      const deselAllBtn = $("#cm-deselect-all-people", ov);
+      if (deselAllBtn) {
+        deselAllBtn.onclick = () => {
+          $$(".cm-person-cb", ov).forEach(cb => cb.checked = false);
+          updateCount();
+        };
+      }
 
       const searchInput = $("#cm-people-search", ov);
       if (searchInput) {
         searchInput.oninput = () => {
           const kw = searchInput.value.toLowerCase().trim();
-          $$("#cm-people option", ov).forEach(opt => {
-            const txt = opt.dataset.txt || opt.textContent.toLowerCase();
-            opt.style.display = (!kw || txt.includes(kw)) ? "" : "none";
+          $$(".cm-person-card", ov).forEach(card => {
+            const txt = card.dataset.txt || card.textContent.toLowerCase();
+            card.style.display = (!kw || txt.includes(kw)) ? "flex" : "none";
           });
         };
       }
@@ -243,13 +287,13 @@ const Inbox = (() => {
 
       <div class="inbox">
         <div class="inbox-list card" id="ib-list-container">
-          <div class="inbox-batch-bar row" style="padding:10px 14px;border-bottom:1px solid var(--border);background:var(--bg);gap:10px;align-items:center">
-            <label style="display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;cursor:pointer;margin:0">
-              <input type="checkbox" id="ib-chk-all"> <span>Chọn tất cả</span>
+          <div class="inbox-batch-bar row" style="padding:10px 14px;border-bottom:1px solid var(--border);background:var(--bg);gap:10px;align-items:center;flex-wrap:nowrap">
+            <label style="display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:700;cursor:pointer;margin:0;white-space:nowrap;flex-shrink:0;user-select:none">
+              <input type="checkbox" id="ib-chk-all" style="width:16px!important;height:16px!important;cursor:pointer;flex-shrink:0;margin:0"> <span style="white-space:nowrap;display:inline-block">Chọn tất cả</span>
             </label>
             <div class="grow"></div>
-            <button class="btn bad sm" id="ib-del-selected" style="display:none">🗑 Xóa đã chọn (0)</button>
-            <button class="btn sm" id="ib-del-all" title="Xóa toàn bộ hộp thư">🗑 Xóa tất cả</button>
+            <button class="btn bad sm" id="ib-del-selected" style="display:none;white-space:nowrap;flex-shrink:0">🗑 Xóa đã chọn (0)</button>
+            <button class="btn sm" id="ib-del-all" title="Xóa toàn bộ hộp thư" style="white-space:nowrap;flex-shrink:0">🗑 Xóa tất cả</button>
           </div>
           <div id="ib-list" style="overflow:auto;max-height:calc(100vh - 260px)"></div>
         </div>

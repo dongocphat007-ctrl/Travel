@@ -57,7 +57,39 @@
 
   const sections = [
     { id: "home", label: "Doanh thu theo ngày", icon: "💰", perm: "stats:view_cashier", async render(el) {
-      let curDate = new Date().toISOString().slice(0, 10);
+      const todayVN = (typeof Staff !== "undefined" && Staff.todayVN) ? Staff.todayVN() : new Date().toISOString().slice(0, 10);
+      const tomorrowVN = (() => { const d = new Date(todayVN + "T00:00:00Z"); d.setUTCDate(d.getUTCDate() + 1); return d.toISOString().slice(0, 10); })();
+      let curDate = todayVN;
+
+      async function showStatsOverviewModal() {
+        try {
+          const res = await get("/api/cashier/stats-overview?period=year&year=2026");
+          const k = res.kpi || {};
+          const mList = res.months || [];
+          const body = `
+            <div class="note info">Số liệu tổng hợp năm 2026 đồng bộ thời gian thực 100% với Quản trị viên (Admin).</div>
+            <div class="grid g4" style="margin-bottom:14px">
+              <div class="kpi ok"><div class="l">Doanh thu thuần</div><div class="v">${money(k.revenue)}</div><div class="s">Đã thu: ${money(k.collected)}</div></div>
+              <div class="kpi" style="border-left:4px solid var(--accent,#D97706)"><div class="l">Doanh số chốt duyệt</div><div class="v" style="color:var(--accent,#D97706)">${money(k.bookedRevenue)}</div><div class="s">Phải thu: ${money(k.receivable || 0)}</div></div>
+              <div class="kpi"><div class="l">Đơn tour hiệu lực</div><div class="v">${(k.orders || 0).toLocaleString("vi-VN")} đơn</div><div class="s">Đã duyệt: ${(k.confirmedOrders || 0).toLocaleString("vi-VN")}</div></div>
+              <div class="kpi"><div class="l">Lượng khách</div><div class="v">${(k.guests || 0).toLocaleString("vi-VN")} khách</div><div class="s">Tỷ lệ hủy: ${k.cancelRate || 0}%</div></div>
+            </div>
+            <h3>Bảng doanh thu 12 tháng năm 2026</h3>
+            ${table([
+              { t: "Tháng", html: r => `<b>Tháng ${r.month}</b>` },
+              { t: "Thực thu thuần", num: true, html: r => `<b>${money(r.revenue)}</b>` },
+              { t: "Doanh số chốt", num: true, html: r => money(r.bookedRevenue || 0) },
+              { t: "Đã thu", num: true, html: r => money(r.collected || 0) },
+              { t: "Số đơn", num: true, k: "orders" },
+              { t: "Số khách", num: true, k: "guests" }
+            ], mList.slice(0, 11))}
+          `;
+          await Staff.modal("📊 Tổng quan Doanh thu & Đối soát Tài chính (Khớp 100% Admin)", body, [{ label: "Đóng" }], { wide: true });
+        } catch (e) {
+          Staff.toast(e.message, "bad");
+        }
+      }
+
       async function loadDate(targetDate) {
         if (targetDate) curDate = targetDate;
         const res = await get(`/api/cashier/daily-stats?date=${encodeURIComponent(curDate)}`);
@@ -70,12 +102,13 @@
             <div class="row" style="gap:6px;align-items:center">
               <label for="cs-day" style="font-weight:600">📅 Chọn ngày:</label>
               <input type="date" id="cs-day" value="${esc(curDate)}" style="padding:6px 10px;font-weight:700">
-              <button class="btn sm" id="cs-today">Hôm nay</button>
+              <button class="btn sm ${curDate === todayVN ? 'primary' : ''}" id="cs-today">Hôm nay (${day(todayVN)})</button>
+              <button class="btn sm ${curDate === tomorrowVN ? 'primary' : ''}" id="cs-tomorrow">Ngày mai (${day(tomorrowVN)})</button>
             </div>
             <div class="grow"></div>
             <div class="row" style="gap:6px;flex-wrap:wrap">
+              <button class="btn sm" id="cs-overview-btn" style="background:#0F766E;color:#fff">📊 Doanh thu năm/tháng (Khớp Admin)</button>
               <button class="btn ok sm" id="cs-add-rev">➕ Thêm doanh thu quầy</button>
-              <button class="btn sm" id="cs-import">📥 Nhập Excel/CSV</button>
               <button class="btn sm" id="cs-exp-excel">📊 Xuất Excel</button>
               <button class="btn sm" id="cs-exp-word">📝 Xuất Word</button>
               <button class="btn sm" id="cs-exp-pdf">🖨️ In / PDF</button>
@@ -91,7 +124,7 @@
             `).join("")}
           </div>` : ""}
 
-          <div class="note info">Số liệu ngày <b>${day(s.date || curDate)}</b> (giờ Việt Nam): gồm các giao dịch thanh toán trong hệ thống và doanh thu thu nhận tại quầy.</div>
+          <div class="note info">Số liệu ngày <b>${day(s.date || curDate)}</b> (giờ Việt Nam): gồm các giao dịch thanh toán trong hệ thống và doanh thu thu nhận tại quầy. Đồng bộ 100% với Admin.</div>
           <div class="grid g4">
             <div class="kpi ok"><div class="l">Tổng đã thu</div><div class="v">${money(s.totalCollected)}</div><div class="s">${s.transactionCount || 0} giao dịch</div></div>
             <div class="kpi"><div class="l">Đã hoàn</div><div class="v">${money(s.totalRefunded)}</div></div>
@@ -122,7 +155,9 @@
 
         // Event listeners
         $("#cs-day", el).onchange = e => loadDate(e.target.value);
-        $("#cs-today", el).onclick = () => loadDate(new Date().toISOString().slice(0, 10));
+        $("#cs-today", el).onclick = () => loadDate(todayVN);
+        $("#cs-tomorrow", el).onclick = () => loadDate(tomorrowVN);
+        $("#cs-overview-btn", el).onclick = () => showStatsOverviewModal();
         $$("[data-pick-date]", el).forEach(btn => btn.onclick = () => loadDate(btn.dataset.pickDate));
 
         // Xuất file
@@ -142,35 +177,6 @@
           ], { submit: "Ghi nhận doanh thu", kind: "ok" });
           if (!v) return;
           await act(null, () => post("/api/cashier/daily-revenue", { date: curDate, amount: Number(v.amount), customerName: v.customerName, tourName: v.tourName, kind: v.kind, payCode: v.payCode, note: v.note }), "Đã ghi nhận doanh thu.", () => loadDate(curDate));
-        };
-
-        // Nhập Excel/CSV
-        $("#cs-import", el).onclick = () => {
-          if (!window.DataExportImport) return;
-          window.DataExportImport.importData({
-            title: "Nhập danh sách giao dịch / sao kê ngày " + curDate,
-            sampleHeaders: ["Số tiền", "Khách hàng", "Tour", "Loại", "Mã GD", "Ghi chú"],
-            onConfirm: async (parsed) => {
-              const rows = parsed.rows || [];
-              const itemsToImport = rows.map(r => {
-                let amt = 0;
-                for (let i = 0; i < r.length; i++) {
-                  const cleaned = String(r[i]).replace(/[^\d]/g, "");
-                  if (cleaned && Number(cleaned) > 1000) { amt = Number(cleaned); break; }
-                }
-                return {
-                  date: curDate,
-                  amount: amt || 100000,
-                  customerName: r[1] || r[0] || "Khách nhập file",
-                  tourName: r[2] || "Tour du lịch",
-                  kind: "imported",
-                  payCode: r[4] || "",
-                  note: r[5] || "Nhập từ tệp sao kê"
-                };
-              });
-              await act(null, () => post("/api/cashier/daily-revenue/import", { items: itemsToImport }), `Đã nạp thành công ${itemsToImport.length} giao dịch.`, () => loadDate(curDate));
-            }
-          });
         };
       }
       await loadDate(curDate);
@@ -247,9 +253,38 @@
         const r = await get("/api/cashier/guide-fees");
         const cnt = r.pending.reduce((n, g) => n + g.items.length, 0);
         tabs(el, [{ id: "p", label: "Chờ chi", n: cnt }, { id: "d", label: "Đã chi" }], (id, box) => {
-          if (id === "d") { box.innerHTML = table([{ t: "Chi lúc", html: i => dt(i.paidAt), sort: i => i.paidAt }, { t: "HDV", k: "guideName" }, { t: "Tour", k: "tourName" }, { t: "Mã", html: i => `<span class="mono">${esc(i.payCode)}</span>` }, { t: "Số tiền", num: true, html: i => money(i.fee) }, { t: "Người chi", html: i => esc(i.paidByName || "—") }], r.paid, { sortable: true, empty: "Chưa chi khoản nào" }); return; }
-          box.innerHTML = `<div class="note">Chi thù lao cho HDV sau khi tour <b>đã hoàn thành</b>. Chuyển tiền xong bấm <b>Đã chi</b> để ghi sổ; HDV sẽ thấy khoản này ở mục Thu nhập. Tổng đang chờ: <b>${money(r.pendingTotal)}</b>.</div>` + (r.pending.length ? r.pending.map(g => `<div class="card"><div class="card-header-acts"><h2>${esc(g.guideName)} <span class="muted small">· ${g.items.length} tour · ${money(g.total)}</span></h2><button class="btn ok sm" data-all="${esc(g.guideId)}">Đã chi tất cả (${money(g.total)})</button></div>`
-            + table([{ t: "Hoàn thành", html: i => day(i.completedAt) }, { t: "Tour", k: "tourName" }, { t: "Mã", html: i => `<span class="mono">${esc(i.payCode)}</span>` }, { t: "Giá tour", num: true, html: i => money(i.price || 0) }, { t: "Thù lao (20%)", num: true, html: i => `<b>${money(i.fee)}</b>` }, { t: "", html: i => `<button class="btn sm" data-one="${esc(i.id)}">Đã chi</button>` }], g.items) + "</div>").join("") : '<div class="empty">Không có khoản thù lao nào đang chờ chi.</div>');
+          if (id === "d") {
+            box.innerHTML = table([
+              { t: "Chi lúc", html: i => dt(i.paidAt), sort: i => i.paidAt },
+              { t: "HDV", k: "guideName" },
+              { t: "Tour", k: "tourName" },
+              { t: "Mã đơn", html: i => `<span class="mono">${esc(i.payCode)}</span>` },
+              { t: "Loại HDV & Tỷ lệ", html: i => `<span class="badge ${i.rate === '10%' || i.rate === '12%' ? 'amber' : 'info'}">${esc(i.tier || 'HDV')} (${esc(i.rate || '4%')})</span>` },
+              { t: "Số tiền đã chi", num: true, html: i => `<b>${money(i.fee)}</b>` },
+              { t: "Người chi", html: i => esc(i.paidByName || "—") }
+            ], r.paid, { sortable: true, empty: "Chưa chi khoản nào" });
+            return;
+          }
+          box.innerHTML = `
+            <div class="note info" style="margin-bottom:12px">
+              <b>📋 Bảng quy chế thù lao HDV chuẩn (Áp dụng theo loại nhân sự và độ khó):</b>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:6px;margin-top:6px;font-size:12px">
+                <div>🔹 <b>HDV chính thức, đã có lương:</b> 3–5% giá trị tour (mặc định 4%)</div>
+                <div>🔹 <b>HDV chính thức, tour khó/dài:</b> 5–7% giá trị tour (mặc định 6%)</div>
+                <div>🔹 <b>HDV cộng tác viên:</b> 7–10% giá trị tour (mặc định 8%)</div>
+                <div>🔹 <b>Tour đặc biệt/khó (quốc tế/trekking):</b> 10–12% giá trị tour (mặc định 10%)</div>
+              </div>
+            </div>
+            <div class="note">Chi thù lao cho HDV sau khi tour <b>đã hoàn thành</b>. Chuyển tiền xong bấm <b>Đã chi</b> để ghi sổ; HDV sẽ thấy khoản này ở mục Thu nhập. Tổng đang chờ: <b>${money(r.pendingTotal)}</b>.</div>` + (r.pending.length ? r.pending.map(g => `<div class="card"><div class="card-header-acts"><h2>${esc(g.guideName)} <span class="muted small">· ${g.items.length} tour · ${money(g.total)}</span></h2><button class="btn ok sm" data-all="${esc(g.guideId)}">Đã chi tất cả (${money(g.total)})</button></div>`
+            + table([
+              { t: "Hoàn thành", html: i => day(i.completedAt) },
+              { t: "Tour", k: "tourName" },
+              { t: "Mã", html: i => `<span class="mono">${esc(i.payCode)}</span>` },
+              { t: "Giá tour", num: true, html: i => money(i.price || 0) },
+              { t: "Phân loại & Tỷ lệ gợi ý", html: i => `<span class="badge ${i.rate === '10%' || i.rate === '12%' ? 'amber' : 'info'}">${esc(i.tier || 'HDV')}</span><div class="small muted">${esc(i.rate || '4%')} (${esc(i.range || '3–5%')})</div>` },
+              { t: "Thù lao chi trả", num: true, html: i => `<b>${money(i.fee)}</b>` },
+              { t: "", html: i => `<button class="btn sm ok" data-one="${esc(i.id)}">Đã chi</button>` }
+            ], g.items) + "</div>").join("") : '<div class="empty">Không có khoản thù lao nào đang chờ chi.</div>');
           const pay = async (ids, label) => { if (await confirmBox("Xác nhận đã chi thù lao", label)) act(null, () => post("/api/cashier/guide-fees/pay", { ids }), "Đã ghi sổ chi thù lao.", reload); };
           $$("[data-one]", box).forEach(b => b.onclick = () => { const it = r.pending.flatMap(g => g.items).find(x => x.id === b.dataset.one); pay([it.id], `Đã chuyển <b>${money(it.fee)}</b> cho ${esc(it.guideName)} (đơn ${esc(it.payCode)})?`); });
           $$("[data-all]", box).forEach(b => b.onclick = () => { const g = r.pending.find(x => x.guideId === b.dataset.all); pay(g.items.map(x => x.id), `Đã chuyển tổng <b>${money(g.total)}</b> (${g.items.length} tour) cho ${esc(g.guideName)}?`); });
@@ -294,6 +329,205 @@
       }
       await reload();
     } },
+
+    { id: "working-capital", label: "Tiền lưu động", icon: "🏦", perm: "stats:view_cashier", async render(el) {
+      let curYear = 2026;
+      let curTab = "in"; // "in", "out", "all"
+      let curCat = "all";
+
+      async function reload() {
+        const res = await get(`/api/finance/working-capital?year=${curYear}`);
+        const totalCollected = res.totalCollected || 0;
+        const totalSpent = res.totalSpent || 0;
+        const netBalance = res.netBalance || 0;
+        const summary = res.summary || {};
+        const incomes = res.incomes || [];
+        const expenses = res.expenses || [];
+
+        const filteredExpenses = curCat === "all" ? expenses : expenses.filter(x => x.categoryCode === curCat);
+
+        // Ghép dòng tiền tổng hợp
+        const allFlows = [
+          ...incomes.map(x => ({ ...x, flowType: "in" })),
+          ...expenses.map(x => ({ ...x, flowType: "out" }))
+        ].sort((a, b) => String(b.at || "").localeCompare(String(a.at || "")));
+
+        el.innerHTML = `
+          <div class="card" style="margin-bottom:16px">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px">
+              <div>
+                <h2 style="margin:0">Quỹ tiền lưu động & Quản trị dòng tiền công ty</h2>
+                <div class="muted small" style="margin-top:4px">Số tiền lưu động = Doanh thu từ tour du lịch − Lương nhân viên − Tiền tiêu (mua dụng cụ cho khách mang đi, hoàn tiền, thù lao HDV, cọc...). Đồng bộ 100% với Admin.</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <label style="font-weight:600;margin:0">Chọn năm:</label>
+                <select id="ck-year" class="input sm" style="width:130px;font-weight:700">
+                  ${Array.from({ length: 2026 - 1986 + 1 }, (_, i) => 2026 - i).map(y => `<option value="${y}" ${y === curYear ? 'selected' : ''}>Năm ${y}</option>`).join('')}
+                </select>
+                <button class="btn sm" id="ck-refresh">🔄 Tải lại</button>
+                <button class="btn ok sm" id="ck-csv">📊 Xuất Excel/CSV</button>
+              </div>
+            </div>
+
+            <!-- 3 KPI đối soát chuẩn khớp 100% với Admin -->
+            <div class="grid g3" style="gap:14px;margin-bottom:18px">
+              <div class="kpi" style="border-left:4px solid var(--teal)">
+                <div class="l">Tổng thu từ tour (Dòng tiền vào)</div>
+                <div class="v" style="color:var(--teal)">+${money(totalCollected)}</div>
+                <div class="s">Thu tiền cọc, đủ 100%, thu nốt & quầy (+${incomes.length} GD)</div>
+              </div>
+              <div class="kpi bad" style="border-left:4px solid var(--bad)">
+                <div class="l">Tổng tiền tiêu & chi phí (Dòng tiền ra)</div>
+                <div class="v" style="color:var(--bad)">-${money(totalSpent)}</div>
+                <div class="s">Lương NV, thù lao HDV, mua dụng cụ khách, hoàn tiền...</div>
+              </div>
+              <div class="kpi ok" style="border-left:4px solid var(--ok);background:rgba(5,150,105,0.04)">
+                <div class="l">Số tiền lưu động hiện có (Quỹ khả dụng)</div>
+                <div class="v" style="color:var(--ok);font-size:28px">${money(netBalance)}</div>
+                <div class="s">Khi thu tiền tour, số tiền lưu động tăng lên ngay lập tức</div>
+              </div>
+            </div>
+
+            <!-- Phân bổ các khoản chi & tiền tiêu -->
+            <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:16px">
+              <div style="font-weight:700;font-size:13px;margin-bottom:8px">📊 Chi tiết cơ cấu tiền tiêu & chi phí từ quỹ lưu động:</div>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px">
+                <div style="font-size:13px">💼 Chi lương nhân sự: <b style="color:var(--navy)">${money(summary.salarySpent || 0)}</b></div>
+                <div style="font-size:13px">🧑‍✈️ Thù lao HDV (3–12%): <b style="color:var(--navy)">${money(summary.guideFeeSpent || 0)}</b></div>
+                <div style="font-size:13px">🎒 Mua dụng cụ đoàn cho khách: <b style="color:var(--navy)">${money(summary.suppliesSpent || 0)}</b></div>
+                <div style="font-size:13px">💸 Hoàn tiền cho khách: <b style="color:var(--navy)">${money(summary.refundSpent || 0)}</b></div>
+                <div style="font-size:13px">💳 Giải ngân rút tiền ví: <b style="color:var(--navy)">${money(summary.withdrawalSpent || 0)}</b></div>
+                <div style="font-size:13px">🏨 Cọc xe & khách sạn: <b style="color:var(--navy)">${money(summary.opsSpent || 0)}</b></div>
+              </div>
+            </div>
+
+            <!-- TAB LỰA CHỌN: LỊCH SỬ VÀO / LỊCH SỬ RA / DÒNG TIỀN TỔNG HỢP -->
+            <div style="display:flex;gap:8px;border-bottom:2px solid var(--border);padding-bottom:10px;margin-bottom:14px;align-items:center;flex-wrap:wrap">
+              <button class="pill-btn ${curTab === 'in' ? 'active' : ''}" data-tab="in" style="font-weight:700">
+                📥 Lịch sử tiền vào (Thu tiền tour) <span class="badge ok">${incomes.length}</span>
+              </button>
+              <button class="pill-btn ${curTab === 'out' ? 'active' : ''}" data-tab="out" style="font-weight:700">
+                📤 Lịch sử tiền ra (Tiền tiêu & Chi phí) <span class="badge bad">${expenses.length}</span>
+              </button>
+              <button class="pill-btn ${curTab === 'all' ? 'active' : ''}" data-tab="all" style="font-weight:700">
+                🔄 Tất cả dòng tiền (${allFlows.length})
+              </button>
+            </div>
+
+            <div id="ck-tab-content"></div>
+          </div>
+        `;
+
+        const contentBox = $("#ck-tab-content", el);
+
+        if (curTab === "in") {
+          // BẢNG LỊCH SỬ TIỀN VÀO
+          contentBox.innerHTML = `
+            <div style="margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">
+              <span class="small muted">Toàn bộ các khoản thu từ khách hàng qua đặt tour trực tuyến, thanh toán quầy, thu nốt. Khi ghi nhận khoản mới, quỹ lưu động tăng tức thì.</span>
+              <span class="badge ok" style="font-size:13px">Tổng dòng vào: +${money(totalCollected)}</span>
+            </div>
+            ${table([
+              { t: "Thời gian", html: x => `<b>${dt(x.at)}</b>`, sort: x => x.at },
+              { t: "Nguồn thu / Khoản mục", html: x => `<span class="badge ok">${esc(x.category)}</span>` },
+              { t: "Khách hàng", html: x => `<b>${esc(x.customerName || "—")}</b>` },
+              { t: "Tour / Dịch vụ", html: x => esc(x.tourName || "—") },
+              { t: "Số tiền thu (+)", num: true, html: x => `<b style="color:var(--ok)">+${money(x.amount)}</b>`, sort: x => x.amount },
+              { t: "Mã đơn / Mã GD", html: x => `<span class="mono small">${esc(x.ref || "—")}</span>` },
+              { t: "Người thu", html: x => `<span class="small">${esc(x.actorName || "Thu ngân")}</span>` },
+              { t: "Ghi chú", html: x => `<span class="small muted">${esc(x.note || "—")}</span>` }
+            ], incomes, { empty: `Chưa có giao dịch thu tiền tour nào trong năm ${curYear}` })}
+          `;
+        } else if (curTab === "out") {
+          // BẢNG LỊCH SỬ TIỀN RA (TIÊU TIỀN, LƯƠNG, VẬT TƯ, HOÀN TIỀN...)
+          contentBox.innerHTML = `
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;align-items:center">
+              <span class="small muted" style="font-weight:600">Lọc danh mục chi:</span>
+              <button class="pill-btn ${curCat === 'all' ? 'active' : ''}" data-cat="all">Tất cả (${expenses.length})</button>
+              <button class="pill-btn ${curCat === 'salary' ? 'active' : ''}" data-cat="salary">💼 Chi lương</button>
+              <button class="pill-btn ${curCat === 'guide_fee' ? 'active' : ''}" data-cat="guide_fee">🧑‍✈️ Thù lao HDV</button>
+              <button class="pill-btn ${curCat === 'supplies' ? 'active' : ''}" data-cat="supplies">🎒 Dụng cụ cho khách</button>
+              <button class="pill-btn ${curCat === 'refund' ? 'active' : ''}" data-cat="refund">💸 Hoàn tiền</button>
+              <button class="pill-btn ${curCat === 'withdrawal' ? 'active' : ''}" data-cat="withdrawal">💳 Rút tiền ví</button>
+              <button class="pill-btn ${curCat === 'ops' ? 'active' : ''}" data-cat="ops">🏨 Cọc xe & KS</button>
+            </div>
+            ${table([
+              { t: "Thời gian", html: x => `<b>${dt(x.at)}</b>`, sort: x => x.at },
+              { t: "Khoản mục chi / Tiền tiêu", html: x => {
+                const colors = { salary: "primary", guide_fee: "ok", supplies: "amber", refund: "bad", withdrawal: "warn", ops: "info" };
+                return `<span class="badge ${colors[x.categoryCode] || ''}">${esc(x.category)}</span>`;
+              } },
+              { t: "Người nhận / Đối tượng", html: x => `<b>${esc(x.recipient || "—")}</b>` },
+              { t: "Số tiền chi (-)", num: true, html: x => `<b style="color:var(--bad)">-${money(x.amount)}</b>`, sort: x => x.amount },
+              { t: "Mã / Số tham chiếu", html: x => `<span class="mono small">${esc(x.ref || "—")}</span>` },
+              { t: "Người duyệt chi", html: x => `<span class="small">${esc(x.actorName || "Thu ngân")}</span>` },
+              { t: "Ghi chú giải trình", html: x => `<span class="small muted">${esc(x.note || "—")}</span>` }
+            ], filteredExpenses, { empty: `Không có khoản chi nào trong danh mục này của năm ${curYear}` })}
+          `;
+
+          $$("[data-cat]", contentBox).forEach(btn => btn.onclick = () => {
+            curCat = btn.dataset.cat;
+            reload();
+          });
+        } else {
+          // BẢNG DÒNG TIỀN TỔNG HỢP (CẢ THU VÀO VÀ CHI RA)
+          contentBox.innerHTML = `
+            <div style="margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">
+              <span class="small muted">Lịch sử toàn bộ các biến động dòng tiền của quỹ lưu động năm ${curYear}.</span>
+              <span class="badge ${netBalance >= 0 ? 'ok' : 'bad'}" style="font-size:13px">Số dư lưu động: ${money(netBalance)}</span>
+            </div>
+            ${table([
+              { t: "Thời gian", html: x => `<b>${dt(x.at)}</b>`, sort: x => x.at },
+              { t: "Dòng tiền", html: x => x.flowType === "in" ? `<span class="badge ok">📥 Tiền vào (+)</span>` : `<span class="badge bad">📤 Tiền ra (−)</span>` },
+              { t: "Khoản mục", html: x => esc(x.category) },
+              { t: "Đối tượng / Khách hàng", html: x => `<b>${esc(x.customerName || x.recipient || "—")}</b>` },
+              { t: "Biến động", num: true, html: x => x.flowType === "in" ? `<b style="color:var(--ok)">+${money(x.amount)}</b>` : `<b style="color:var(--bad)">-${money(x.amount)}</b>`, sort: x => x.amount },
+              { t: "Mã tham chiếu", html: x => `<span class="mono small">${esc(x.ref || "—")}</span>` },
+              { t: "Người thực hiện", html: x => `<span class="small">${esc(x.actorName || "Thu ngân")}</span>` },
+              { t: "Ghi chú", html: x => `<span class="small muted">${esc(x.note || "—")}</span>` }
+            ], allFlows, { empty: `Không có biến động dòng tiền nào trong năm ${curYear}` })}
+          `;
+        }
+
+        $("#ck-year", el).onchange = e => { curYear = Number(e.target.value); reload(); };
+        $("#ck-refresh", el).onclick = () => reload();
+        $("#ck-csv", el).onclick = () => {
+          if (window.DataExportImport) {
+            window.DataExportImport.exportExcel({
+              filename: `so-quy-tien-luu-dong-${curYear}.xls`,
+              sheetName: "TienLuuDong",
+              title: `BÁO CÁO DÒNG TIỀN & SỔ QUỸ LƯU ĐỘNG CÔNG TY NĂM ${curYear}`,
+              headers: ["Thời gian", "Loại dòng tiền", "Khoản mục", "Đối tượng / Khách hàng", "Số tiền (₫)", "Mã tham chiếu", "Người thực hiện", "Ghi chú giải trình"],
+              summary: [
+                ["Năm tài chính", String(curYear)],
+                ["Tổng thu từ tour (Dòng tiền Vào)", "+" + money(totalCollected)],
+                ["Tổng tiền tiêu & Chi phí (Dòng tiền Ra)", "-" + money(totalSpent)],
+                ["Số tiền lưu động ròng hiện có", money(netBalance)]
+              ],
+              rows: allFlows.map(x => [
+                dt(x.at),
+                x.flowType === "in" ? "Vào (+)" : "Ra (-)",
+                x.category,
+                x.customerName || x.recipient || "—",
+                x.amount,
+                x.ref || "—",
+                x.actorName || "—",
+                x.note || "—"
+              ])
+            });
+          } else {
+            csv(`tien-luu-dong-${curYear}.csv`, ["Thời gian", "Loại dòng tiền", "Khoản mục", "Khách/Người nhận", "Số tiền (₫)", "Mã tham chiếu", "Người thực hiện", "Ghi chú"],
+              allFlows.map(x => [dt(x.at), x.flowType === "in" ? "Vào (+)" : "Ra (-)", x.category, x.customerName || x.recipient, x.amount, x.ref, x.actorName, x.note]));
+          }
+        };
+        $$("[data-tab]", el).forEach(btn => btn.onclick = () => {
+          curTab = btn.dataset.tab;
+          reload();
+        });
+      }
+      await reload();
+    } },
+
     { id: "reconcile", label: "Đóng sổ cuối ngày", icon: "📒", perm: "reconcile:create", async render(el) {
       async function reload() {
         const r = await get("/api/cashier/reconcile"), t = r.today;

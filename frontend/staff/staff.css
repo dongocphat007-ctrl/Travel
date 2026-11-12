@@ -1,3 +1,4 @@
+@import "/css/fonts.css";
 /* Khu vực nội bộ Travel: dùng chung cho Admin, Thu ngân, Điều hành, CSKH, Biên tập, HDV */
 :root{
   --navy:#0d2137;--navy-2:#16324f;--amber:#f59e0b;--teal:#0891b2;--bg:#eef2f7;--surface:#fff;--border:#d9e1ec;--text:#1c2b3a;--muted:#64748b;
@@ -26,7 +27,14 @@ button{font:inherit;cursor:pointer}
 .nav .count{margin-left:auto;background:var(--bad);color:#fff;border-radius:99px;font-size:11.5px;padding:1px 7px;font-weight:700}
 .nav .sep{height:1px;background:rgba(255,255,255,.1);margin:8px 6px}
 .nav .grp{padding:8px 12px 2px;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#7ea3c6}
-.side-foot{padding:14px 20px;border-top:1px solid rgba(255,255,255,.1);font-size:12.5px;color:#9fc3e6}
+.side-foot{padding:12px 14px;border-top:1px solid rgba(255,255,255,.1);display:flex;flex-direction:column;gap:8px}
+.side-foot-profile{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;color:#cfe0f1;text-decoration:none;font-weight:600;font-size:13px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);transition:all .2s ease}
+.side-foot-profile:hover{background:rgba(255,255,255,.12);color:#fff;border-color:rgba(255,255,255,.2);transform:translateX(2px)}
+.side-foot-actions{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.side-btn-action{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:7px 8px;border-radius:7px;font-size:11.5px;font-weight:600;color:#cfe0f1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);cursor:pointer;transition:all .2s ease;white-space:nowrap}
+.side-btn-action:hover{background:rgba(255,255,255,.15);color:#fff;border-color:rgba(255,255,255,.25);transform:translateY(-1px)}
+.side-btn-logout{color:#fca5a5;background:rgba(220,38,38,.12);border-color:rgba(220,38,38,.25)}
+.side-btn-logout:hover{background:rgba(220,38,38,.28);color:#fff;border-color:rgba(220,38,38,.45)}
 .main{min-width:0;display:flex;flex-direction:column}
 .top{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:20}
 .top h1{margin:0;font-size:19px;font-weight:700;flex:1}
@@ -85,12 +93,15 @@ td.actions,th.actions{text-align:right;white-space:nowrap}
 .act-btns,.table-actions,td.actions > .row,td:last-child > .row{display:inline-flex;align-items:center;gap:6px;flex-wrap:nowrap;white-space:nowrap;justify-content:flex-end}
 .act-btns .btn,.table-actions .btn,td.actions .btn,td:last-child > .row .btn{flex-shrink:0;white-space:nowrap;font-size:12.5px;padding:5px 10px}
 .empty{padding:26px;text-align:center;color:var(--muted)}
+th.sticky-col,td.sticky-col{position:sticky;left:0;background:var(--surface);z-index:2;box-shadow:2px 0 6px rgba(0,0,0,.06)}
+th.sticky-col{z-index:3;background:var(--bg)}
 .tabs{display:flex;gap:4px;border-bottom:2px solid var(--border);margin-bottom:18px;flex-wrap:wrap}
 .tabs button{background:none;border:0;padding:9px 14px;font-weight:600;color:var(--muted);border-bottom:3px solid transparent;margin-bottom:-2px}
 .tabs button.active{color:var(--navy);border-bottom-color:var(--amber)}
 @media (prefers-color-scheme:dark){.tabs button.active{color:#fff}}
 .tabs .n{background:var(--bad);color:#fff;border-radius:99px;font-size:11px;padding:0 6px;margin-left:5px}
 input,select,textarea{font:inherit;color:var(--text);background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 10px;width:100%}
+input[type="checkbox"],input[type="radio"]{width:auto!important;margin:0;padding:0;cursor:pointer;flex-shrink:0}
 input:focus,select:focus,textarea:focus,button:focus-visible,a:focus-visible{outline:2px solid var(--teal);outline-offset:1px}
 label{display:block;font-weight:600;font-size:13px;margin:10px 0 4px}
 .field-err{color:var(--bad);font-size:12.5px;margin-top:3px}
@@ -107,8 +118,9 @@ label{display:block;font-weight:600;font-size:13px;margin:10px 0 4px}
 
 /* ── hộp thoại / thông báo ── */
 .overlay{position:fixed;inset:0;background:rgba(7,17,31,.55);display:flex;align-items:flex-start;justify-content:center;padding:6vh 14px;z-index:100;overflow:auto}
-.modal{background:var(--surface);border-radius:14px;max-width:640px;width:100%;box-shadow:var(--shadow);padding:22px 24px}
-.modal.wide{max-width:900px}
+.modal{background:var(--surface);border-radius:14px;max-width:640px;width:100%;box-shadow:var(--shadow);padding:22px 24px;box-sizing:border-box;overflow-x:hidden}
+.modal.wide{max-width:980px;width:95%;max-height:92vh;overflow-y:auto;overflow-x:hidden}
+.modal .mb{width:100%;box-sizing:border-box;overflow-x:hidden}
 .modal h2{margin:0 0 12px;font-size:18px;padding-bottom:10px;border-bottom:1px solid var(--border)}
 .modal h3{margin:18px 0 10px;font-size:15px;padding-bottom:6px;border-bottom:1px dashed var(--border)}
 .modal .acts{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;padding-top:14px;border-top:1px solid var(--border);flex-wrap:wrap}
@@ -323,4 +335,21 @@ tbody tr:last-child td {
     padding: 9px 10px;
     font-size: 12.5px;
   }
+}
+
+/* ── Sticky cột Nhân viên cho bảng lương để không bao giờ bị che khuất khi cuộn ngang ── */
+#adm-salary-table th:first-child,
+#adm-salary-table td:first-child {
+  position: sticky;
+  left: 0;
+  background: var(--surface);
+  z-index: 2;
+  box-shadow: 2px 0 6px rgba(0,0,0,0.06);
+}
+#adm-salary-table thead th:first-child {
+  background: var(--bg);
+  z-index: 3;
+}
+#adm-salary-table tbody tr:hover td:first-child {
+  background: var(--surface);
 }

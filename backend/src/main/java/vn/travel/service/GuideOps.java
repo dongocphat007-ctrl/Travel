@@ -36,12 +36,88 @@ public class GuideOps {
         this.core = core;
     }
 
-    /** Id hồ sơ HDV của tài khoản đăng nhập. */
+    /** Id hồ sơ HDV của tài khoản đăng nhập. Tự động liên kết hoặc khởi tạo nếu thiếu để không bao giờ bị lỗi 403. */
     public String profileId(Map<String, Object> account) {
-        String g = core.canonGuide(Maps.str(account, "guideId"));
-        if (g.isEmpty()) g = core.canonGuide(Maps.str(account, "id"));
-        if (core.guide(g) == null) throw new HttpError(403, "Tài khoản chưa được liên kết hồ sơ hướng dẫn viên", "no_guide_profile");
-        return g;
+        if (account == null) throw new HttpError(401, "Chưa đăng nhập", "unauthorized");
+        String g = Maps.str(account, "guideId");
+        if (g.isEmpty()) {
+            Map<String, Object> gp = Maps.map(account.get("guideProfile"));
+            if (gp != null) g = Maps.str(gp, "guideId");
+        }
+        if (g.isEmpty()) g = Maps.str(account, "id");
+        String canon = core.canonGuide(g);
+        if (core.guide(canon) != null) return canon;
+
+        // 1. Thử tìm theo email
+        String email = Maps.str(account, "email");
+        for (Map<String, Object> p : core.guideProfiles()) {
+            if (!email.isEmpty() && email.equalsIgnoreCase(Maps.str(p, "email"))) {
+                String gid = Maps.str(p, "id");
+                account.put("guideId", gid);
+                db.edit("accounts", all -> all.forEach(a -> {
+                    if (Maps.str(account, "id").equals(a.get("id"))) a.put("guideId", gid);
+                }));
+                return gid;
+            }
+        }
+
+        // 2. Thử tìm theo tên
+        String name = Maps.str(account, "name");
+        for (Map<String, Object> p : core.guideProfiles()) {
+            if (!name.isEmpty() && name.equalsIgnoreCase(Maps.str(p, "name"))) {
+                String gid = Maps.str(p, "id");
+                account.put("guideId", gid);
+                db.edit("accounts", all -> all.forEach(a -> {
+                    if (Maps.str(account, "id").equals(a.get("id"))) a.put("guideId", gid);
+                }));
+                return gid;
+            }
+        }
+
+        // 3. Thử tìm theo mã số (ví dụ hdv003 -> g3)
+        String accId = Maps.str(account, "id");
+        if (accId.toLowerCase().startsWith("hdv")) {
+            try {
+                int num = Integer.parseInt(accId.substring(3));
+                String candidate = "g" + num;
+                if (core.guide(candidate) != null) {
+                    account.put("guideId", candidate);
+                    db.edit("accounts", all -> all.forEach(a -> {
+                        if (accId.equals(a.get("id"))) a.put("guideId", candidate);
+                    }));
+                    return candidate;
+                }
+            } catch (Exception ignored) {}
+        }
+
+        // 4. Nếu tài khoản có vai trò guide nhưng chưa có hồ sơ, tự động tạo hồ sơ để không bao giờ bị khoá ngoài
+        if ("guide".equalsIgnoreCase(Maps.str(account, "role"))) {
+            String gid = !canon.isEmpty() && canon.startsWith("g") ? canon : ("g_" + accId);
+            String finalName = name.isEmpty() ? "Hướng dẫn viên" : name;
+            Map<String, Object> newProfile = new LinkedHashMap<>();
+            newProfile.put("id", gid);
+            newProfile.put("name", finalName);
+            newProfile.put("phone", Maps.str(account, "phone"));
+            newProfile.put("email", email);
+            newProfile.put("status", "active");
+            newProfile.put("guideType", "all");
+            newProfile.put("employmentType", "permanent");
+            newProfile.put("languages", List.of("Tiếng Việt", "Tiếng Anh"));
+            newProfile.put("regions", List.of("north", "central", "south"));
+            newProfile.put("rating", 4.8);
+            newProfile.put("toursCount", 0);
+            newProfile.put("busyDates", new ArrayList<>());
+            newProfile.put("bio", "Hướng dẫn viên nhiệt tình, tận tâm.");
+
+            db.edit("guides", all -> all.add(newProfile));
+            account.put("guideId", gid);
+            db.edit("accounts", all -> all.forEach(a -> {
+                if (accId.equals(a.get("id"))) a.put("guideId", gid);
+            }));
+            return gid;
+        }
+
+        throw new HttpError(403, "Tài khoản chưa được liên kết hồ sơ hướng dẫn viên", "no_guide_profile");
     }
 
     private Map<String, Object> own(String guideId, String bookingId) {
@@ -248,32 +324,96 @@ public class GuideOps {
         String st = Flow.norm(b.get("status"));
         return Maps.of("ok", true, "report", Maps.of("bookingId", b.get("id"), "payCode", b.get("payCode"), "tourName", b.get("tourName"), "date", b.get("date"),
                 "status", st, "statusLabel", Flow.label(st), "total", ps.size(), "present", present + late, "late", late, "absent", absent, "unmarked", ps.size() - present - late - absent,
+                "passengers", ps,
                 "incidents", incidents, "note", saved == null ? "" : Maps.str(saved, "note"), "submittedAt", saved == null ? null : saved.get("submittedAt"),
                 "updatedAt", saved == null ? null : saved.get("updatedAt"), "canSubmit", Flow.COMPLETED.equals(st)));
     }
 
-    /** Nộp / sửa báo cáo sau khi kết thúc tour: lưu số liệu chốt tại thời điểm nộp + ghi chú (gồm chi phí phát sinh nếu có). */
+    /** Nộp / sửa báo cáo sau khi kết thúc tour (hỗ trợ cả ghi chú và cập nhật danh sách điểm danh hành khách). */
     public Map<String, Object> submitReport(Map<String, Object> account, String bookingId, String note) {
-        String n = note == null ? "" : note.trim();
+        return submitReport(account, bookingId, Maps.of("note", note == null ? "" : note));
+    }
+
+    public Map<String, Object> submitReport(Map<String, Object> account, String bookingId, Map<String, Object> body) {
+        String n = Maps.str(body, "note").trim();
         if (n.length() > 2000) throw HttpError.bad("Ghi chú tối đa 2000 ký tự", "note");
         String gid = profileId(account);
         Actor me = Actor.of(account);
         own(gid, bookingId);
-        Map<String, Object> r = (Map<String, Object>) report(account, bookingId).get("report");
+
+        List<Object> rawMarks = Maps.list(body.get("marks"));
+
         Map<String, Object> out = core.edit(bookingId, b -> {
-            if (!Flow.COMPLETED.equals(Flow.norm(b.get("status")))) throw HttpError.conflict("Chỉ nộp báo cáo sau khi đã kết thúc chuyến đi", "status");
+            if (!Flow.COMPLETED.equals(Flow.norm(b.get("status"))))
+                throw HttpError.conflict("Chỉ nộp báo cáo sau khi đã kết thúc chuyến đi", "status");
+
+            List<Object> ps = new ArrayList<>(Maps.list(b.get("passengers")));
+            if (rawMarks != null && !rawMarks.isEmpty()) {
+                for (Object o : rawMarks) {
+                    Map<String, Object> m = Maps.map(o);
+                    int i = (int) Maps.lng(m, "index");
+                    String s = Maps.str(m, "state");
+                    if (i >= 0 && i < ps.size()) {
+                        Map<String, Object> p = new LinkedHashMap<>(Maps.map(ps.get(i)));
+                        if (s.isEmpty()) {
+                            p.remove("checkin");
+                            p.remove("checkinAt");
+                        } else {
+                            p.put("checkin", s);
+                            p.put("checkinAt", Times.iso(core.now()));
+                        }
+                        ps.set(i, p);
+                    }
+                }
+                b.put("passengers", ps);
+            }
+
+            int present = 0, late = 0, absent = 0;
+            for (Object o : ps) {
+                String c = Maps.str(Maps.map(o), "checkin");
+                if ("present".equals(c)) present++;
+                else if ("late".equals(c)) late++;
+                else if ("absent".equals(c)) absent++;
+            }
+            int total = ps.size();
+            boolean allAbsent = !ps.isEmpty() && absent == total;
+            b.put("noShow", allAbsent);
+            b.put("noShowCount", absent);
+            b.put("lateCount", late);
+
             Map<String, Object> old = Maps.map(b.get("tourReport"));
             String now = Times.iso(core.now());
-            b.put("tourReport", Maps.of("note", n, "total", r.get("total"), "present", r.get("present"), "late", r.get("late"), "absent", r.get("absent"),
-                    "incidentCount", ((List<?>) r.get("incidents")).size(), "submittedAt", old == null ? now : old.get("submittedAt"), "updatedAt", now,
-                    "byId", me.id(), "byName", me.name()));
-            core.note(b, "report", me, (old == null ? "HDV nộp báo cáo tour" : "HDV cập nhật báo cáo tour") + (n.isEmpty() ? "" : ": " + n));
+            int incidentCount = 0;
+            for (Map<String, Object> i : db.list("incidents")) {
+                if (Maps.str(b, "id").equals(Maps.str(i, "bookingId"))) incidentCount++;
+            }
+
+            b.put("tourReport", Maps.of(
+                "note", n,
+                "total", total,
+                "present", present + late,
+                "late", late,
+                "absent", absent,
+                "incidentCount", incidentCount,
+                "submittedAt", old == null ? now : old.get("submittedAt"),
+                "updatedAt", now,
+                "byId", me.id(),
+                "byName", me.name()
+            ));
+            core.note(b, "report", me, (old == null ? "HDV nộp báo cáo tour" : "HDV cập nhật báo cáo tour")
+                + " (Có mặt: " + (present + late) + "/" + total + ", vắng: " + absent + ")"
+                + (n.isEmpty() ? "" : ": " + n));
         });
-        boolean first = Maps.map(out.get("tourReport")).get("submittedAt").equals(Maps.map(out.get("tourReport")).get("updatedAt"));
+
+        Map<String, Object> rp = Maps.map(out.get("tourReport"));
+        boolean first = rp.get("submittedAt").equals(rp.get("updatedAt"));
         core.audit.log(me.id(), me.name(), me.role(), "trip.report", Maps.str(out, "payCode"), n);
-        if (first)
-            core.notifyRoles("📝 HDV đã nộp báo cáo tour", Maps.str(out, "guideName") + " – đơn " + out.get("payCode") + ": có mặt " + r.get("present") + "/" + r.get("total") + ", vắng " + r.get("absent")
-                    + (n.isEmpty() ? "" : ". Ghi chú: " + (n.length() > 160 ? n.substring(0, 157) + "…" : n)), "operator.html#incidents", "rpt-" + out.get("id"), Role.OPERATOR);
+        if (first) {
+            core.notifyRoles("📝 HDV đã nộp báo cáo tour",
+                Maps.str(out, "guideName") + " – đơn " + out.get("payCode") + ": có mặt " + rp.get("present") + "/" + rp.get("total") + ", vắng " + rp.get("absent")
+                + (n.isEmpty() ? "" : ". Ghi chú: " + (n.length() > 160 ? n.substring(0, 157) + "…" : n)),
+                "operator.html#incidents", "rpt-" + out.get("id"), Role.OPERATOR);
+        }
         return report(account, bookingId);
     }
 

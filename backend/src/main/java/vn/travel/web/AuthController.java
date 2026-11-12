@@ -43,7 +43,7 @@ public class AuthController {
         Map<String, Object> r = accounts.register(Maps.str(in, "name"), Maps.str(in, "email"), Maps.str(in, "password"),
                 Maps.str(in, "birthday"));
         current.start(req, res, Maps.str(Maps.map(r.get("user")), "id"));
-        return Maps.of("ok", true, "user", r.get("user"), "welcomeVoucher", r.get("welcomeVoucher"));
+        return Maps.of("ok", true, "user", r.get("user"), "welcomeVoucher", r.get("welcomeVoucher"), "isFirstLogin", r.get("isFirstLogin"));
     }
 
     @PostMapping("/api/auth/login")
@@ -51,7 +51,7 @@ public class AuthController {
             HttpServletResponse res) {
         Map<String, Object> u = accounts.login(Maps.str(b(body), "email"), Maps.str(b(body), "password"));
         current.start(req, res, Maps.str(u, "id"));
-        return Maps.of("ok", true, "user", u);
+        return Maps.of("ok", true, "user", u, "welcomeVoucher", u.get("welcomeVoucher"), "isFirstLogin", u.get("isFirstLogin"));
     }
 
     @PostMapping("/api/auth/google")
@@ -59,7 +59,7 @@ public class AuthController {
             HttpServletResponse res) {
         Map<String, Object> u = accounts.google(Maps.str(b(body), "credential"));
         current.start(req, res, Maps.str(u, "id"));
-        return Maps.of("ok", true, "user", u);
+        return Maps.of("ok", true, "user", u, "welcomeVoucher", u.get("welcomeVoucher"), "isFirstLogin", u.get("isFirstLogin"));
     }
 
     @RequestMapping(value = "/api/auth/logout", method = { RequestMethod.POST, RequestMethod.GET })

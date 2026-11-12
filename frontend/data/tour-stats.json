@@ -3,88 +3,88 @@
   "sample" : true,
   "tours" : [ {
     "tourId" : "112",
-    "reviews" : 1420,
+    "rating" : 4.9,
     "used" : 2850,
-    "rating" : 4.9
+    "reviews" : 1420
   }, {
     "tourId" : "111",
-    "reviews" : 1310,
+    "rating" : 4.9,
     "used" : 2650,
-    "rating" : 4.9
+    "reviews" : 1310
   }, {
     "tourId" : "105",
-    "reviews" : 1214,
+    "rating" : 4.9,
     "used" : 2486,
-    "rating" : 4.9
+    "reviews" : 1214
   }, {
     "tourId" : "101",
-    "reviews" : 1067,
+    "rating" : 4.8,
     "used" : 2203,
-    "rating" : 4.8
+    "reviews" : 1067
   }, {
     "tourId" : "108",
-    "reviews" : 903,
+    "rating" : 4.8,
     "used" : 1941,
-    "rating" : 4.8
+    "reviews" : 903
   }, {
     "tourId" : "107",
-    "reviews" : 788,
+    "rating" : 4.8,
     "used" : 1722,
-    "rating" : 4.8
+    "reviews" : 788
   }, {
     "tourId" : "103",
-    "reviews" : 720,
+    "rating" : 4.9,
     "used" : 1610,
-    "rating" : 4.9
+    "reviews" : 720
   }, {
     "tourId" : "104",
-    "reviews" : 680,
+    "rating" : 4.8,
     "used" : 1550,
-    "rating" : 4.8
+    "reviews" : 680
   }, {
     "tourId" : "110",
-    "reviews" : 652,
+    "rating" : 4.7,
     "used" : 1508,
-    "rating" : 4.7
+    "reviews" : 652
   }, {
     "tourId" : "106",
-    "reviews" : 590,
+    "rating" : 4.8,
     "used" : 1380,
-    "rating" : 4.8
+    "reviews" : 590
   }, {
     "tourId" : "102",
-    "reviews" : 541,
+    "rating" : 4.7,
     "used" : 1296,
-    "rating" : 4.7
+    "reviews" : 541
   }, {
     "tourId" : "109",
-    "reviews" : 480,
+    "rating" : 4.8,
     "used" : 1150,
-    "rating" : 4.8
+    "reviews" : 480
   }, {
     "tourId" : "hot07",
-    "reviews" : 436,
+    "rating" : 4.8,
     "used" : 1084,
-    "rating" : 4.8
+    "reviews" : 436
   }, {
     "tourId" : "hot08",
-    "reviews" : 352,
+    "rating" : 4.7,
     "used" : 927,
-    "rating" : 4.7
+    "reviews" : 352
   }, {
     "tourId" : "hot09",
-    "reviews" : 289,
+    "rating" : 4.8,
     "used" : 803,
-    "rating" : 4.8
+    "reviews" : 289
   }, {
     "tourId" : "hot10",
-    "reviews" : 231,
+    "rating" : 4.7,
     "used" : 688,
-    "rating" : 4.7
+    "reviews" : 231
   }, {
     "tourId" : "hot11",
-    "reviews" : 176,
+    "rating" : 4.7,
     "used" : 574,
-    "rating" : 4.7
+    "reviews" : 176
   } ]
 }

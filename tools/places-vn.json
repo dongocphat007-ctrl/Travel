@@ -1,84 +1,732 @@
 {
   "_note": "Bảng địa danh du lịch Việt Nam do dự án tự biên soạn (toạ độ gần đúng, sai số vài km, KHÔNG phải địa chỉ chính xác). Dùng bởi refine_locations.py để nâng toạ độ tour từ 'tâm tỉnh' lên 'điểm đến'. level: city = trung tâm thành phố/thị xã, place = điểm đến cụ thể (đảo, đèo, khu du lịch, vườn quốc gia, thị trấn). Chỉnh tay khi cần.",
   "places": [
-    {"name": "Hà Nội", "level": "city", "lat": 21.03, "lng": 105.85, "alias": ["hà nội"], "origin": true},
-    {"name": "TP. Hồ Chí Minh", "level": "city", "lat": 10.78, "lng": 106.70, "alias": ["tp.hcm", "tp. hồ chí minh", "tp hcm", "sài gòn", "thành phố hồ chí minh"], "origin": true},
-    {"name": "Hải Phòng", "level": "city", "lat": 20.86, "lng": 106.68, "alias": ["hải phòng"]},
-    {"name": "Đà Nẵng", "level": "city", "lat": 16.05, "lng": 108.21, "alias": ["đà nẵng"]},
-    {"name": "Huế", "level": "city", "lat": 16.46, "lng": 107.59, "alias": ["huế"]},
-    {"name": "Cần Thơ", "level": "city", "lat": 10.03, "lng": 105.78, "alias": ["cần thơ"]},
-    {"name": "Hạ Long", "level": "place", "lat": 20.95, "lng": 107.08, "alias": ["hạ long", "vịnh hạ long", "hạ long bay"]},
-    {"name": "Cát Bà", "level": "place", "lat": 20.73, "lng": 107.05, "alias": ["cát bà"]},
-    {"name": "Cô Tô", "level": "place", "lat": 20.97, "lng": 107.77, "alias": ["cô tô"]},
-    {"name": "Yên Tử", "level": "place", "lat": 21.17, "lng": 106.72, "alias": ["yên tử"]},
-    {"name": "Uông Bí", "level": "city", "lat": 21.03, "lng": 106.77, "alias": ["uông bí"]},
-    {"name": "Sa Pa", "level": "place", "lat": 22.34, "lng": 103.84, "alias": ["sa pa", "sapa"]},
-    {"name": "Fansipan", "level": "place", "lat": 22.30, "lng": 103.78, "alias": ["fansipan"]},
-    {"name": "Bắc Hà", "level": "place", "lat": 22.54, "lng": 104.29, "alias": ["bắc hà"]},
-    {"name": "Y Tý", "level": "place", "lat": 22.63, "lng": 103.63, "alias": ["y tý"]},
-    {"name": "Mù Cang Chải", "level": "place", "lat": 21.85, "lng": 104.09, "alias": ["mù cang chải"]},
-    {"name": "Hà Giang", "level": "city", "lat": 22.82, "lng": 104.98, "alias": ["hà giang"]},
-    {"name": "Mã Pí Lèng", "level": "place", "lat": 23.24, "lng": 105.41, "alias": ["mã pí lèng"]},
-    {"name": "Cao Bằng", "level": "city", "lat": 22.67, "lng": 106.26, "alias": ["cao bằng"]},
-    {"name": "Thác Bản Giốc", "level": "place", "lat": 22.85, "lng": 106.72, "alias": ["bản giốc", "thác bản giốc"]},
-    {"name": "Hồ Ba Bể", "level": "place", "lat": 22.42, "lng": 105.62, "alias": ["hồ ba bể", "ba bể"]},
-    {"name": "Lạng Sơn", "level": "city", "lat": 21.85, "lng": 106.76, "alias": ["lạng sơn"]},
-    {"name": "Điện Biên Phủ", "level": "city", "lat": 21.39, "lng": 103.02, "alias": ["điện biên", "điện biên phủ"]},
-    {"name": "Mộc Châu", "level": "place", "lat": 20.84, "lng": 104.64, "alias": ["mộc châu"]},
-    {"name": "Tà Xùa", "level": "place", "lat": 21.30, "lng": 104.48, "alias": ["tà xùa"]},
-    {"name": "Mai Châu", "level": "place", "lat": 20.66, "lng": 105.05, "alias": ["mai châu"]},
-    {"name": "Pù Luông", "level": "place", "lat": 20.47, "lng": 105.23, "alias": ["pù luông"]},
-    {"name": "Hòa Bình", "level": "city", "lat": 20.82, "lng": 105.34, "alias": ["hòa bình"]},
-    {"name": "Tam Đảo", "level": "place", "lat": 21.46, "lng": 105.64, "alias": ["tam đảo"]},
-    {"name": "Đền Hùng", "level": "place", "lat": 21.35, "lng": 105.33, "alias": ["đền hùng"]},
-    {"name": "Bắc Ninh", "level": "city", "lat": 21.19, "lng": 106.07, "alias": ["bắc ninh"]},
-    {"name": "Nam Định", "level": "city", "lat": 20.43, "lng": 106.17, "alias": ["nam định"]},
-    {"name": "Thái Bình", "level": "city", "lat": 20.45, "lng": 106.34, "alias": ["thái bình"]},
-    {"name": "Ninh Bình", "level": "city", "lat": 20.25, "lng": 105.97, "alias": ["ninh bình"]},
-    {"name": "Tràng An", "level": "place", "lat": 20.25, "lng": 105.90, "alias": ["tràng an"]},
-    {"name": "Tam Cốc", "level": "place", "lat": 20.22, "lng": 105.93, "alias": ["tam cốc"]},
-    {"name": "Cúc Phương", "level": "place", "lat": 20.31, "lng": 105.60, "alias": ["cúc phương"]},
-    {"name": "Chùa Tam Chúc", "level": "place", "lat": 20.51, "lng": 105.86, "alias": ["tam chúc"]},
-    {"name": "Sầm Sơn", "level": "place", "lat": 19.74, "lng": 105.90, "alias": ["sầm sơn"]},
-    {"name": "Cửa Lò", "level": "place", "lat": 18.82, "lng": 105.72, "alias": ["cửa lò"]},
-    {"name": "Phong Nha", "level": "place", "lat": 17.59, "lng": 106.28, "alias": ["phong nha", "phong nha – kẻ bàng"]},
-    {"name": "Thành cổ Quảng Trị", "level": "place", "lat": 16.75, "lng": 107.20, "alias": ["thành cổ quảng trị"]},
-    {"name": "Bạch Mã", "level": "place", "lat": 16.20, "lng": 107.85, "alias": ["bạch mã"]},
-    {"name": "Hội An", "level": "city", "lat": 15.88, "lng": 108.33, "alias": ["hội an"]},
-    {"name": "Mỹ Sơn", "level": "place", "lat": 15.77, "lng": 108.12, "alias": ["mỹ sơn"]},
-    {"name": "Cù Lao Chàm", "level": "place", "lat": 15.95, "lng": 108.51, "alias": ["cù lao chàm"]},
-    {"name": "Lý Sơn", "level": "place", "lat": 15.38, "lng": 109.12, "alias": ["lý sơn"]},
-    {"name": "Quy Nhơn", "level": "city", "lat": 13.78, "lng": 109.22, "alias": ["quy nhơn"]},
-    {"name": "Nha Trang", "level": "city", "lat": 12.24, "lng": 109.19, "alias": ["nha trang"]},
-    {"name": "Bình Ba", "level": "place", "lat": 12.17, "lng": 109.23, "alias": ["bình ba"]},
-    {"name": "Vạn Ninh", "level": "place", "lat": 12.70, "lng": 109.20, "alias": ["vạn ninh"]},
-    {"name": "Pleiku", "level": "city", "lat": 13.98, "lng": 108.00, "alias": ["pleiku"]},
-    {"name": "Kon Tum", "level": "city", "lat": 14.35, "lng": 108.00, "alias": ["kon tum"]},
-    {"name": "Buôn Ma Thuột", "level": "city", "lat": 12.67, "lng": 108.04, "alias": ["buôn ma thuột"]},
-    {"name": "Đà Lạt", "level": "city", "lat": 11.94, "lng": 108.44, "alias": ["đà lạt"]},
-    {"name": "Bảo Lộc", "level": "city", "lat": 11.55, "lng": 107.80, "alias": ["bảo lộc"]},
-    {"name": "Vườn quốc gia Cát Tiên", "level": "place", "lat": 11.43, "lng": 107.43, "alias": ["cát tiên"]},
-    {"name": "Mũi Né", "level": "place", "lat": 10.93, "lng": 108.29, "alias": ["mũi né"]},
-    {"name": "Phan Thiết", "level": "city", "lat": 10.93, "lng": 108.10, "alias": ["phan thiết"]},
-    {"name": "Hồ Trị An", "level": "place", "lat": 11.07, "lng": 107.05, "alias": ["hồ trị an", "trị an"]},
-    {"name": "Núi Bà Đen", "level": "place", "lat": 11.38, "lng": 106.17, "alias": ["núi bà đen"]},
-    {"name": "Củ Chi", "level": "place", "lat": 11.14, "lng": 106.46, "alias": ["củ chi"]},
-    {"name": "Cần Giờ", "level": "place", "lat": 10.41, "lng": 106.96, "alias": ["cần giờ"]},
-    {"name": "Chợ Lớn", "level": "place", "lat": 10.75, "lng": 106.66, "alias": ["chợ lớn", "quận 5"]},
-    {"name": "Vũng Tàu", "level": "city", "lat": 10.35, "lng": 107.08, "alias": ["vũng tàu"]},
-    {"name": "Hồ Tràm", "level": "place", "lat": 10.50, "lng": 107.40, "alias": ["hồ tràm"]},
-    {"name": "Bình Châu", "level": "place", "lat": 10.58, "lng": 107.52, "alias": ["bình châu"]},
-    {"name": "Côn Đảo", "level": "place", "lat": 8.69, "lng": 106.61, "alias": ["côn đảo"]},
-    {"name": "Mỹ Tho", "level": "city", "lat": 10.36, "lng": 106.36, "alias": ["mỹ tho"]},
-    {"name": "Bến Tre", "level": "city", "lat": 10.24, "lng": 106.38, "alias": ["bến tre"]},
-    {"name": "Vĩnh Long", "level": "city", "lat": 10.25, "lng": 105.97, "alias": ["vĩnh long"]},
-    {"name": "Trà Vinh", "level": "city", "lat": 9.93, "lng": 106.34, "alias": ["trà vinh"]},
-    {"name": "Sóc Trăng", "level": "city", "lat": 9.60, "lng": 105.97, "alias": ["sóc trăng"]},
-    {"name": "Bạc Liêu", "level": "city", "lat": 9.29, "lng": 105.72, "alias": ["bạc liêu"]},
-    {"name": "Châu Đốc", "level": "city", "lat": 10.70, "lng": 105.12, "alias": ["châu đốc"]},
-    {"name": "Hà Tiên", "level": "city", "lat": 10.38, "lng": 104.49, "alias": ["hà tiên"]},
-    {"name": "Phú Quốc", "level": "place", "lat": 10.23, "lng": 103.96, "alias": ["phú quốc"]},
-    {"name": "Cà Mau", "level": "city", "lat": 9.18, "lng": 105.15, "alias": ["cà mau"]},
-    {"name": "Đất Mũi", "level": "place", "lat": 8.60, "lng": 104.72, "alias": ["đất mũi", "mũi cà mau"]}
+    {
+      "name": "Hà Nội",
+      "level": "city",
+      "lat": 21.03,
+      "lng": 105.85,
+      "alias": [
+        "hà nội"
+      ],
+      "origin": true
+    },
+    {
+      "name": "TP. Hồ Chí Minh",
+      "level": "city",
+      "lat": 10.78,
+      "lng": 106.70,
+      "alias": [
+        "tp.hcm",
+        "tp. hồ chí minh",
+        "tp hcm",
+        "sài gòn",
+        "thành phố hồ chí minh"
+      ],
+      "origin": true
+    },
+    {
+      "name": "Hải Phòng",
+      "level": "city",
+      "lat": 20.86,
+      "lng": 106.68,
+      "alias": [
+        "hải phòng"
+      ]
+    },
+    {
+      "name": "Đà Nẵng",
+      "level": "city",
+      "lat": 16.05,
+      "lng": 108.21,
+      "alias": [
+        "đà nẵng"
+      ]
+    },
+    {
+      "name": "Huế",
+      "level": "city",
+      "lat": 16.46,
+      "lng": 107.59,
+      "alias": [
+        "huế"
+      ]
+    },
+    {
+      "name": "Cần Thơ",
+      "level": "city",
+      "lat": 10.03,
+      "lng": 105.78,
+      "alias": [
+        "cần thơ"
+      ]
+    },
+    {
+      "name": "Hạ Long",
+      "level": "place",
+      "lat": 20.95,
+      "lng": 107.08,
+      "alias": [
+        "hạ long",
+        "vịnh hạ long",
+        "hạ long bay"
+      ]
+    },
+    {
+      "name": "Cát Bà",
+      "level": "place",
+      "lat": 20.73,
+      "lng": 107.05,
+      "alias": [
+        "cát bà"
+      ]
+    },
+    {
+      "name": "Cô Tô",
+      "level": "place",
+      "lat": 20.97,
+      "lng": 107.77,
+      "alias": [
+        "cô tô"
+      ]
+    },
+    {
+      "name": "Yên Tử",
+      "level": "place",
+      "lat": 21.17,
+      "lng": 106.72,
+      "alias": [
+        "yên tử"
+      ]
+    },
+    {
+      "name": "Uông Bí",
+      "level": "city",
+      "lat": 21.03,
+      "lng": 106.77,
+      "alias": [
+        "uông bí"
+      ]
+    },
+    {
+      "name": "Sa Pa",
+      "level": "place",
+      "lat": 22.34,
+      "lng": 103.84,
+      "alias": [
+        "sa pa",
+        "sapa"
+      ]
+    },
+    {
+      "name": "Fansipan",
+      "level": "place",
+      "lat": 22.30,
+      "lng": 103.78,
+      "alias": [
+        "fansipan"
+      ]
+    },
+    {
+      "name": "Bắc Hà",
+      "level": "place",
+      "lat": 22.54,
+      "lng": 104.29,
+      "alias": [
+        "bắc hà"
+      ]
+    },
+    {
+      "name": "Y Tý",
+      "level": "place",
+      "lat": 22.63,
+      "lng": 103.63,
+      "alias": [
+        "y tý"
+      ]
+    },
+    {
+      "name": "Mù Cang Chải",
+      "level": "place",
+      "lat": 21.85,
+      "lng": 104.09,
+      "alias": [
+        "mù cang chải"
+      ]
+    },
+    {
+      "name": "Hà Giang",
+      "level": "city",
+      "lat": 22.82,
+      "lng": 104.98,
+      "alias": [
+        "hà giang"
+      ]
+    },
+    {
+      "name": "Mã Pí Lèng",
+      "level": "place",
+      "lat": 23.24,
+      "lng": 105.41,
+      "alias": [
+        "mã pí lèng"
+      ]
+    },
+    {
+      "name": "Cao Bằng",
+      "level": "city",
+      "lat": 22.67,
+      "lng": 106.26,
+      "alias": [
+        "cao bằng"
+      ]
+    },
+    {
+      "name": "Thác Bản Giốc",
+      "level": "place",
+      "lat": 22.85,
+      "lng": 106.72,
+      "alias": [
+        "bản giốc",
+        "thác bản giốc"
+      ]
+    },
+    {
+      "name": "Hồ Ba Bể",
+      "level": "place",
+      "lat": 22.42,
+      "lng": 105.62,
+      "alias": [
+        "hồ ba bể",
+        "ba bể"
+      ]
+    },
+    {
+      "name": "Lạng Sơn",
+      "level": "city",
+      "lat": 21.85,
+      "lng": 106.76,
+      "alias": [
+        "lạng sơn"
+      ]
+    },
+    {
+      "name": "Điện Biên Phủ",
+      "level": "city",
+      "lat": 21.39,
+      "lng": 103.02,
+      "alias": [
+        "điện biên",
+        "điện biên phủ"
+      ]
+    },
+    {
+      "name": "Mộc Châu",
+      "level": "place",
+      "lat": 20.84,
+      "lng": 104.64,
+      "alias": [
+        "mộc châu"
+      ]
+    },
+    {
+      "name": "Tà Xùa",
+      "level": "place",
+      "lat": 21.30,
+      "lng": 104.48,
+      "alias": [
+        "tà xùa"
+      ]
+    },
+    {
+      "name": "Mai Châu",
+      "level": "place",
+      "lat": 20.66,
+      "lng": 105.05,
+      "alias": [
+        "mai châu"
+      ]
+    },
+    {
+      "name": "Pù Luông",
+      "level": "place",
+      "lat": 20.47,
+      "lng": 105.23,
+      "alias": [
+        "pù luông"
+      ]
+    },
+    {
+      "name": "Hòa Bình",
+      "level": "city",
+      "lat": 20.82,
+      "lng": 105.34,
+      "alias": [
+        "hòa bình"
+      ]
+    },
+    {
+      "name": "Tam Đảo",
+      "level": "place",
+      "lat": 21.46,
+      "lng": 105.64,
+      "alias": [
+        "tam đảo"
+      ]
+    },
+    {
+      "name": "Đền Hùng",
+      "level": "place",
+      "lat": 21.35,
+      "lng": 105.33,
+      "alias": [
+        "đền hùng"
+      ]
+    },
+    {
+      "name": "Bắc Ninh",
+      "level": "city",
+      "lat": 21.19,
+      "lng": 106.07,
+      "alias": [
+        "bắc ninh"
+      ]
+    },
+    {
+      "name": "Nam Định",
+      "level": "city",
+      "lat": 20.43,
+      "lng": 106.17,
+      "alias": [
+        "nam định"
+      ]
+    },
+    {
+      "name": "Thái Bình",
+      "level": "city",
+      "lat": 20.45,
+      "lng": 106.34,
+      "alias": [
+        "thái bình"
+      ]
+    },
+    {
+      "name": "Ninh Bình",
+      "level": "city",
+      "lat": 20.25,
+      "lng": 105.97,
+      "alias": [
+        "ninh bình"
+      ]
+    },
+    {
+      "name": "Tràng An",
+      "level": "place",
+      "lat": 20.25,
+      "lng": 105.90,
+      "alias": [
+        "tràng an"
+      ]
+    },
+    {
+      "name": "Tam Cốc",
+      "level": "place",
+      "lat": 20.22,
+      "lng": 105.93,
+      "alias": [
+        "tam cốc"
+      ]
+    },
+    {
+      "name": "Cúc Phương",
+      "level": "place",
+      "lat": 20.31,
+      "lng": 105.60,
+      "alias": [
+        "cúc phương"
+      ]
+    },
+    {
+      "name": "Chùa Tam Chúc",
+      "level": "place",
+      "lat": 20.51,
+      "lng": 105.86,
+      "alias": [
+        "tam chúc"
+      ]
+    },
+    {
+      "name": "Sầm Sơn",
+      "level": "place",
+      "lat": 19.74,
+      "lng": 105.90,
+      "alias": [
+        "sầm sơn"
+      ]
+    },
+    {
+      "name": "Cửa Lò",
+      "level": "place",
+      "lat": 18.82,
+      "lng": 105.72,
+      "alias": [
+        "cửa lò"
+      ]
+    },
+    {
+      "name": "Phong Nha",
+      "level": "place",
+      "lat": 17.59,
+      "lng": 106.28,
+      "alias": [
+        "phong nha",
+        "phong nha – kẻ bàng"
+      ]
+    },
+    {
+      "name": "Thành cổ Quảng Trị",
+      "level": "place",
+      "lat": 16.75,
+      "lng": 107.20,
+      "alias": [
+        "thành cổ quảng trị"
+      ]
+    },
+    {
+      "name": "Bạch Mã",
+      "level": "place",
+      "lat": 16.20,
+      "lng": 107.85,
+      "alias": [
+        "bạch mã"
+      ]
+    },
+    {
+      "name": "Hội An",
+      "level": "city",
+      "lat": 15.88,
+      "lng": 108.33,
+      "alias": [
+        "hội an"
+      ]
+    },
+    {
+      "name": "Mỹ Sơn",
+      "level": "place",
+      "lat": 15.77,
+      "lng": 108.12,
+      "alias": [
+        "mỹ sơn"
+      ]
+    },
+    {
+      "name": "Cù Lao Chàm",
+      "level": "place",
+      "lat": 15.95,
+      "lng": 108.51,
+      "alias": [
+        "cù lao chàm"
+      ]
+    },
+    {
+      "name": "Lý Sơn",
+      "level": "place",
+      "lat": 15.38,
+      "lng": 109.12,
+      "alias": [
+        "lý sơn"
+      ]
+    },
+    {
+      "name": "Quy Nhơn",
+      "level": "city",
+      "lat": 13.78,
+      "lng": 109.22,
+      "alias": [
+        "quy nhơn"
+      ]
+    },
+    {
+      "name": "Nha Trang",
+      "level": "city",
+      "lat": 12.24,
+      "lng": 109.19,
+      "alias": [
+        "nha trang"
+      ]
+    },
+    {
+      "name": "Bình Ba",
+      "level": "place",
+      "lat": 12.17,
+      "lng": 109.23,
+      "alias": [
+        "bình ba"
+      ]
+    },
+    {
+      "name": "Vạn Ninh",
+      "level": "place",
+      "lat": 12.70,
+      "lng": 109.20,
+      "alias": [
+        "vạn ninh"
+      ]
+    },
+    {
+      "name": "Pleiku",
+      "level": "city",
+      "lat": 13.98,
+      "lng": 108.00,
+      "alias": [
+        "pleiku"
+      ]
+    },
+    {
+      "name": "Kon Tum",
+      "level": "city",
+      "lat": 14.35,
+      "lng": 108.00,
+      "alias": [
+        "kon tum"
+      ]
+    },
+    {
+      "name": "Buôn Ma Thuột",
+      "level": "city",
+      "lat": 12.67,
+      "lng": 108.04,
+      "alias": [
+        "buôn ma thuột"
+      ]
+    },
+    {
+      "name": "Đà Lạt",
+      "level": "city",
+      "lat": 11.94,
+      "lng": 108.44,
+      "alias": [
+        "đà lạt"
+      ]
+    },
+    {
+      "name": "Bảo Lộc",
+      "level": "city",
+      "lat": 11.55,
+      "lng": 107.80,
+      "alias": [
+        "bảo lộc"
+      ]
+    },
+    {
+      "name": "Vườn quốc gia Cát Tiên",
+      "level": "place",
+      "lat": 11.43,
+      "lng": 107.43,
+      "alias": [
+        "cát tiên"
+      ]
+    },
+    {
+      "name": "Mũi Né",
+      "level": "place",
+      "lat": 10.93,
+      "lng": 108.29,
+      "alias": [
+        "mũi né"
+      ]
+    },
+    {
+      "name": "Phan Thiết",
+      "level": "city",
+      "lat": 10.93,
+      "lng": 108.10,
+      "alias": [
+        "phan thiết"
+      ]
+    },
+    {
+      "name": "Hồ Trị An",
+      "level": "place",
+      "lat": 11.07,
+      "lng": 107.05,
+      "alias": [
+        "hồ trị an",
+        "trị an"
+      ]
+    },
+    {
+      "name": "Núi Bà Đen",
+      "level": "place",
+      "lat": 11.38,
+      "lng": 106.17,
+      "alias": [
+        "núi bà đen"
+      ]
+    },
+    {
+      "name": "Củ Chi",
+      "level": "place",
+      "lat": 11.14,
+      "lng": 106.46,
+      "alias": [
+        "củ chi"
+      ]
+    },
+    {
+      "name": "Cần Giờ",
+      "level": "place",
+      "lat": 10.41,
+      "lng": 106.96,
+      "alias": [
+        "cần giờ"
+      ]
+    },
+    {
+      "name": "Chợ Lớn",
+      "level": "place",
+      "lat": 10.75,
+      "lng": 106.66,
+      "alias": [
+        "chợ lớn",
+        "quận 5"
+      ]
+    },
+    {
+      "name": "Vũng Tàu",
+      "level": "city",
+      "lat": 10.35,
+      "lng": 107.08,
+      "alias": [
+        "vũng tàu"
+      ]
+    },
+    {
+      "name": "Hồ Tràm",
+      "level": "place",
+      "lat": 10.50,
+      "lng": 107.40,
+      "alias": [
+        "hồ tràm"
+      ]
+    },
+    {
+      "name": "Bình Châu",
+      "level": "place",
+      "lat": 10.58,
+      "lng": 107.52,
+      "alias": [
+        "bình châu"
+      ]
+    },
+    {
+      "name": "Côn Đảo",
+      "level": "place",
+      "lat": 8.69,
+      "lng": 106.61,
+      "alias": [
+        "côn đảo"
+      ]
+    },
+    {
+      "name": "Mỹ Tho",
+      "level": "city",
+      "lat": 10.36,
+      "lng": 106.36,
+      "alias": [
+        "mỹ tho"
+      ]
+    },
+    {
+      "name": "Bến Tre",
+      "level": "city",
+      "lat": 10.24,
+      "lng": 106.38,
+      "alias": [
+        "bến tre"
+      ]
+    },
+    {
+      "name": "Vĩnh Long",
+      "level": "city",
+      "lat": 10.25,
+      "lng": 105.97,
+      "alias": [
+        "vĩnh long"
+      ]
+    },
+    {
+      "name": "Trà Vinh",
+      "level": "city",
+      "lat": 9.93,
+      "lng": 106.34,
+      "alias": [
+        "trà vinh"
+      ]
+    },
+    {
+      "name": "Sóc Trăng",
+      "level": "city",
+      "lat": 9.60,
+      "lng": 105.97,
+      "alias": [
+        "sóc trăng"
+      ]
+    },
+    {
+      "name": "Bạc Liêu",
+      "level": "city",
+      "lat": 9.29,
+      "lng": 105.72,
+      "alias": [
+        "bạc liêu"
+      ]
+    },
+    {
+      "name": "Châu Đốc",
+      "level": "city",
+      "lat": 10.70,
+      "lng": 105.12,
+      "alias": [
+        "châu đốc"
+      ]
+    },
+    {
+      "name": "Hà Tiên",
+      "level": "city",
+      "lat": 10.38,
+      "lng": 104.49,
+      "alias": [
+        "hà tiên"
+      ]
+    },
+    {
+      "name": "Phú Quốc",
+      "level": "place",
+      "lat": 10.23,
+      "lng": 103.96,
+      "alias": [
+        "phú quốc"
+      ]
+    },
+    {
+      "name": "Cà Mau",
+      "level": "city",
+      "lat": 9.18,
+      "lng": 105.15,
+      "alias": [
+        "cà mau"
+      ]
+    },
+    {
+      "name": "Đất Mũi",
+      "level": "place",
+      "lat": 8.60,
+      "lng": 104.72,
+      "alias": [
+        "đất mũi",
+        "mũi cà mau"
+      ]
+    }
   ]
 }

@@ -19,6 +19,6 @@ public class MapsController {
     @GetMapping("/api/maps/config")
     public Map<String, Object> config() {
         String key = props.googleMapsApiKey();
-        return Maps.of("googleMapsApiKey", TravelProperties.blank(key) ? "" : key.trim(), "language", "vi", "region", "VN");
+        return Maps.of("ok", true, "googleMapsApiKey", TravelProperties.blank(key) ? "" : key.trim(), "language", "vi", "region", "VN");
     }
 }

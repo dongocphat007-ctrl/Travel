@@ -18,6 +18,66 @@ public final class Rewards {
 
     Rewards(OpsCore core) { this.core = core; }
 
+    /**
+     * Bảng phân loại thù lao HDV theo quy chuẩn:
+     * - HDV chính thức, đã có lương: 3–5% giá trị tour (mặc định 4%)
+     * - HDV chính thức, tour khó/dài: 5–7% (mặc định 6%)
+     * - HDV cộng tác viên: 7–10% (mặc định 8%)
+     * - Tour đặc biệt/khó (quốc tế hoặc trekking/thám hiểm hang động/mạo hiểm): 10–12% (mặc định 10%)
+     */
+    public static class GuideFeeTier {
+        public final String code;
+        public final String name;
+        public final double defaultPercent;
+        public final String rangeLabel;
+
+        public GuideFeeTier(String code, String name, double defaultPercent, String rangeLabel) {
+            this.code = code;
+            this.name = name;
+            this.defaultPercent = defaultPercent;
+            this.rangeLabel = rangeLabel;
+        }
+    }
+
+    public static GuideFeeTier determineTier(Map<String, Object> g, Map<String, Object> b, int days) {
+        String empType = g != null ? Maps.str(g, "employmentType").toLowerCase() : "";
+        String gType = g != null ? Maps.str(g, "guideType").toLowerCase() : "";
+        String tName = Maps.str(b, "tourName").toLowerCase();
+        String tDest = Maps.str(b, "tourDest").toLowerCase();
+
+        boolean isSpecial = tName.contains("trekking") || tName.contains("thám hiểm") || tName.contains("leo núi")
+                || tName.contains("hang động") || tName.contains("fansipan") || tName.contains("mạo hiểm")
+                || tName.contains("quốc tế") || tName.contains("nước ngoài") || "outbound".equals(gType);
+
+        if (isSpecial) {
+            return new GuideFeeTier("special_hard", "Tour đặc biệt/khó", 0.10, "10–12%");
+        }
+        if ("collaborator".equals(empType) || "freelance".equals(empType)) {
+            return new GuideFeeTier("collaborator", "HDV cộng tác viên", 0.08, "7–10%");
+        }
+        if (days >= 4 || tName.contains("xuyên việt") || tName.contains("liên tuyến") || tName.contains("dài ngày")) {
+            return new GuideFeeTier("permanent_hard", "HDV chính thức, tour khó/dài", 0.06, "5–7%");
+        }
+        return new GuideFeeTier("permanent_regular", "HDV chính thức, đã có lương", 0.04, "3–5% giá trị tour");
+    }
+
+    public long getOrComputeFee(Map<String, Object> b) {
+        if (b.get("guideFee") != null) {
+            long f = Maps.lng(b, "guideFee");
+            if (f > 0) return f;
+        }
+        String gid = core.canonGuide(Maps.str(b, "guideId"));
+        Map<String, Object> g = core.guide(gid);
+        int days = feeDays(b);
+        long price = Maps.lng(b, "price");
+        GuideFeeTier tier = determineTier(g, b, days);
+        long fee = Math.round(price * tier.defaultPercent);
+        if (fee <= 0) {
+            fee = (long) days * core.config.i("guideFeePerDay");
+        }
+        return fee;
+    }
+
     /** Gọi SAU khi đơn đã lưu ở trạng thái completed. Idempotent. */
     public void onCompleted(String bookingId) {
         String[] user = new String[1];
@@ -28,16 +88,21 @@ public final class Rewards {
             fresh[0] = true;
             b.put("rewardedAt", Times.iso(core.now()));
             user[0] = Maps.str(b, "userId");
-            // 7.9: thù lao HDV = 20% giá tiền tour – chỉ khi completed và có HDV
+            // 7.9: thù lao HDV theo bảng thù lao quy chuẩn (3-5%, 5-7%, 7-10%, 10-12%) – chỉ khi completed và có HDV
             if (!Maps.str(b, "guideId").isEmpty()) {
+                String gid = core.canonGuide(Maps.str(b, "guideId"));
+                Map<String, Object> g = core.guide(gid);
+                int days = feeDays(b);
                 long price = Maps.lng(b, "price");
-                long fee = Math.round(price * 0.20);
+                GuideFeeTier tier = determineTier(g, b, days);
+                long fee = Math.round(price * tier.defaultPercent);
                 if (fee <= 0) {
-                    int days = Math.max(1, Guides.tourDays(b) + (int) Maps.lng(b, "extraDays"));
                     fee = (long) days * core.config.i("guideFeePerDay");
                 }
                 b.put("guideFee", fee);
-                b.put("guideFeeRate", "20%");
+                b.put("guideFeeRate", Math.round(tier.defaultPercent * 100) + "%");
+                b.put("guideFeeTier", tier.name);
+                b.put("guideFeeRange", tier.rangeLabel);
             }
             // 7.10: điểm
             if (!Maps.bool(b, "noShow")) {
@@ -93,14 +158,17 @@ public final class Rewards {
             if (gid.isEmpty() || (guideId != null && !guideId.equals(gid)) || !Flow.COMPLETED.equals(Flow.norm(b.get("status")))) continue;
             int days = feeDays(b);
             long price = Maps.lng(b, "price");
-            long calc20 = Math.round(price * 0.20);
-            long fee = b.get("guideFee") != null ? Maps.lng(b, "guideFee") : (calc20 > 0 ? calc20 : days * perDay);
+            Map<String, Object> g = core.guide(gid);
+            GuideFeeTier tier = determineTier(g, b, days);
+            long calculated = Math.round(price * tier.defaultPercent);
+            long fee = b.get("guideFee") != null ? Maps.lng(b, "guideFee") : (calculated > 0 ? calculated : days * perDay);
+            String rate = b.get("guideFeeRate") != null ? Maps.str(b, "guideFeeRate") : (Math.round(tier.defaultPercent * 100) + "%");
+            String tierLabel = b.get("guideFeeTier") != null ? Maps.str(b, "guideFeeTier") : tier.name;
             String paidAt = Maps.str(b, "guideFeePaidAt");
             String done = Maps.str(b, "completedAt");
             if (done.isEmpty()) done = Maps.str(b, "statusAt");
-            Map<String, Object> g = core.guide(gid);
             rows.add(Maps.of("id", b.get("id"), "payCode", b.get("payCode"), "tourName", b.get("tourName"), "date", b.get("date"), "days", days,
-                    "price", price, "rate", "20%",
+                    "price", price, "rate", rate, "tier", tierLabel, "range", tier.rangeLabel,
                     "completedAt", done, "fee", fee, "paid", !paidAt.isEmpty(), "paidAt", paidAt, "paidByName", Maps.str(b, "guideFeePaidByName"),
                     "guideId", gid, "guideName", g == null ? Maps.str(b, "guideName") : Maps.str(g, "name")));
         }
@@ -138,6 +206,6 @@ public final class Rewards {
             monthly.add(Maps.of("month", key, "paid", m[0], "pending", m[1], "total", m[0] + m[1], "count", m[2]));
         }
         return Maps.of("ok", true, "month", month == null ? "" : month, "total", total, "count", rows.size(), "paidTotal", paidTotal, "pendingTotal", pendingTotal,
-                "items", rows, "allPaid", allPaid, "allPending", allPending, "toursLed", all.size(), "monthly", monthly, "feeRate", "20% giá tour", "feePerDay", core.config.i("guideFeePerDay"));
+                "items", rows, "allPaid", allPaid, "allPending", allPending, "toursLed", all.size(), "monthly", monthly, "feeRate", "3% – 12% theo quy chế bảng thù lao", "feePerDay", core.config.i("guideFeePerDay"));
     }
 }

@@ -52,9 +52,7 @@ public class CashierController {
 
     @PostMapping("/api/cashier/daily-revenue/import")
     public Map<String, Object> importDailyRevenue(@RequestBody(required = false) Map<String, Object> body, HttpServletRequest req) {
-        Map<String, Object> u = current.requirePermission(req, Permission.RECONCILE_CREATE);
-        java.util.List<?> items = Api.body(body).get("items") instanceof java.util.List<?> l ? l : java.util.List.of();
-        return cashier.importDailyRevenues(Api.actor(u), items);
+        throw new HttpError(403, "Thu ngân chỉ được phép xuất file báo cáo, không được phép nhập file từ ngoài vào. Quyền nhập file chỉ dành cho Admin.");
     }
 
     /** Thù lao HDV: danh sách chờ chi (gom theo HDV) + đã chi. */

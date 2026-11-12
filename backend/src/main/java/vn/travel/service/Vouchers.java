@@ -67,6 +67,8 @@ public class Vouchers {
     // ───────── cấp tự động ─────────
     public Map<String, Object> grantWelcome(Map<String, Object> user) {
         String uid = Maps.str(user, "id");
+        boolean has = db.list("vouchers").stream().anyMatch(v -> uid.equals(v.get("ownerId")) && "welcome".equals(v.get("source")));
+        if (has) return null; // Mỗi tài khoản chỉ nhận voucher chào mừng 1 lần duy nhất
         Long created = Times.parse(user.get("createdAt"));
         if (created == null) created = clock.millis();
         long end = created + WELCOME_DAYS * DAY;
@@ -181,6 +183,11 @@ public class Vouchers {
     private void check(Map<String, Object> v, String tourId, String userId) {
         String owner = Maps.str(v, "ownerId");
         if (!owner.isEmpty() && !owner.equals(userId)) throw new HttpError(403, "Mã này không dành cho tài khoản của bạn");
+        String targetMode = Maps.str(v, "targetMode");
+        List<Object> targetIds = Maps.list(v.get("targetIds"));
+        if ("custom".equals(targetMode) && !targetIds.isEmpty() && userId != null) {
+            if (!targetIds.contains(userId)) throw new HttpError(403, "Mã voucher này không áp dụng cho tài khoản của bạn");
+        }
         String vt = Maps.str(v, "tourId");
         if (!vt.isEmpty() && tourId != null && !vt.equals(tourId)) throw new HttpError(400, "Mã này chỉ áp dụng cho tour " + tours.name(vt));
         switch (state(v, userId)) {
@@ -250,6 +257,7 @@ public class Vouchers {
         String code = Maps.str(b, "code").trim().toUpperCase();
         if (!code.matches("[A-Z0-9_-]{3,24}")) throw HttpError.bad("Mã chỉ gồm chữ/số/gạch, 3–24 ký tự", "code");
         String type = Maps.str(b, "type");
+        if ("amount".equals(type)) type = "fixed";
         if (!type.equals("percent") && !type.equals("fixed")) throw HttpError.bad("Loại giảm không hợp lệ", "type");
         double value = vnum(b.get("value"));
         if (!(value > 0) || (type.equals("percent") && value > 100)) throw HttpError.bad("Giá trị giảm không hợp lệ", "value");
@@ -265,9 +273,26 @@ public class Vouchers {
             ownerId = Maps.str(a, "id");
         }
         String title = Maps.str(b, "title").trim();
+        String targetType = Maps.str(b, "targetType");
+        if (targetType.isEmpty()) targetType = "all";
+        String targetMode = Maps.str(b, "targetMode");
+        if (targetMode.isEmpty()) targetMode = "all";
+        List<Object> targetIds = new ArrayList<>(Maps.list(b.get("targetIds")));
+        String targetLabel = Maps.str(b, "targetLabel");
+        if (targetLabel.isEmpty()) {
+            if ("customer".equals(targetType)) targetLabel = "all".equals(targetMode) ? "Tất cả khách hàng" : (targetIds.size() + " khách hàng đã chọn");
+            else if ("staff".equals(targetType)) targetLabel = "all".equals(targetMode) ? "Tất cả nhân viên" : (targetIds.size() + " nhân sự đã chọn");
+            else targetLabel = "Tất cả mọi người";
+        }
+
         Map<String, Object> v = newVoucher(code, title.isEmpty() ? code : title, type, (long) value, ownerId.isEmpty() ? null : ownerId, null, "admin",
                 s == null ? null : Times.iso(s), e == null ? null : Times.iso(e), (long) uses);
         v.put("maxDiscount", (long) max);
+        v.put("targetType", targetType);
+        v.put("targetMode", targetMode);
+        v.put("targetIds", targetIds);
+        v.put("targetLabel", targetLabel);
+
         db.edit("vouchers", all -> {
             if (all.stream().anyMatch(x -> Maps.str(x, "code").equalsIgnoreCase(code))) throw new HttpError(409, "Mã đã tồn tại", "code");
             all.add(v);

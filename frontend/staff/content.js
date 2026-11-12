@@ -143,14 +143,63 @@
       }
       await reload();
     } },
-    { id: "reviews", label: "Kiểm duyệt đánh giá", icon: "⭐", perm: "review:moderate", async render(el) {
-      const bar = Parts.search(() => draw(), "Tìm theo tour, tác giả, nội dung…", '<select id="rf"><option value="">Tất cả</option><option value="hidden">Đang ẩn</option><option value="shown">Đang hiện</option></select><button type="button" class="btn ok" id="btn-ai-sentiment" style="margin-left:8px;font-size:0.82rem;white-space:nowrap">✨ AI Phân tích cảm xúc</button>');
-      const aiBox = h('<div id="ai-sentiment-box" style="display:none;margin-bottom:16px;background:linear-gradient(135deg,#f0fdf4 0%,#f0f9ff 100%);border:1.5px solid #0284c7;border-radius:12px;padding:16px 20px"></div>');
-      const body = h("<div></div>"); el.append(bar, aiBox, body); let list = [];
-      $("#rf", bar).onchange = () => draw();
+    { id: "reviews", label: "Kiểm duyệt & Trả lời bình luận", icon: "⭐", perm: "review:moderate", async render(el) {
+      let curStatus = "unreplied"; // Mặc định: Cần xử lý ngay (Chưa trả lời)
+      let curCat = "";
+      let curTarget = "";
+      let list = [];
 
-      $("#btn-ai-sentiment", bar).onclick = async () => {
-        const btn = $("#btn-ai-sentiment", bar);
+      el.innerHTML = `
+        <div class="card" style="margin-bottom:16px">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:14px">
+            <div>
+              <h2 style="margin:0">Kiểm duyệt & Trả lời bình luận (Biên tập & CSKH)</h2>
+              <div class="muted small" style="margin-top:2px">Quyền hạn: Xem bình luận, Trả lời công khai, Gắn loại, Chuyển vấn đề cho bộ phận khác và Ẩn vi phạm.</div>
+            </div>
+            <button type="button" class="btn ok" id="btn-ai-sentiment" style="font-size:0.85rem">✨ AI Phân tích cảm xúc & Tóm tắt</button>
+          </div>
+
+          <div id="ai-sentiment-box" style="display:none;margin-bottom:16px;background:linear-gradient(135deg,#f0fdf4 0%,#f0f9ff 100%);border:1.5px solid #0284c7;border-radius:12px;padding:16px 20px"></div>
+
+          <!-- BỘ LỌC CHÍNH: TRẠNG THÁI CẦN XỬ LÝ (QUAN TRỌNG VỚI CSKH) -->
+          <div style="margin-bottom:12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px 14px">
+            <div style="font-weight:700;font-size:13px;margin-bottom:8px;color:var(--text)">🎯 Trạng thái cần xử lý (Bộ lọc chính):</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap" id="cnt-status-seg">
+              <button type="button" class="pill-btn ${curStatus === 'unreplied' ? 'active' : ''}" data-st="unreplied">🚨 Cần xử lý ngay (Chưa trả lời) <span class="badge bad" id="cnt-unrep-count" style="margin-left:4px">0</span></button>
+              <button type="button" class="pill-btn ${curStatus === 'replied' ? 'active' : ''}" data-st="replied">💬 Đã trả lời</button>
+              <button type="button" class="pill-btn ${curStatus === 'forwarded' ? 'active' : ''}" data-st="forwarded">🔄 Đã chuyển bộ phận</button>
+              <button type="button" class="pill-btn ${curStatus === 'hidden' ? 'active' : ''}" data-st="hidden">👁️‍🗨️ Đã ẩn vi phạm</button>
+              <button type="button" class="pill-btn ${curStatus === 'all' ? 'active' : ''}" data-st="all">📑 Tất cả</button>
+            </div>
+          </div>
+
+          <!-- Bộ lọc phụ -->
+          <div class="row" style="gap:10px;flex-wrap:wrap;margin-bottom:14px;align-items:center">
+            <input type="text" id="cnt-rv-search" placeholder="🔍 Tìm tác giả, tour, nội dung, phản hồi..." style="flex:1;min-width:220px;padding:7px 10px;font-size:13px">
+            <select id="cnt-rv-cat" class="input sm" style="width:160px">
+              <option value="">Tất cả phân loại</option>
+              <option value="inquiry">❓ Hỏi thông tin</option>
+              <option value="review">⭐ Đánh giá trải nghiệm</option>
+              <option value="complaint">⚠️ Khiếu nại dịch vụ</option>
+              <option value="feedback">💡 Góp ý / Đóng góp</option>
+            </select>
+            <select id="cnt-rv-target" class="input sm" style="width:160px">
+              <option value="">Mọi mục hiển thị</option>
+              <option value="tour">Chuyến đi / Tour</option>
+              <option value="food">Ẩm thực 3 miền</option>
+              <option value="contact">Phản hồi Footer</option>
+            </select>
+            <button class="btn sm" id="cnt-rv-reset">🔄 Đặt lại</button>
+          </div>
+
+          <div id="cnt-reviews-table"></div>
+        </div>
+      `;
+
+      const aiBox = $("#ai-sentiment-box", el);
+
+      $("#btn-ai-sentiment", el).onclick = async () => {
+        const btn = $("#btn-ai-sentiment", el);
         const oldText = btn.innerHTML;
         btn.disabled = true;
         btn.innerHTML = "⏳ Đang phân tích...";
@@ -190,74 +239,188 @@
           $("#btn-close-ai-box", aiBox).onclick = () => { aiBox.style.display = "none"; };
           aiBox.scrollIntoView({ behavior: "smooth", block: "start" });
         } catch (err) {
-          alert("Lỗi khi phân tích: " + err.message);
+          Staff.toast("Lỗi khi phân tích AI: " + err.message, "bad");
         } finally {
           btn.disabled = false;
           btn.innerHTML = oldText;
         }
       };
-      function draw() {
-        const q = $("input", bar).value.toLowerCase(), f = $("#rf", bar).value;
-        const rows = list.filter(r => (!f || (f === "hidden") === !!r.hidden) && (!q || JSON.stringify([r.tourName, r.foodName, r.author, r.name, r.comment, r.content, r.text, r.title, (r.reply && r.reply.content) || ""]).toLowerCase().includes(q)));
-        body.innerHTML = table([
-          { t: "Mục", html: r => esc(r.tourName || r.foodName || r.tourId || "Chung") },
-          { t: "Tác giả", html: r => esc(r.author || r.name || "—") + (r.source === "verified" ? ` <span class="badge ok" style="font-size:0.75rem">Đã đi</span>` : (r.source === "member" ? ` <span class="badge info" style="font-size:0.75rem">Thành viên</span>` : "")) },
-          { t: "Sao", num: true, html: r => esc(r.rating) + " ★" },
-          {
-            t: "Nội dung & Phản hồi",
-            html: r => {
-              let h = `<div>${esc(r.comment || r.content || r.text || r.title || "")}</div>`;
-              if (r.reply && r.reply.content) {
-                h += `<div style="margin-top:6px;padding:6px 10px;background:#e0f2fe;border-left:3px solid #0284c7;border-radius:4px;font-size:0.85rem;color:#0369a1">
-                  <b>💬 Phản hồi (${esc(r.reply.byName || "Content")}):</b> ${esc(r.reply.content)}
-                </div>`;
-              }
-              if (r.hidden && r.hiddenInfo) {
-                h += `<div class="small" style="color:var(--bad)">Đã ẩn: ${esc(r.hiddenInfo.reason || "")}</div>`;
-              }
-              return h;
-            }
-          },
-          {
-            t: "Thao tác",
-            nowrap: true,
-            cls: "actions",
-            html: r => `
-              <div class="act-btns">
-                <button class="btn sm primary" data-rep="${esc(r.id)}" title="Trả lời / Phản hồi">${r.reply && r.reply.content ? "✏️ Sửa rep" : "💬 Rep"}</button>
-                ${r.reply && r.reply.content ? `<button class="btn sm" data-delrep="${esc(r.id)}" title="Xóa phản hồi">🗑️</button>` : ""}
-                ${r.hidden ? `<button class="btn sm" data-s="${esc(r.id)}">Hiện lại</button>` : `<button class="btn bad sm" data-h="${esc(r.id)}">Ẩn</button>`}
-              </div>
-            `
-          }
-        ], rows.slice(0, 300), { empty: "Không có đánh giá" });
 
-        $$("[data-rep]", body).forEach(b => b.onclick = async () => {
+      function draw() {
+        const q = ($("#cnt-rv-search", el).value || "").toLowerCase();
+        const unrepliedCount = list.filter(r => !r.reply || !r.reply.content).length;
+        const unrepEl = $("#cnt-unrep-count", el);
+        if (unrepEl) unrepEl.textContent = unrepliedCount;
+
+        $$("#cnt-status-seg button", el).forEach(b => b.classList.toggle("active", b.dataset.st === curStatus));
+
+        const filtered = list.filter(r => {
+          if (curStatus === "unreplied" && r.reply && r.reply.content) return false;
+          if (curStatus === "replied" && (!r.reply || !r.reply.content)) return false;
+          if (curStatus === "forwarded" && !r.forwardedTo) return false;
+          if (curStatus === "hidden" && !r.hidden) return false;
+
+          if (curCat && r.category !== curCat) return false;
+          if (curTarget) {
+            const tt = r.targetType || "tour";
+            if (tt !== curTarget) return false;
+          }
+          if (q) {
+            const str = JSON.stringify([r.tourName, r.foodName, r.name, r.author, r.comment, r.content, r.text, (r.reply && r.reply.content) || "", r.forwardedNote || ""]).toLowerCase();
+            if (!str.includes(q)) return false;
+          }
+          return true;
+        });
+
+        const tbl = $("#cnt-reviews-table", el);
+        tbl.innerHTML = table([
+          { t: "Mục & Phân loại", html: r => {
+            const catColors = { inquiry: "info", review: "ok", complaint: "bad", feedback: "warn" };
+            const catIcons = { inquiry: "❓ Hỏi thông tin", review: "⭐ Đánh giá", complaint: "⚠️ Khiếu nại", feedback: "💡 Góp ý" };
+            const targetBadge = r.targetType === "food" ? '<span class="badge info">Ẩm thực</span>' : (r.targetType === "contact" ? '<span class="badge warn">Footer Contact</span>' : '<span class="badge">Tour</span>');
+            return `
+              <div><b>${esc(r.tourName || r.foodName || (r.targetType === 'contact' ? 'Phản hồi khách hàng' : 'Tour du lịch'))}</b></div>
+              <div style="margin-top:3px;display:flex;gap:4px;flex-wrap:wrap">
+                ${targetBadge}
+                <span class="badge ${catColors[r.category] || 'ok'}">${esc(catIcons[r.category] || r.categoryName || '⭐ Đánh giá')}</span>
+              </div>
+            `;
+          } },
+          { t: "Khách gửi", html: r => {
+            const src = r.source === "verified" ? '<span class="badge ok" style="font-size:10px">Đã đi tour</span>' : (r.source === "member" ? '<span class="badge info" style="font-size:10px">Thành viên</span>' : '<span class="badge" style="font-size:10px">Khách vãng lai</span>');
+            return `
+              <b>${esc(r.name || r.author || "Khách hàng")}</b>
+              <div class="small muted">${src}</div>
+              <div class="small muted" style="font-size:11px">${dt(r.createdAt || r.date)}</div>
+            `;
+          } },
+          { t: "Đánh giá & Nội dung", html: r => {
+            const stars = r.rating > 0 ? `<b style="color:var(--amber)">${r.rating} ★</b> ` : "";
+            let repBlock = "";
+            if (r.reply && r.reply.content) {
+              repBlock = `
+                <div style="margin-top:6px;padding:8px 12px;background:#f0f9ff;border-left:3px solid #0284c7;border-radius:6px;font-size:13px;color:#0369a1">
+                  <b>💬 Phản hồi Travel:</b> ${esc(r.reply.content)}
+                </div>
+              `;
+            }
+            let fwdBlock = "";
+            if (r.forwardedTo) {
+              fwdBlock = `
+                <div style="margin-top:6px;padding:6px 10px;background:#fef3c7;border-left:3px solid #f59e0b;border-radius:6px;font-size:12px;color:#92400e">
+                  <b>🔄 Đã chuyển ${esc(r.forwardedToName || r.forwardedTo)}:</b> "${esc(r.forwardedNote || 'Vui lòng kiểm tra và hỗ trợ')}" <span class="muted">(${esc(r.forwardedByName || 'CSKH')})</span>
+                </div>
+              `;
+            }
+            let hideBlock = "";
+            if (r.hidden) {
+              hideBlock = `<div class="badge bad" style="margin-top:4px">👁️‍🗨️ Đã ẩn vi phạm: ${esc((r.hiddenInfo && r.hiddenInfo.reason) || 'Vi phạm tiêu chuẩn cộng đồng')}</div>`;
+            }
+            return `
+              <div>${stars}${esc(r.content || r.comment || r.text || "")}</div>
+              ${repBlock}
+              ${fwdBlock}
+              ${hideBlock}
+            `;
+          } },
+          { t: "Thao tác", nowrap: true, cls: "actions", html: r => `
+            <div class="act-btns" style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end">
+              <button class="btn sm primary" data-rep="${esc(r.id)}" title="Trả lời bình luận">${r.reply && r.reply.content ? "✏️ Sửa rep" : "💬 Trả lời"}</button>
+              <button class="btn sm" data-tag="${esc(r.id)}" title="Gắn phân loại: Hỏi tin / Đánh giá / Khiếu nại / Góp ý">🏷️ Loại</button>
+              <button class="btn sm" data-fwd="${esc(r.id)}" title="Chuyển vấn đề cho bộ phận Điều hành / Thu ngân / HDV">🔄 Chuyển</button>
+              ${r.hidden ? `<button class="btn sm ok" data-s="${esc(r.id)}" title="Hiện lại trên website">Hiện</button>` : `<button class="btn sm bad" data-h="${esc(r.id)}" title="Ẩn do vi phạm">Ẩn</button>`}
+            </div>
+          ` }
+        ], filtered, { empty: "Không tìm thấy bình luận nào phù hợp bộ lọc" });
+
+        $$("[data-rep]", tbl).forEach(b => b.onclick = async () => {
           const item = list.find(x => x.id === b.dataset.rep);
           const currentRep = (item && item.reply && item.reply.content) || "";
           const v = await ask(
-            `Phản hồi bình luận của ${item ? (item.name || item.author || "khách") : ""}`,
+            `Phản hồi công khai cho khách ${item ? (item.name || item.author || "") : ""}`,
             [
               { name: "reply", label: "Nội dung phản hồi (hiển thị công khai dưới bình luận của khách)", type: "textarea", value: currentRep, required: true }
             ],
-            { submit: "Gửi phản hồi" }
+            { submit: "Gửi phản hồi", kind: "ok" }
           );
           if (v && v.reply) {
-            act(b, () => post(`/api/content/reviews/${b.dataset.rep}/reply`, { reply: v.reply }), "Đã lưu phản hồi.", load);
+            act(b, () => post(`/api/content/reviews/${b.dataset.rep}/reply`, { reply: v.reply }), "Đã lưu phản hồi thành công.", reload);
           }
         });
 
-        $$("[data-delrep]", body).forEach(b => b.onclick = async () => {
-          if (await confirmBox("Xóa phản hồi", "Bạn có chắc muốn xóa câu trả lời cho bình luận này?", "bad")) {
-            act(b, () => post(`/api/content/reviews/${b.dataset.delrep}/reply`, { reply: "" }), "Đã xóa phản hồi.", load);
+        $$("[data-tag]", tbl).forEach(b => b.onclick = async () => {
+          const item = list.find(x => x.id === b.dataset.tag);
+          const v = await ask(`Gắn phân loại cho bình luận #${item?.id}`, [
+            { name: "category", label: "Chọn phân loại bình luận", type: "select", options: [
+              ["inquiry", "❓ Hỏi thông tin dịch vụ"],
+              ["review", "⭐ Đánh giá trải nghiệm"],
+              ["complaint", "⚠️ Khiếu nại dịch vụ"],
+              ["feedback", "💡 Góp ý / Đóng góp ý kiến"]
+            ], value: item?.category || "inquiry", required: true }
+          ], { submit: "Lưu phân loại", kind: "ok" });
+          if (v && v.category) {
+            act(b, () => post(`/api/content/reviews/${b.dataset.tag}/tag`, { category: v.category }), "Đã gắn phân loại bình luận.", reload);
           }
         });
 
-        $$("[data-h]", body).forEach(b => b.onclick = async () => { const v = await ask("Ẩn đánh giá", [{ name: "reason", label: "Lý do ẩn (vi phạm tiêu chuẩn cộng đồng)", type: "textarea", required: true }], { kind: "bad", submit: "Ẩn" }); if (v) act(null, () => post(`/api/content/reviews/${b.dataset.h}/moderate`, { hide: true, reason: v.reason }), "Đã ẩn.", load); });
-        $$("[data-s]", body).forEach(b => b.onclick = () => act(b, () => post(`/api/content/reviews/${b.dataset.s}/moderate`, { hide: false }), "Đã hiện lại.", load));
+        $$("[data-fwd]", tbl).forEach(b => b.onclick = async () => {
+          const item = list.find(x => x.id === b.dataset.fwd);
+          const v = await ask(`Chuyển vấn đề bình luận cho phòng ban khác`, [
+            { name: "to", label: "Chuyển tới bộ phận", type: "select", options: [
+              ["operator", "🧭 Điều hành tour (Kiểm tra lịch, chỗ, xe)"],
+              ["cashier", "🧾 Thu ngân / Kế toán (Kiểm tra tiền, hoàn tiền)"],
+              ["guide", "🧑‍✈️ Hướng dẫn viên (Xác minh sự cố trên tour)"],
+              ["tech", "💻 Kỹ thuật / Hệ thống (Lỗi web, voucher, đăng nhập)"]
+            ], required: true },
+            { name: "note", label: "Ghi chú giao việc / Yêu cầu hỗ trợ", type: "textarea", placeholder: "Ví dụ: Khách hỏi chính sách dời tour, nhờ Điều hành kiểm tra chỗ..." }
+          ], { submit: "Chuyển vấn đề", kind: "ok" });
+          if (v && v.to) {
+            act(b, () => post(`/api/content/reviews/${b.dataset.fwd}/forward`, { to: v.to, note: v.note }), "Đã chuyển vấn đề thành công.", reload);
+          }
+        });
+
+        $$("[data-h]", tbl).forEach(b => b.onclick = async () => {
+          const v = await ask("Ẩn bình luận vi phạm", [
+            { name: "reason", label: "Lý do ẩn (bắt buộc ghi rõ)", type: "textarea", required: true, placeholder: "VD: Chứa từ ngữ thô tục, quảng cáo rác..." }
+          ], { kind: "bad", submit: "Xác nhận ẩn" });
+          if (v && v.reason) {
+            act(null, () => post(`/api/content/reviews/${b.dataset.h}/moderate`, { hide: true, reason: v.reason }), "Đã ẩn bình luận vi phạm.", reload);
+          }
+        });
+
+        $$("[data-s]", tbl).forEach(b => b.onclick = () => {
+          act(b, () => post(`/api/content/reviews/${b.dataset.s}/moderate`, { hide: false }), "Đã hiện lại bình luận.", reload);
+        });
       }
-      async function load() { list = (await get("/api/content/reviews")).reviews; draw(); }
-      await load();
+
+      async function reload() {
+        const res = await get("/api/content/reviews");
+        list = res.reviews || [];
+        draw();
+      }
+
+      $$("#cnt-status-seg button", el).forEach(btn => btn.onclick = () => {
+        curStatus = btn.dataset.st;
+        draw();
+      });
+
+      $("#cnt-rv-search", el).oninput = () => {
+        clearTimeout(window.__cnt_rv_t);
+        window.__cnt_rv_t = setTimeout(draw, 250);
+      };
+      $("#cnt-rv-cat", el).onchange = e => { curCat = e.target.value; draw(); };
+      $("#cnt-rv-target", el).onchange = e => { curTarget = e.target.value; draw(); };
+      $("#cnt-rv-reset", el).onclick = () => {
+        curStatus = "unreplied";
+        curCat = "";
+        curTarget = "";
+        $("#cnt-rv-search", el).value = "";
+        $("#cnt-rv-cat", el).value = "";
+        $("#cnt-rv-target", el).value = "";
+        draw();
+      };
+
+      await reload();
     } },
     { id: "customer-notis", label: "Thông báo khách", icon: "📢", perm: "notification:customer_send", async render(el) {
       el.innerHTML = `

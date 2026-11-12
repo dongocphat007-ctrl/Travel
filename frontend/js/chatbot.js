@@ -634,9 +634,9 @@ ${userSection}`;
         .tc-chat-close:hover{background:rgba(255,255,255,.15)}
         .tc-mode-badge{border-bottom:1px solid #e0e7ff;padding:5px 14px;font-size:.72rem;font-weight:600;display:flex;align-items:center;gap:5px}
         #tc-messages{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px}
-        .tc-msg{display:flex}.tc-msg.user{justify-content:flex-end}
-        .tc-bubble{max-width:82%;padding:9px 13px;border-radius:12px;font-size:.875rem;line-height:1.6;white-space:pre-wrap}
-        .tc-msg.ai .tc-bubble{background:#f1f5f9;color:#1e293b;border-bottom-left-radius:4px}
+        .tc-msg{display:flex}.tc-msg.user{justify-content:flex-end}.tc-msg.ai{flex-direction:column;align-items:flex-start}
+        .tc-bubble{max-width:85%;padding:9px 13px;border-radius:12px;font-size:.875rem;line-height:1.6;white-space:pre-wrap;box-sizing:border-box}
+        .tc-msg.ai .tc-bubble{background:#f1f5f9;color:#1e293b;border-bottom-left-radius:4px;width:fit-content}
         .tc-msg.user .tc-bubble{background:#1a73e8;color:#fff;border-bottom-right-radius:4px}
         .tc-msg.has-tours{flex-direction:column;align-items:flex-start;gap:8px}
         .tc-tours{display:flex;flex-direction:column;gap:6px;width:92%}
@@ -667,7 +667,7 @@ ${userSection}`;
         #tc-fab{position:fixed;bottom:24px;right:24px;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#1a73e8,#0d47a1);border:none;color:#fff;font-size:1.5rem;cursor:pointer;z-index:8889;box-shadow:0 4px 20px rgba(26,115,232,.4);display:flex;align-items:center;justify-content:center;transition:transform .2s,box-shadow .2s}
         #tc-fab:hover{transform:scale(1.08);box-shadow:0 6px 28px rgba(26,115,232,.55)}
         #tc-fab-badge{position:absolute;top:-2px;right:-2px;width:18px;height:18px;background:#ef4444;border-radius:50%;font-size:.65rem;font-weight:700;display:none;align-items:center;justify-content:center;color:#fff}
-        .tc-msg-actions{display:flex;gap:6px;margin-top:4px;margin-left:4px;align-items:center;flex-wrap:wrap}
+        .tc-msg-actions{display:flex;gap:6px;margin-top:6px;margin-left:2px;align-items:center;flex-wrap:wrap;width:100%}
         .tc-fb-btn{background:#f1f5f9;border:1px solid #cbd5e1;cursor:pointer;font-size:.74rem;padding:3px 8px;border-radius:12px;color:#475569;transition:all .15s;line-height:1.2;display:inline-flex;align-items:center;gap:3px}
         .tc-fb-btn:hover:not(:disabled){opacity:1;background:#e2e8f0;border-color:#94a3b8;color:#0f172a}
         .tc-fb-btn.active{opacity:1;background:#dbeafe;border-color:#3b82f6;color:#1d4ed8;font-weight:700}

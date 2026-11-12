@@ -12,11 +12,35 @@
         <div class="profile-info">
           <div class="profile-name-row">
             <span class="profile-name" id="pf-name-display"></span>
-            <button class="pf-edit-inline-btn" id="pf-edit-btn">✏️ Sửa tên</button>
+            <button class="pf-edit-inline-btn" id="pf-edit-btn">✏️ Sửa thông tin</button>
           </div>
           <div class="profile-detail-row">
             <span class="profile-detail-icon">📧</span>
             <span id="pf-email"></span>
+          </div>
+          <div class="profile-detail-row" id="pf-phone-row">
+            <span class="profile-detail-icon">📱</span>
+            <span id="pf-phone">Chưa có số điện thoại</span>
+          </div>
+          <div class="profile-detail-row" id="pf-gmail-row">
+            <span class="profile-detail-icon">📬</span>
+            <span id="pf-gmail">Chưa có Gmail liên hệ</span>
+          </div>
+          <div class="profile-detail-row" id="pf-facebook-row">
+            <span class="profile-detail-icon">🌐</span>
+            <span id="pf-facebook">Chưa liên kết Facebook</span>
+          </div>
+          <div class="profile-detail-row" id="pf-degrees-row">
+            <span class="profile-detail-icon">🎓</span>
+            <span id="pf-degrees">Chưa cập nhật bằng cấp / chứng chỉ</span>
+          </div>
+          <div class="profile-detail-row" id="pf-idcard-row">
+            <span class="profile-detail-icon">🪪</span>
+            <span id="pf-idcard">Chưa cập nhật CCCD/CMND</span>
+          </div>
+          <div class="profile-detail-row" id="pf-address-row">
+            <span class="profile-detail-icon">📍</span>
+            <span id="pf-address">Chưa cập nhật địa chỉ</span>
           </div>
           <div class="profile-detail-row" id="pf-provider-row">
             <span class="profile-detail-icon">🔐</span>
@@ -41,13 +65,41 @@
           </div>
         </div>
       </div>
-      <div class="profile-edit-form" id="pf-edit-form" style="display:none">
-        <div class="form-group">
-          <label class="form-label" for="pf-name-input">Tên hiển thị mới</label>
-          <input type="text" id="pf-name-input" class="form-input" placeholder="Nhập tên của bạn">
-          <div class="form-err" id="err-pf-name"></div>
+      <div class="profile-edit-form" id="pf-edit-form" style="display:none;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:20px;margin-bottom:20px">
+        <h4 style="margin:0 0 16px;font-size:1.1rem;color:#0f172a">✏️ Chỉnh sửa thông tin cá nhân</h4>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));gap:12px">
+          <div class="form-group">
+            <label class="form-label" for="pf-name-input">Họ và tên *</label>
+            <input type="text" id="pf-name-input" class="form-input" placeholder="Nhập họ tên của bạn">
+            <div class="form-err" id="err-pf-name"></div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="pf-phone-input">Số điện thoại</label>
+            <input type="text" id="pf-phone-input" class="form-input" placeholder="0912345678">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="pf-gmail-input">Gmail liên hệ</label>
+            <input type="email" id="pf-gmail-input" class="form-input" placeholder="tenban@gmail.com">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="pf-facebook-input">Trang cá nhân Facebook</label>
+            <input type="text" id="pf-facebook-input" class="form-input" placeholder="https://facebook.com/username">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="pf-idcard-input">Số CCCD / CMND</label>
+            <input type="text" id="pf-idcard-input" class="form-input" placeholder="12 chữ số CCCD">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="pf-address-input">Địa chỉ</label>
+            <input type="text" id="pf-address-input" class="form-input" placeholder="Quận/Huyện, Tỉnh/TP">
+          </div>
         </div>
-        <div style="display:flex;gap:10px;margin-top:12px">
+        <div class="form-group" style="margin-top:12px">
+          <label class="form-label" for="pf-degrees-input">Bằng cấp & Chứng chỉ chuyên môn</label>
+          <input type="text" id="pf-degrees-input" class="form-input" placeholder="Ví dụ: Cử nhân Du lịch, TOEIC 750, Thẻ HDV...">
+          <div class="form-hint" style="font-size:0.8rem;color:#64748b;margin-top:4px">Phân tách nhiều bằng cấp / chứng chỉ bằng dấu phẩy.</div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:16px">
           <button class="btn btn-accent" id="pf-save-btn">💾 Lưu thay đổi</button>
           <button class="btn btn-ghost" id="pf-cancel-btn">Hủy</button>
         </div>

@@ -59,13 +59,22 @@
     }
     destroy();
     el.innerHTML = "";
+    if (el._leaflet_id) {
+      try { delete el._leaflet_id; } catch (e) { el._leaflet_id = undefined; }
+    }
     var map = L.map(el, { center: [p.lat, p.lng], zoom: z, zoomControl: true, scrollWheelZoom: false });   // tắt zoom bằng cuộn để khỏi vướng cuộn modal
     mapTiles.createLayer(L).addTo(map);
     var icon = L.divIcon({ html: '<span style="font-size:28px;line-height:1;filter:drop-shadow(0 2px 3px rgba(0,0,0,.5))">📍</span>', className: "tlm-pin", iconSize: [28, 34], iconAnchor: [14, 32], popupAnchor: [0, -30] });
     var marker = L.marker([p.lat, p.lng], { icon: icon }).addTo(map).bindPopup(popup);
     inst = { el: el, map: map, marker: marker };
     // Modal vừa hiện / đang cuộn: Leaflet cần tính lại kích thước để không bị xám/lệch
-    if (typeof setTimeout === "function") setTimeout(function () { if (inst && inst.map === map) { try { map.invalidateSize(); } catch (e) {} } }, 250);
+    if (typeof setTimeout === "function") {
+      [80, 200, 500].forEach(function (ms) {
+        setTimeout(function () {
+          if (inst && inst.map === map) { try { map.invalidateSize(); } catch (e) {} }
+        }, ms);
+      });
+    }
     return { ok: true, moved: false };
   }
 

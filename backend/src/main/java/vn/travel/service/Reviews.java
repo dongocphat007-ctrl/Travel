@@ -63,18 +63,17 @@ public class Reviews {
         for (Map<String, Object> r : all) {
             Map<String, Object> c = new LinkedHashMap<>();
             for (String k : List.of("id", "tourId", "tourName", "targetType", "foodName", "rating", "content", "comment", "text", "title", "author", "name",
-                    "createdAt", "guideId", "bookingId", "guideRating", "guideComment", "filtered", "reply", "source", "sample", "images", "replies", "kind"))
+                    "createdAt", "guideId", "bookingId", "guideRating", "guideComment", "filtered", "reply", "source", "sample", "images", "replies", "kind",
+                    "category", "categoryName", "forwardedTo", "forwardedToName", "forwardedNote", "forwardedBy", "forwardedByName", "forwardedAt", "handledBy", "handledRole"))
                 if (r.containsKey(k))
                     c.put(k, r.get(k));
             if (!c.containsKey("comment") && c.containsKey("content")) c.put("comment", c.get("content"));
             if (!c.containsKey("content") && c.containsKey("comment")) c.put("content", c.get("comment"));
-            // Ẩn danh tính và vai trò nhân viên trả lời, công khai luôn hiển thị là Travel
+            // Giữ thông tin nhân sự nội bộ đã xử lý (reply) để Admin / CSKH kiểm soát
             if (c.get("reply") instanceof Map<?, ?> repMap) {
-                Map<String, Object> safeRep = new LinkedHashMap<>((Map<String, Object>) repMap);
-                safeRep.put("byName", "Travel");
-                safeRep.remove("byRole");
-                safeRep.remove("by");
-                c.put("reply", safeRep);
+                if (repMap.containsKey("byName")) c.put("handledBy", repMap.get("byName"));
+                if (repMap.containsKey("byRole")) c.put("handledRole", repMap.get("byRole"));
+                if (repMap.containsKey("at")) c.put("handledAt", repMap.get("at"));
             }
             Object h = hidden == null ? null : hidden.get(Maps.str(r, "id"));
             c.put("hidden", h != null);
@@ -384,30 +383,129 @@ public class Reviews {
         return Maps.of("ok", true, "id", reviewId, "reply", updated[0] != null ? updated[0].get("reply") : null);
     }
 
+    /** Gắn loại bình luận (Hỏi thông tin, Đánh giá, Khiếu nại, Góp ý) */
+    public Map<String, Object> tagReview(Actor by, String reviewId, String category) {
+        String catName = switch (category != null ? category.toLowerCase() : "") {
+            case "inquiry" -> "Hỏi thông tin";
+            case "complaint" -> "Khiếu nại";
+            case "feedback" -> "Góp ý";
+            default -> "Đánh giá";
+        };
+        final boolean[] found = {false};
+        db.edit("reviews", all -> {
+            for (Map<String, Object> r : all) {
+                if (reviewId.equals(Maps.str(r, "id"))) {
+                    r.put("category", category);
+                    r.put("categoryName", catName);
+                    r.put("taggedBy", by.name());
+                    r.put("taggedAt", Times.iso(clock.millis()));
+                    found[0] = true;
+                    break;
+                }
+            }
+        });
+        if (!found[0]) {
+            for (Object o : Maps.list(data.obj("reviews-seed.json").get("reviews"))) {
+                Map<String, Object> seed = Maps.map(o);
+                if (seed != null && reviewId.equals(Maps.str(seed, "id"))) {
+                    Map<String, Object> copy = new LinkedHashMap<>(seed);
+                    copy.put("category", category);
+                    copy.put("categoryName", catName);
+                    copy.put("taggedBy", by.name());
+                    copy.put("taggedAt", Times.iso(clock.millis()));
+                    db.edit("reviews", all -> all.add(copy));
+                    found[0] = true;
+                    break;
+                }
+            }
+        }
+        if (!found[0]) throw HttpError.notFound("Không tìm thấy đánh giá: " + reviewId);
+        return Maps.of("ok", true, "id", reviewId, "category", category, "categoryName", catName);
+    }
+
+    /** Chuyển vấn đề cho bộ phận khác (Điều hành, Thu ngân, HDV, Kỹ thuật) */
+    public Map<String, Object> forwardReview(Actor by, String reviewId, String toRole, String note) {
+        String roleName = switch (toRole != null ? toRole.toLowerCase() : "") {
+            case "operator" -> "Điều hành tour";
+            case "cashier" -> "Thu ngân / Kế toán";
+            case "guide" -> "Hướng dẫn viên";
+            case "tech" -> "Bộ phận Kỹ thuật";
+            default -> "Bộ phận liên quan";
+        };
+        final boolean[] found = {false};
+        db.edit("reviews", all -> {
+            for (Map<String, Object> r : all) {
+                if (reviewId.equals(Maps.str(r, "id"))) {
+                    r.put("forwardedTo", toRole);
+                    r.put("forwardedToName", roleName);
+                    r.put("forwardedNote", note != null ? note.trim() : "");
+                    r.put("forwardedBy", by.id());
+                    r.put("forwardedByName", by.name());
+                    r.put("forwardedAt", Times.iso(clock.millis()));
+                    found[0] = true;
+                    break;
+                }
+            }
+        });
+        if (!found[0]) {
+            for (Object o : Maps.list(data.obj("reviews-seed.json").get("reviews"))) {
+                Map<String, Object> seed = Maps.map(o);
+                if (seed != null && reviewId.equals(Maps.str(seed, "id"))) {
+                    Map<String, Object> copy = new LinkedHashMap<>(seed);
+                    copy.put("forwardedTo", toRole);
+                    copy.put("forwardedToName", roleName);
+                    copy.put("forwardedNote", note != null ? note.trim() : "");
+                    copy.put("forwardedBy", by.id());
+                    copy.put("forwardedByName", by.name());
+                    copy.put("forwardedAt", Times.iso(clock.millis()));
+                    db.edit("reviews", all -> all.add(copy));
+                    found[0] = true;
+                    break;
+                }
+            }
+        }
+        if (!found[0]) throw HttpError.notFound("Không tìm thấy đánh giá: " + reviewId);
+        return Maps.of("ok", true, "id", reviewId, "forwardedTo", toRole, "forwardedToName", roleName);
+    }
+
+    /** Xóa vĩnh viễn đánh giá / bình luận (Chỉ Admin) */
+    public Map<String, Object> deleteReview(Actor by, String reviewId) {
+        db.edit("reviews", all -> all.removeIf(r -> reviewId.equals(Maps.str(r, "id"))));
+        db.editObj("reviewmod", m -> {
+            if (m.get("hidden") instanceof Map<?, ?> h) {
+                Map<String, Object> hMap = new LinkedHashMap<>((Map<String, Object>) h);
+                hMap.remove(reviewId);
+                m.put("hidden", hMap);
+            }
+        });
+        return Maps.of("ok", true, "id", reviewId, "deleted", true);
+    }
+
     /**
-     * Khách hàng đăng nhập có thể gửi bình luận, hỏi đáp và đánh giá (cho Tour hoặc Ẩm thực 3 miền).
+     * Khách hàng đăng nhập hoặc khách vãng lai gửi bình luận, hỏi đáp, đánh giá và phản hồi liên hệ.
      */
     public Map<String, Object> addComment(Map<String, Object> user, Map<String, Object> in) {
         String tourId = Maps.str(in, "tourId");
         String targetType = Maps.str(in, "targetType");
         if (targetType.isEmpty()) targetType = "tour";
-        if (!Set.of("tour", "food").contains(targetType)) throw HttpError.bad("Loại bài viết không hợp lệ", "targetType");
+        if (!Set.of("tour", "food", "contact", "feedback").contains(targetType)) throw HttpError.bad("Loại bài viết không hợp lệ", "targetType");
 
         String content = Maps.str(in, "content").trim();
         if (content.isEmpty()) content = Maps.str(in, "text").trim();
         if (content.isEmpty()) content = Maps.str(in, "comment").trim();
+        if (content.isEmpty()) content = Maps.str(in, "message").trim();
         if (content.length() < 3) throw HttpError.bad("Nội dung bình luận ít nhất 3 ký tự");
-        if (content.length() > 1000) throw HttpError.bad("Nội dung bình luận tối đa 1000 ký tự");
+        if (content.length() > 2000) throw HttpError.bad("Nội dung bình luận tối đa 2000 ký tự");
 
         int rating = ReviewSchema.toRating(in.get("rating"));
         if ("food".equals(targetType) && in.get("rating") != null && rating < 1)
             throw HttpError.bad("Điểm đánh giá phải là số nguyên từ 1 đến 5 sao", "rating");
-        List<String> attached = reviewImages(user, in.get("images"));
+        List<String> attached = user != null ? reviewImages(user, in.get("images")) : List.of();
 
-        boolean admin = accounts.isAdmin(user);
-        String uid = Maps.str(user, "id");
-        String uName = Maps.str(user, "name");
-        if (uName.isEmpty()) uName = "Thành viên";
+        boolean admin = user != null && accounts.isAdmin(user);
+        String uid = user != null ? Maps.str(user, "id") : "guest_" + System.currentTimeMillis();
+        String uName = user != null ? Maps.str(user, "name") : Maps.str(in, "name");
+        if (uName.isEmpty()) uName = "Khách hàng";
 
         Map<String, Object> r = new LinkedHashMap<>();
         r.put("id", Ids.newId("rv"));
@@ -417,11 +515,14 @@ public class Reviews {
         if (in.containsKey("tourName")) r.put("tourName", Maps.str(in, "tourName"));
         r.put("userId", uid);
         r.put("name", uName);
+        if (in.containsKey("email")) r.put("email", Maps.str(in, "email"));
+        if (in.containsKey("phone")) r.put("phone", Maps.str(in, "phone"));
+        if (in.containsKey("category")) r.put("category", Maps.str(in, "category"));
         r.put("content", maskBad(content));
-        r.put("kind", "comment");
-        if ("food".equals(targetType) && rating > 0) r.put("rating", rating);
+        r.put("kind", "contact".equals(targetType) ? "feedback" : "comment");
+        if (!"tour".equals(targetType) && rating > 0) r.put("rating", rating);
         if (!attached.isEmpty()) r.put("images", attached);
-        r.put("source", admin ? "admin" : "member");
+        r.put("source", admin ? "admin" : (user != null ? "member" : "guest"));
         r.put("createdAt", Times.iso(clock.millis()));
 
         db.edit("reviews", all -> all.add(r));

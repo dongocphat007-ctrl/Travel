@@ -564,11 +564,11 @@ const TourPage = (() => {
     } catch (e) {
       /* không có server */
     }
-    const isLogged = window.Auth && Auth.currentUser && Auth.currentUser();
-    if (!isLogged && (!el || !el.eligible)) {
+    const isLogged = !!(window.Auth && (typeof Auth.currentUser === "function" ? Auth.currentUser() : (typeof Auth.getUser === "function" ? Auth.getUser() : null)));
+    if (!isLogged) {
       fb.innerHTML = '<div class="rv-login-prompt" style="padding:18px 20px;background:var(--card-subtle,#f8f9fa);border:1px dashed var(--border,#cbd5e1);border-radius:12px;text-align:center;margin-top:20px">' +
         '<p style="margin-bottom:12px;color:var(--text);font-size:0.95rem">Bạn cần <b>đăng nhập</b> để gửi đánh giá hoặc bình luận, đặt câu hỏi về tour này.</p>' +
-        '<button type="button" class="btn primary sm" onclick="window.Auth && Auth.openLoginModal ? Auth.openLoginModal() : (window.location.href=\'#/login\')">Đăng nhập để bình luận</button>' +
+        '<button type="button" class="btn primary sm" onclick="typeof showLoginModal === \'function\' ? showLoginModal() : (window.Auth && Auth.openLoginModal ? Auth.openLoginModal() : (window.location.href=\'#/login\'))">Đăng nhập để bình luận</button>' +
         '</div>';
       return;
     }
@@ -661,10 +661,27 @@ const TourPage = (() => {
       count = document.getElementById("rv-count");
     if (!isEligibleVerified) {
       pick.hidden = true;
+      const titleEl = fb.querySelector(".rv-form > b");
+      if (titleEl) {
+        titleEl.textContent = "Hỏi đáp & Bình luận về tour";
+        const tipEl = document.createElement("span");
+        tipEl.style.cssText = "display:block;font-size:0.85rem;color:var(--muted,#64748b);margin:4px 0 10px;font-weight:normal";
+        tipEl.textContent = "💡 Bạn chưa hoàn thành chuyến đi này nên có thể gửi bình luận hoặc câu hỏi giao lưu. Chức năng đánh giá sao chỉ mở sau khi bạn hoàn thành tour.";
+        titleEl.after(tipEl);
+      }
       fb.querySelector(".rv-crit-box").hidden = true;
       document.getElementById("rv-guide").closest(".rv-crit-row").hidden = true;
       area.placeholder = "Viết bình luận hoặc câu hỏi về tour (ít nhất 3 ký tự)";
       document.getElementById("rv-send").textContent = "Gửi bình luận";
+    } else {
+      const titleEl = fb.querySelector(".rv-form > b");
+      if (titleEl) {
+        titleEl.textContent = "Chia sẻ trải nghiệm của bạn (Đánh giá sau chuyến đi)";
+        const tipEl = document.createElement("span");
+        tipEl.style.cssText = "display:block;font-size:0.85rem;color:#16a34a;margin:4px 0 10px;font-weight:normal";
+        tipEl.textContent = "✔ Bạn đã hoàn thành tour này. Hãy chấm điểm sao và chia sẻ trải nghiệm thực tế nhé!";
+        titleEl.after(tipEl);
+      }
     }
     const paintStars = (hover) => {
       const upto = hover || rating;
@@ -784,16 +801,16 @@ const TourPage = (() => {
           errEl.textContent =
             (r.data && r.data.msg) || "Không gửi được đánh giá";
           btn.disabled = false;
-          btn.textContent = "Gửi đánh giá";
+          btn.textContent = isEligibleVerified ? "Gửi đánh giá" : "Gửi bình luận";
           return;
         }
-        showToast("Cảm ơn bạn đã đánh giá tour!", "success");
+        showToast(isEligibleVerified ? "Cảm ơn bạn đã đánh giá tour!" : "Cảm ơn bạn đã gửi bình luận hỏi thăm về tour!", "success");
         loadReviews(t);
         document.dispatchEvent(new CustomEvent("travel:bookings")); // cập nhật bảng xếp hạng
       } catch (e) {
-        errEl.textContent = "Không gửi được đánh giá (không có máy chủ)";
+        errEl.textContent = isEligibleVerified ? "Không gửi được đánh giá (không có máy chủ)" : "Không gửi được bình luận (không có máy chủ)";
         btn.disabled = false;
-        btn.textContent = "Gửi đánh giá";
+        btn.textContent = isEligibleVerified ? "Gửi đánh giá" : "Gửi bình luận";
       }
     };
   }
@@ -1133,6 +1150,7 @@ const TourPage = (() => {
 
   // Quay lại: nếu vào từ giao diện thì lùi lịch sử; nếu mở link trực tiếp thì về trang chủ
   function goBack(forceHome) {
+    if (window.TourLocationMap) TourLocationMap.destroy();
     if (fromApp && !forceHome && history.length > 1) {
       history.back();
       return;

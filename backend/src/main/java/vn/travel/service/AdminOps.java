@@ -81,6 +81,71 @@ public class AdminOps {
         return core.view(out, Role.ADMIN);
     }
 
+    /** Nạp danh sách đơn hàng từ tệp Excel/CSV cho Quản trị viên (Admin). */
+    public Map<String, Object> importBookings(Actor admin, List<?> items) {
+        if (items == null || items.isEmpty()) throw HttpError.bad("Không có dữ liệu đơn hàng để nhập", "items");
+        List<Map<String, Object>> created = new ArrayList<>();
+        core.db.edit("bookings", all -> {
+            for (Object o : items) {
+                Map<String, Object> row = Maps.map(o);
+                if (row == null) continue;
+                String id = Maps.str(row, "id");
+                if (id.isEmpty()) id = "bk_" + vn.travel.util.Ids.hex(5);
+                String payCode = Maps.str(row, "payCode");
+                if (payCode.isEmpty()) payCode = "TRAVEL-IMP" + (System.currentTimeMillis() % 1000000);
+                long price = Maps.lng(row, "price");
+                if (price <= 0) price = 3_000_000L;
+                long paidAmount = Maps.lng(row, "paidAmount");
+                long pax = Math.max(1, Maps.lng(row, "pax"));
+                String date = Maps.str(row, "date");
+                if (date.isEmpty()) date = core.today().plusDays(7).toString();
+                String status = Maps.str(row, "status");
+                if (status.isEmpty()) {
+                    status = (paidAmount >= price) ? Flow.CONFIRMED : (paidAmount > 0 ? Flow.PAID_DEPOSIT : Flow.PENDING_PAYMENT);
+                }
+                Map<String, Object> b = new LinkedHashMap<>();
+                b.put("id", id);
+                b.put("payCode", payCode);
+                b.put("tourId", row.get("tourId") != null ? Maps.str(row, "tourId") : "101");
+                b.put("tourName", row.get("tourName") != null ? Maps.str(row, "tourName") : "Tour du lịch trải nghiệm");
+                b.put("customerName", row.get("customerName") != null ? Maps.str(row, "customerName") : "Khách nhập file");
+                b.put("phone", Maps.str(row, "phone"));
+                b.put("email", Maps.str(row, "email"));
+                b.put("date", date);
+                b.put("pax", pax);
+                b.put("price", price);
+                b.put("deposit", Math.round(price * 0.20));
+                b.put("status", status);
+                b.put("createdAt", Times.iso(core.now()));
+                b.put("statusAt", Times.iso(core.now()));
+                if (Flow.CONFIRMED.equals(status)) {
+                    b.put("confirmedAt", Times.iso(core.now()));
+                    b.put("confirmedBy", admin.id());
+                    b.put("confirmedByName", admin.name());
+                }
+                List<Map<String, Object>> payments = new ArrayList<>();
+                if (paidAmount > 0) {
+                    Map<String, Object> p = Maps.of(
+                            "id", "pay_imp_" + vn.travel.util.Ids.hex(4),
+                            "amount", paidAmount,
+                            "kind", paidAmount >= price ? "full" : "deposit",
+                            "at", Times.iso(core.now()),
+                            "byName", admin.name(),
+                            "note", "Nhập từ file đơn hàng"
+                    );
+                    payments.add(p);
+                    if (paidAmount >= price) b.put("fullPaid", true);
+                    else b.put("depositPaid", true);
+                }
+                b.put("payments", payments);
+                all.add(b);
+                created.add(b);
+            }
+        });
+        core.audit.log(admin.id(), admin.name(), admin.role(), "booking.import", "Nạp file", created.size() + " đơn");
+        return Maps.of("ok", true, "importedCount", created.size(), "bookings", created);
+    }
+
     /**
      * Hủy đơn: chưa có tiền → cancelled; đã có tiền → refund_pending + hồ sơ hoàn tiền (gọi TRONG khóa sửa đơn).
      * pct = % số tiền đã nhận được hoàn.

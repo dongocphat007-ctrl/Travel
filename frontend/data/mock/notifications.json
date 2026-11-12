@@ -1,0 +1,48 @@
+[
+  {
+    "id": "noti_001",
+    "userId": "ad001",
+    "title": "Báo cáo doanh thu tháng 10/2026 đã sẵn sàng",
+    "body": "Toàn bộ số liệu đối soát doanh thu và quỹ lương tháng 10/2026 đã được cập nhật.",
+    "type": "system",
+    "read": false,
+    "createdAt": "2026-11-09T09:00:00.000Z"
+  },
+  {
+    "id": "noti_002",
+    "userId": "tn001",
+    "title": "Có yêu cầu hoàn tiền mới cần xử lý",
+    "body": "Đơn TV1054 đã được Quản trị viên duyệt hoàn tiền.",
+    "type": "refund",
+    "read": false,
+    "createdAt": "2026-11-09T09:00:00.000Z"
+  },
+  {
+    "id": "noti_003",
+    "userId": "dh001",
+    "title": "Đề xuất hủy tour đang chờ phản hồi",
+    "body": "Tour Huế ngày 16/11 đã gửi cho Quản trị viên duyệt hủy chuyến.",
+    "type": "operator",
+    "read": true,
+    "createdAt": "2026-11-08T09:00:00.000Z"
+  },
+  {
+    "id": "noti_004",
+    "userId": "cs001",
+    "title": "Khiếu nại mới từ khách hàng",
+    "body": "Khách hàng Trần Thị Bích gửi phản ánh về phòng khách sạn tour Đà Nẵng.",
+    "type": "support",
+    "read": false,
+    "createdAt": "2026-11-09T09:00:00.000Z"
+  },
+  {
+    "id": "noti_005",
+    "userId": "hdv001",
+    "title": "Bạn đã được phân công dẫn tour",
+    "date": "2026-11-11",
+    "body": "Tour Đà Nẵng – Hội An 4N3Đ xuất phát ngày mai.",
+    "type": "guide",
+    "read": false,
+    "createdAt": "2026-11-10T08:00:00.000Z"
+  }
+]

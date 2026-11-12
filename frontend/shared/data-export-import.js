@@ -34,26 +34,47 @@
   }
 
   // ═══════════════════════════════════════════════════════════════════
-  // 1. XUẤT EXCEL (.xls – Excel XML Spreadsheet 2003 chuẩn UTF-8)
+  // 1. XUẤT EXCEL (.xls – Excel XML Spreadsheet chuẩn UTF-8, tự động co giãn cột và hàng theo chữ)
   // ═══════════════════════════════════════════════════════════════════
   function exportExcel({ filename = "du-lieu.xls", sheetName = "Dữ liệu", title = "", headers = [], rows = [], summary = [] }) {
     if (!filename.endsWith(".xls") && !filename.endsWith(".xlsx")) filename += ".xls";
+
+    // 1. Tính toán độ rộng từng cột (Column Width) tự động theo độ dài nội dung chữ
+    const colWidths = (headers || []).map((h, colIdx) => {
+      const hText = typeof h === "object" ? h.title || h.name || "" : String(h || "");
+      let maxLen = hText.length;
+      (rows || []).forEach(r => {
+        const cells = Array.isArray(r) ? r : headers.map(hd => {
+          const k = typeof hd === "object" ? hd.key || hd.name : hd;
+          return r[k];
+        });
+        const val = cells[colIdx];
+        if (val != null) {
+          const str = String(val);
+          str.split(/\r?\n/).forEach(l => { maxLen = Math.max(maxLen, l.length); });
+        }
+      });
+      // Hệ số ~7.5pt/ký tự cho tiếng Việt có dấu; tối thiểu 65pt, tối đa 320pt để văn bản dài tự xuống dòng
+      return Math.min(Math.max(Math.round(maxLen * 7.5 + 26), 65), 320);
+    });
+
+    const columnsXml = colWidths.map((w, idx) => `<Column ss:Index="${idx + 1}" ss:Width="${w}" ss:AutoFitWidth="1"/>`).join("\n   ");
 
     let rowsXml = "";
 
     // Tiêu đề bảng nếu có
     if (title) {
-      rowsXml += `<Row ss:Height="28">
+      rowsXml += `<Row ss:Height="30" ss:AutoFitHeight="1">
         <Cell ss:MergeAcross="${Math.max(headers.length - 1, 0)}" ss:StyleID="Title">
           <Data ss:Type="String">${esc(title)}</Data>
         </Cell>
       </Row>`;
-      rowsXml += `<Row ss:Height="18">
+      rowsXml += `<Row ss:Height="20" ss:AutoFitHeight="1">
         <Cell ss:MergeAcross="${Math.max(headers.length - 1, 0)}" ss:StyleID="SubTitle">
           <Data ss:Type="String">Đơn vị: ${esc(COMPANY.title)} | Ngày xuất: ${esc(nowStr())}</Data>
         </Cell>
       </Row>`;
-      rowsXml += `<Row ss:Height="10"></Row>`;
+      rowsXml += `<Row ss:Height="8"></Row>`;
     }
 
     // Tóm tắt / Metadata nếu có
@@ -69,22 +90,47 @@
 
     // Tiêu đề cột
     if (headers && headers.length) {
-      rowsXml += `<Row ss:Height="24">` + headers.map(h => {
+      rowsXml += `<Row ss:Height="26">` + headers.map(h => {
         const t = typeof h === "object" ? h.title || h.name : h;
         return `<Cell ss:StyleID="Header"><Data ss:Type="String">${esc(t)}</Data></Cell>`;
       }).join("") + `</Row>`;
     }
 
-    // Các dòng dữ liệu
-    rows.forEach(r => {
+    // Các dòng dữ liệu (tự động căn chỉnh chiều cao hàng theo độ dài chữ và màu xen kẽ zebra)
+    (rows || []).forEach((r, rowIdx) => {
       const cells = Array.isArray(r) ? r : headers.map(h => {
         const k = typeof h === "object" ? h.key || h.name : h;
         return r[k];
       });
-      rowsXml += `<Row ss:Height="20">` + cells.map(v => {
+
+      const isEven = (rowIdx % 2 === 1);
+      const firstStr = String(cells[0] || "").toUpperCase();
+      const secondStr = String(cells[1] || "").toUpperCase();
+      const isTotalRow = firstStr.includes("TỔNG") || secondStr.includes("TỔNG");
+
+      // Tính chiều cao hàng theo nội dung chữ nếu có xuống dòng
+      let maxLines = 1;
+      cells.forEach(v => {
+        if (v != null) {
+          const l = String(v).split(/\r?\n/).length;
+          if (l > maxLines) maxLines = l;
+        }
+      });
+      const rowHeight = isTotalRow ? 24 : (maxLines > 1 ? Math.max(22, maxLines * 18 + 6) : 22);
+
+      rowsXml += `<Row ss:Height="${rowHeight}" ss:AutoFitHeight="1">` + cells.map((v, cIdx) => {
         const isNum = typeof v === "number" && !isNaN(v);
         const type = isNum ? "Number" : "String";
-        const style = isNum ? "Num" : "Cell";
+        let style = "Cell";
+        if (isTotalRow) {
+          style = isNum ? "TotalNum" : "TotalRow";
+        } else if (isNum) {
+          style = isEven ? "NumEven" : "Num";
+        } else {
+          const hName = typeof headers[cIdx] === "object" ? headers[cIdx].title || headers[cIdx].name || "" : String(headers[cIdx] || "");
+          const isCenter = /^(STT|Mã|Ngày|Thời gian|Trạng thái|Loại)/i.test(hName) || /^\d{1,2}\/\d{1,2}\/\d{4}/.test(String(v));
+          style = isCenter ? (isEven ? "CenterEven" : "Center") : (isEven ? "CellEven" : "Cell");
+        }
         return `<Cell ss:StyleID="${style}"><Data ss:Type="${type}">${esc(v)}</Data></Cell>`;
       }).join("") + `</Row>`;
     });
@@ -106,42 +152,122 @@
    <Alignment ss:Horizontal="Left" ss:Vertical="Center"/>
   </Style>
   <Style ss:ID="SubTitle">
-   <Font ss:FontName="Segoe UI" ss:Size="9" ss:Italic="1" ss:Color="#64748B"/>
+   <Font ss:FontName="Segoe UI" ss:Size="9.5" ss:Italic="1" ss:Color="#64748B"/>
+   <Alignment ss:Horizontal="Left" ss:Vertical="Center"/>
   </Style>
   <Style ss:ID="MetaLabel">
    <Font ss:FontName="Segoe UI" ss:Size="10" ss:Bold="1" ss:Color="#334155"/>
+   <Alignment ss:Vertical="Center"/>
    <Borders><Bottom ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/></Borders>
   </Style>
   <Style ss:ID="MetaVal">
    <Font ss:FontName="Segoe UI" ss:Size="10" ss:Color="#0F172A"/>
+   <Alignment ss:Vertical="Center"/>
    <Borders><Bottom ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/></Borders>
   </Style>
   <Style ss:ID="Header">
    <Font ss:FontName="Segoe UI" ss:Size="10" ss:Bold="1" ss:Color="#FFFFFF"/>
    <Interior ss:Color="#0D2137" ss:Pattern="Solid"/>
-   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="1"/>
    <Borders>
-    <Bottom ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#0A1628"/>
+    <Top ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#0D2137"/>
+    <Bottom ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#0D2137"/>
+    <Left ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#1E3050"/>
     <Right ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#1E3050"/>
    </Borders>
   </Style>
   <Style ss:ID="Cell">
+   <Font ss:FontName="Segoe UI" ss:Size="9.5" ss:Color="#1E293B"/>
+   <Alignment ss:Vertical="Center" ss:WrapText="1"/>
    <Borders>
-    <Bottom ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
-    <Right ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Top ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Bottom ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Left ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Right ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="CellEven">
+   <Font ss:FontName="Segoe UI" ss:Size="9.5" ss:Color="#1E293B"/>
+   <Interior ss:Color="#F8FAFC" ss:Pattern="Solid"/>
+   <Alignment ss:Vertical="Center" ss:WrapText="1"/>
+   <Borders>
+    <Top ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Bottom ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Left ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Right ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="Center">
+   <Font ss:FontName="Segoe UI" ss:Size="9.5" ss:Color="#1E293B"/>
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+   <Borders>
+    <Top ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Bottom ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Left ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Right ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="CenterEven">
+   <Font ss:FontName="Segoe UI" ss:Size="9.5" ss:Color="#1E293B"/>
+   <Interior ss:Color="#F8FAFC" ss:Pattern="Solid"/>
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+   <Borders>
+    <Top ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Bottom ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Left ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Right ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
    </Borders>
   </Style>
   <Style ss:ID="Num">
+   <Font ss:FontName="Segoe UI" ss:Size="9.5" ss:Color="#0F172A"/>
    <Alignment ss:Horizontal="Right" ss:Vertical="Center"/>
    <NumberFormat ss:Format="#,##0"/>
    <Borders>
-    <Bottom ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
-    <Right ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Top ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Bottom ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Left ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Right ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="NumEven">
+   <Font ss:FontName="Segoe UI" ss:Size="9.5" ss:Color="#0F172A"/>
+   <Interior ss:Color="#F8FAFC" ss:Pattern="Solid"/>
+   <Alignment ss:Horizontal="Right" ss:Vertical="Center"/>
+   <NumberFormat ss:Format="#,##0"/>
+   <Borders>
+    <Top ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Bottom ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Left ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Right ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="TotalRow">
+   <Font ss:FontName="Segoe UI" ss:Size="10" ss:Bold="1" ss:Color="#0D2137"/>
+   <Interior ss:Color="#E2E8F0" ss:Pattern="Solid"/>
+   <Alignment ss:Vertical="Center" ss:WrapText="1"/>
+   <Borders>
+    <Top ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#0D2137"/>
+    <Bottom ss:Position="Bottom" ss:LineStyle="Double" ss:Weight="3" ss:Color="#0D2137"/>
+    <Left ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Right ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="TotalNum">
+   <Font ss:FontName="Segoe UI" ss:Size="10" ss:Bold="1" ss:Color="#0D2137"/>
+   <Interior ss:Color="#E2E8F0" ss:Pattern="Solid"/>
+   <Alignment ss:Horizontal="Right" ss:Vertical="Center"/>
+   <NumberFormat ss:Format="#,##0"/>
+   <Borders>
+    <Top ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#0D2137"/>
+    <Bottom ss:Position="Bottom" ss:LineStyle="Double" ss:Weight="3" ss:Color="#0D2137"/>
+    <Left ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Right ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
    </Borders>
   </Style>
  </Styles>
  <Worksheet ss:Name="${esc(sheetName.slice(0, 31))}">
   <Table>
+   ${columnsXml}
    ${rowsXml}
   </Table>
  </Worksheet>
@@ -931,6 +1057,63 @@
     }
   }
 
+  /** Xuất Báo cáo Danh sách Ý kiến & Bình luận Đánh giá (Excel, Word, PDF) */
+  function exportReviewsList(reviewsList = [], format = "excel") {
+    const title = "BÁO CÁO TỔNG HỢP Ý KIẾN ĐÁNH GIÁ & BÌNH LUẬN KHÁCH HÀNG";
+    const subtitle = `Tổng số: ${reviewsList.length} bình luận | Xuất lúc: ${nowStr()}`;
+    const headers = [
+      "STT",
+      "Thời gian",
+      "Khách hàng",
+      "Email / ĐT",
+      "Tour / Dịch vụ",
+      "Số sao",
+      "Phân loại",
+      "Nội dung bình luận",
+      "Trạng thái",
+      "Phản hồi từ công ty",
+      "Người trả lời"
+    ];
+    const rows = reviewsList.map((r, i) => [
+      i + 1,
+      r.createdAt || r.at || "—",
+      r.userName || r.author || r.name || "Khách hàng",
+      r.userEmail || r.email || r.phone || "—",
+      r.tourName || r.targetName || r.targetId || "Tour du lịch",
+      r.rating != null ? `${r.rating} ⭐` : "—",
+      r.categoryLabel || r.category || "Đánh giá",
+      r.content || r.comment || r.text || "",
+      r.statusLabel || r.status || "Hoạt động",
+      r.reply || r.response || "Chưa phản hồi",
+      r.repliedByName || r.repliedBy || "—"
+    ]);
+
+    if (format === "excel") {
+      exportExcel({
+        filename: "danh-sach-binh-luan-danh-gia.xls",
+        sheetName: "BinhLuan",
+        title,
+        headers,
+        rows
+      });
+    } else if (format === "word") {
+      exportWord({
+        filename: "danh-sach-binh-luan-danh-gia.doc",
+        title,
+        subtitle,
+        headers,
+        rows
+      });
+    } else {
+      printDocument({
+        title,
+        subtitle,
+        headers,
+        rows
+      });
+    }
+  }
+
   return {
     exportExcel,
     exportCsv,
@@ -943,6 +1126,7 @@
     exportDailyRevenueReport,
     exportDepartureManifest,
     exportStaffList,
-    exportFoodsList
+    exportFoodsList,
+    exportReviewsList
   };
 });

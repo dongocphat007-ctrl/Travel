@@ -33,13 +33,14 @@ const TourMap = (() => {
     if (!window.L) { console.error("[TourMap] Leaflet chưa được tải"); return false; }
     const container = document.getElementById(containerId);
     if (!container) { console.error("[TourMap] Không tìm thấy container:", containerId); return false; }
-    if (mapInstance) { mapInstance.remove(); mapInstance = null; }
+    if (mapInstance) { try { mapInstance.remove(); } catch (e) {} mapInstance = null; }
+    if (container._leaflet_id) { try { delete container._leaflet_id; } catch (e) { container._leaflet_id = undefined; } }
     // FIX: center mặc định là Việt Nam (16°N, 106°E), zoom 5
     mapInstance = L.map(containerId, { center: [16, 106], zoom: 5, zoomControl: true });
     TravelMapTiles.createLayer(L).addTo(mapInstance);
     markersLayer = L.layerGroup().addTo(mapInstance);
-    // FIX: invalidateSize sau 200ms để bản đồ render đúng khi container vừa được hiển thị
-    setTimeout(() => { if (mapInstance) mapInstance.invalidateSize(); }, 200);
+    // FIX: invalidateSize đa mốc thời gian để bản đồ render đầy đủ ô gạch khi container vừa hiển thị
+    [80, 200, 500].forEach(ms => setTimeout(() => { if (mapInstance) mapInstance.invalidateSize(); }, ms));
     return true;
   }
 

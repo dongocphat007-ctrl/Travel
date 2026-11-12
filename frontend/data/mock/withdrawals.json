@@ -1,0 +1,27 @@
+[
+  {
+    "id": "wd_001",
+    "userId": "hdv003",
+    "userName": "Lê Hoàng Long",
+    "role": "guide",
+    "amount": 5000000,
+    "bank": "Vietcombank",
+    "account": "001100223344",
+    "status": "pending",
+    "requestedAt": "2026-11-10T09:00:00.000Z",
+    "note": "Rút tiền công tour tháng 10"
+  },
+  {
+    "id": "wd_002",
+    "userId": "cus003",
+    "userName": "Lê Hoàng Cường",
+    "role": "customer",
+    "amount": 2000000,
+    "bank": "Techcombank",
+    "account": "190334455667",
+    "status": "approved",
+    "requestedAt": "2026-11-09T14:00:00.000Z",
+    "approvedAt": "2026-11-10T08:30:00.000Z",
+    "note": "Rút tiền thưởng hoàn tour"
+  }
+]

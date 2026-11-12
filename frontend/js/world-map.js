@@ -49,7 +49,10 @@ const WorldMap = (() => {
 
   function initWorldMap(containerId) {
     if (!window.L) { console.error("[WorldMap] Leaflet not loaded"); return; }
-    if (mapInst) { mapInst.remove(); mapInst = null; }
+    const container = typeof containerId === "string" ? document.getElementById(containerId) : containerId;
+    if (!container) return;
+    if (mapInst) { try { mapInst.remove(); } catch (e) {} mapInst = null; }
+    if (container._leaflet_id) { try { delete container._leaflet_id; } catch (e) { container._leaflet_id = undefined; } }
     mapInst = L.map(containerId, { center: [20, 10], zoom: 2, minZoom: 2, worldCopyJump: true });
 
     TravelMapTiles.createLayer(L).addTo(mapInst);
@@ -58,6 +61,7 @@ const WorldMap = (() => {
       dot.bindTooltip(`${c.flag} ${c.name}`, { direction: "top", className: "wm-tooltip", offset: [0, -6] });
       dot.on("click", () => focusCountry(c));
     });
+    [80, 200, 500].forEach(ms => setTimeout(() => { if (mapInst) mapInst.invalidateSize(); }, ms));
   }
 
   function focusCountry(c) {

@@ -45,6 +45,15 @@ public class WalletOps {
         };
     }
 
+    public static boolean isStaffRole(String role) {
+        if (role == null)
+            return false;
+        return switch (role.toLowerCase()) {
+            case "operator", "cashier", "support", "content", "admin", "guide" -> true;
+            default -> false;
+        };
+    }
+
     public static boolean isGuide(String role) {
         return "guide".equalsIgnoreCase(role);
     }
@@ -123,14 +132,27 @@ public class WalletOps {
             bal = Maps.lng(acc, "balance");
             earned = Maps.lng(acc, "totalEarned");
         } else if (isGuide(role)) {
-            // Hướng dẫn viên: thu nhập THEO TOUR hoàn thành (xác nhận tour để lấy tiền)
-            String gid = core.canonGuide(Maps.str(acc, "guideId"));
-            if (gid.isEmpty())
-                gid = core.canonGuide(userId);
+            // Hướng dẫn viên: thu nhập THEO TOUR hoàn thành (xác nhận tour để lấy tiền) + lương cứng (nếu có)
+            String gid = Maps.str(acc, "guideId");
+            if (gid.isEmpty()) {
+                Map<String, Object> gp = Maps.map(acc.get("guideProfile"));
+                if (gp != null) gid = Maps.str(gp, "guideId");
+            }
+            if (gid.isEmpty()) gid = userId;
+            gid = core.canonGuide(gid);
             Map<String, Object> ge = core.rewards().guideEarnings(gid, null);
-            earned = Maps.lng(ge, "allPaid"); // tiền thù lao từ các tour đã được thu ngân xác nhận chi
+            long feePaid = Maps.lng(ge, "allPaid"); // tiền thù lao từ các tour đã được thu ngân xác nhận chi
             long pendingTour = Maps.lng(ge, "allPending"); // các tour đã hoàn thành nhưng đang chờ chi
+            long accEarned = Maps.lng(acc, "totalEarned");
+            earned = Math.max(feePaid, accEarned);
+            if (earned == 0 && Maps.lng(acc, "baseSalary") > 0) {
+                earned = Maps.lng(acc, "baseSalary");
+            }
             bal = Math.max(0, earned - withdrawn);
+            if (bal == 0 && Maps.lng(acc, "balance") > 0 && withdrawn == 0) {
+                bal = Maps.lng(acc, "balance");
+                earned = Math.max(earned, bal);
+            }
             updateAccount(userId, Map.of(
                     "balance", bal,
                     "totalEarned", earned));
@@ -146,16 +168,65 @@ public class WalletOps {
         long points = Maps.lng(acc, "points");
 
         List<Map<String, Object>> myWithdrawals = new ArrayList<>();
+        withdrawn = 0;
         long pendingAmt = 0;
+        String normUserId = userId != null ? userId.replace("_alias", "") : "";
         for (Map<String, Object> w : db.list("withdrawals")) {
-            if (userId.equals(Maps.str(w, "userId"))) {
+            String uid = Maps.str(w, "userId");
+            if (userId.equals(uid) || (!normUserId.isEmpty() && normUserId.equals(uid))) {
                 myWithdrawals.add(w);
-                if ("pending".equals(w.get("status"))) {
+                if ("approved".equals(w.get("status"))) {
+                    withdrawn += Maps.lng(w, "amount");
+                } else if ("pending".equals(w.get("status"))) {
                     pendingAmt += Maps.lng(w, "amount");
                 }
             }
         }
         myWithdrawals.sort((a, b) -> Maps.str(b, "createdAt").compareTo(Maps.str(a, "createdAt")));
+
+        // Lấy lịch sử phát lương và thù lao chi tiết
+        List<Map<String, Object>> mySalaryLogs = new ArrayList<>();
+        for (Map<String, Object> log : db.list("salary_logs")) {
+            String sid = Maps.str(log, "staffId");
+            if (userId.equals(sid) || (!normUserId.isEmpty() && normUserId.equals(sid))) {
+                mySalaryLogs.add(log);
+            }
+        }
+        if (isGuide(role)) {
+            String gid = Maps.str(acc, "guideId");
+            if (gid.isEmpty()) {
+                Map<String, Object> gp = Maps.map(acc.get("guideProfile"));
+                if (gp != null) gid = Maps.str(gp, "guideId");
+            }
+            if (gid.isEmpty()) gid = userId;
+            gid = core.canonGuide(gid);
+            Map<String, Object> ge = core.rewards().guideEarnings(gid, null);
+            List<?> rawTrips = Maps.list(ge.get("items"));
+            for (Object item : rawTrips) {
+                if (item instanceof Map<?, ?> m) {
+                    Map<String, Object> tr = (Map<String, Object>) m;
+                    if (Maps.bool(tr, "paid")) {
+                        mySalaryLogs.add(Maps.of(
+                                "id", "fee_" + tr.get("bookingId"),
+                                "type", "guide_fee",
+                                "amount", tr.get("fee"),
+                                "at", tr.get("paidAt") != null ? tr.get("paidAt") : tr.get("completedAt"),
+                                "note", "Thù lao dẫn tour " + tr.get("tourName") + " (" + tr.get("payCode") + ")",
+                                "byName", "Thu ngân"
+                        ));
+                    }
+                }
+            }
+        }
+        mySalaryLogs.sort((a, b) -> Maps.str(b, "at").compareTo(Maps.str(a, "at")));
+
+        // Đảm bảo khớp 100% toán học: Số dư ví = Tổng thu nhập đã nhận - Tổng tiền đã rút
+        bal = Math.max(0, earned - withdrawn);
+        updateAccount(userId, Map.of(
+                "balance", bal,
+                "totalEarned", earned,
+                "totalWithdrawn", withdrawn
+        ));
 
         Map<String, Object> res = new LinkedHashMap<>();
         res.put("ok", true);
@@ -175,6 +246,7 @@ public class WalletOps {
         res.put("pointValue", POINT_RATE);
         res.put("minWithdraw", MIN_WITHDRAW);
         res.put("withdrawals", myWithdrawals);
+        res.put("salaryHistory", mySalaryLogs);
         return res;
     }
 
@@ -397,12 +469,12 @@ public class WalletOps {
         return StaffOps.getStaffBaseSalary(acc);
     }
 
-    /** Danh sách nhân viên văn phòng và bảng lương. */
+    /** Danh sách nhân viên và bảng lương (mọi vai trò nội bộ). */
     public Map<String, Object> listStaffSalaries() {
         List<Map<String, Object>> staffList = new ArrayList<>();
         for (Map<String, Object> a : core.accounts.all()) {
             String role = Maps.str(a, "role");
-            if (isOfficeStaff(role) && Accounts.isActive(a)) {
+            if (isStaffRole(role) && Accounts.isActive(a)) {
                 Map<String, Object> item = new LinkedHashMap<>();
                 String uid = Maps.str(a, "id");
                 item.put("id", uid);
@@ -419,7 +491,10 @@ public class WalletOps {
                 item.put("lastPaidAt", a.get("lastPaidAt"));
 
                 String startDate = Maps.str(a, "startDate");
-                if (startDate.isEmpty()) startDate = "2025-11-06";
+                if (startDate.isEmpty()) {
+                    String ca = Maps.str(a, "createdAt");
+                    startDate = !ca.isEmpty() && ca.length() >= 10 ? ca.substring(0, 10) : "2020-01-15";
+                }
                 item.put("startDate", startDate);
 
                 String nextReview = Maps.str(a, "nextReviewDate");
@@ -444,6 +519,7 @@ public class WalletOps {
                 }
 
                 Object kpiObj = a.get("kpiRecent");
+                if (kpiObj == null) kpiObj = a.get("kpi");
                 if (kpiObj != null) {
                     int kpi = (int) vn.travel.util.Pricing.num(kpiObj);
                     item.put("kpiRecent", kpi);
@@ -476,8 +552,8 @@ public class WalletOps {
         if (acc == null)
             throw HttpError.notFound("Không tìm thấy nhân viên");
         String role = Maps.str(acc, "role");
-        if (!isOfficeStaff(role))
-            throw HttpError.bad("Tài khoản này không thuộc nhóm nhân viên văn phòng", "role");
+        if (!isStaffRole(role))
+            throw HttpError.bad("Tài khoản này không thuộc nhóm nhân viên", "role");
 
         long base = getStaffBaseSalary(acc);
         long payAmt = (customAmount != null && customAmount > 0) ? customAmount : base;
@@ -565,7 +641,7 @@ public class WalletOps {
         if (acc == null)
             throw HttpError.notFound("Không tìm thấy nhân viên");
         String role = Maps.str(acc, "role");
-        if (!isOfficeStaff(role) && !isGuide(role))
+        if (!isStaffRole(role))
             throw HttpError.bad("Tài khoản này không thuộc nhóm nhân viên có thu nhập", "role");
 
         long base = getStaffBaseSalary(acc);
@@ -576,8 +652,6 @@ public class WalletOps {
 
         switch (action.toLowerCase()) {
             case "increase" -> {
-                if (isGuide(role))
-                    throw HttpError.bad("HDV nhận 20% theo tour, không áp dụng lương cơ bản", "role");
                 // Tăng mức lương cơ bản
                 long newBase = base + amount;
                 updateAccount(staffUserId, Map.of("baseSalary", newBase));
@@ -585,8 +659,6 @@ public class WalletOps {
                         + String.format("%,d", newBase) + " ₫)";
             }
             case "decrease" -> {
-                if (isGuide(role))
-                    throw HttpError.bad("HDV nhận 20% theo tour, không áp dụng lương cơ bản", "role");
                 // Giảm mức lương cơ bản
                 long newBase = Math.max(5_000_000L, base - amount);
                 updateAccount(staffUserId, Map.of("baseSalary", newBase));

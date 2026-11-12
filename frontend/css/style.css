@@ -1,3 +1,4 @@
+@import "fonts.css";
 /* style.css – Components, Layout, Design Tokens */
 
 :root {
@@ -27,7 +28,7 @@
 }
 
 body {
-  font-family: "Inter", sans-serif;
+  font-family: "Be Vietnam Pro", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   background: var(--bg);
   color: var(--text);
   font-size: 15px;
@@ -49,7 +50,7 @@ body {
   box-shadow: 0 4px 20px rgba(79, 70, 229, 0.35);
 }
 .nav-logo {
-  font-family: "DM Serif Display", serif;
+  font-family: "Playfair Display", "Be Vietnam Pro", "Plus Jakarta Sans", Georgia, serif;
   font-size: 21px;
   color: #fff;
   cursor: pointer;
@@ -193,7 +194,7 @@ body {
   flex-wrap: wrap;
 }
 .page-title {
-  font-family: "DM Serif Display", serif;
+  font-family: "Playfair Display", "Be Vietnam Pro", "Plus Jakarta Sans", Georgia, serif;
   font-size: 27px;
   color: var(--primary-dark);
   line-height: 1.2;
@@ -648,7 +649,7 @@ body {
   min-width: 160px;
 }
 .hero-name {
-  font-family: "DM Serif Display", serif;
+  font-family: "Playfair Display", "Be Vietnam Pro", "Plus Jakarta Sans", Georgia, serif;
   font-size: 26px;
   margin-bottom: 4px;
 }
@@ -855,7 +856,7 @@ body {
   letter-spacing: 0.6px;
 }
 .budget-val {
-  font-family: "DM Serif Display", serif;
+  font-family: "Playfair Display", "Be Vietnam Pro", "Plus Jakarta Sans", Georgia, serif;
   font-size: 22px;
   margin-top: 5px;
 }
@@ -969,7 +970,7 @@ tbody tr:hover {
   margin-bottom: 10px;
 }
 .stat-val {
-  font-family: "DM Serif Display", serif;
+  font-family: "Playfair Display", "Be Vietnam Pro", "Plus Jakarta Sans", Georgia, serif;
   font-size: 26px;
   color: var(--primary-dark);
   line-height: 1;
@@ -986,7 +987,7 @@ tbody tr:hover {
   gap: 20px;
 }
 .section-title {
-  font-family: "DM Serif Display", serif;
+  font-family: "Playfair Display", "Be Vietnam Pro", "Plus Jakarta Sans", Georgia, serif;
   font-size: 20px;
   color: var(--primary-dark);
   margin-bottom: 14px;
@@ -1031,7 +1032,7 @@ tbody tr:hover {
   box-shadow: var(--shadow-md);
 }
 .about-hero h2 {
-  font-family: "DM Serif Display", serif;
+  font-family: "Playfair Display", "Be Vietnam Pro", "Plus Jakarta Sans", Georgia, serif;
   font-size: 36px;
   margin-bottom: 14px;
 }
@@ -1151,7 +1152,7 @@ tbody tr:hover {
   margin-bottom: 16px;
 }
 .login-title {
-  font-family: "DM Serif Display", serif;
+  font-family: "Playfair Display", "Be Vietnam Pro", "Plus Jakarta Sans", Georgia, serif;
   font-size: 24px;
   color: var(--primary-dark);
   margin-bottom: 8px;
@@ -1279,7 +1280,7 @@ tbody tr:hover {
   justify-content: space-between;
 }
 .modal-title {
-  font-family: "DM Serif Display", serif;
+  font-family: "Playfair Display", "Be Vietnam Pro", "Plus Jakarta Sans", Georgia, serif;
   font-size: 19px;
   color: var(--primary-dark);
 }
@@ -2514,7 +2515,7 @@ tbody tr:hover {
 
 /* Brand column */
 .sf-logo {
-  font-family: "DM Serif Display", serif;
+  font-family: "Playfair Display", "Be Vietnam Pro", "Plus Jakarta Sans", Georgia, serif;
   font-size: 22px;
   color: #fff;
   margin-bottom: 10px;
@@ -3753,7 +3754,7 @@ tbody tr:hover {
   color: var(--text);
 }
 .pol-body h2 {
-  font-family: "DM Serif Display", serif;
+  font-family: "Playfair Display", "Be Vietnam Pro", "Plus Jakarta Sans", Georgia, serif;
   font-size: 24px;
   margin: 0 0 4px;
 }

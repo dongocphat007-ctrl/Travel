@@ -1,0 +1,34 @@
+[
+  {
+    "id": "td_001",
+    "name": "Hà Giang – Mùa Hoa Tam Giác Mạch 3N2Đ",
+    "dest": "Hà Giang",
+    "region": "Miền Bắc",
+    "price": 3650000,
+    "duration": "3 ngày 2 đêm",
+    "guide": "guided",
+    "status": "pending_review",
+    "submittedById": "nd001",
+    "submittedByName": "Vũ Biên Tập",
+    "submittedAt": "2026-11-08T16:00:00.000Z",
+    "desc": "Chinh phục đèo Mã Pí Lèng hùng vĩ, du thuyền sông Nho Quế và ngắm cánh đồng tam giác mạch nở rộ.",
+    "note": "Đã hoàn thiện lịch trình chi tiết và bảng giá, kính gửi Admin duyệt xuất bản lên website."
+  },
+  {
+    "id": "td_002",
+    "name": "Tây Ninh – Săn Mây Đỉnh Núi Bà Đen 1N",
+    "dest": "Tây Ninh",
+    "region": "Miền Nam",
+    "price": 990000,
+    "duration": "1 ngày",
+    "guide": "guided",
+    "status": "published",
+    "submittedById": "nd001",
+    "submittedByName": "Vũ Biên Tập",
+    "submittedAt": "2026-11-03T10:00:00.000Z",
+    "approvedById": "ad001",
+    "approvedByName": "Quản Trị Viên",
+    "approvedAt": "2026-11-05T14:00:00.000Z",
+    "desc": "Trải nghiệm hệ thống cáp treo hiện đại, chiêm bái tượng Phật Bà Tây Bổ Đà Sơn kỷ lục châu Á."
+  }
+]

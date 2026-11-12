@@ -12,7 +12,7 @@
 ## 1. Bảng Tổng Hợp Tài Khoản Mẫu (7 Vai Trò Hệ Thống)
 
 | STT | Vai trò | Mã NV | Họ và tên | Email đăng nhập | Mật khẩu | Vùng phụ trách & Hồ sơ liên kết |
-|:---:|---|:---:|---|---|:---:|---|
+| :---: | --- | :---: | --- | --- | :---: | --- |
 | 1 | **Quản trị viên (`ADMIN`)** | `ad001` | Quản Trị Viên | `admin@travel.vn` | `Travel@2026` | Toàn quyền duyệt đơn, duyệt hoàn tiền/đóng sổ, quản lý nhân viên, cấu hình. |
 | 2 | **Thu ngân (`CASHIER`)** | `tn001` | Lê Thu Ngân | `thungan@travel.vn` | `Travel@2026` | Xác nhận tiền cọc/đủ, đối soát chuyển lệch, hoàn tiền, lập bản đóng sổ cuối ngày. |
 | 3 | **Điều hành tour (`OPERATOR`)** | `dh001` | Trần Điều Hành | `dieuhanh@travel.vn` | `Travel@2026` | Gán và đổi HDV, quản lý lịch khởi hành, xử lý đơn bị bỏ quên và sự cố đoàn. |
@@ -34,7 +34,8 @@
 | 19 | **HDV Đông Bắc Á (`GUIDE`)** | `hdv014` | Đặng Bảo Ngọc | `hdv.ngoc@travel.vn` | `Travel@2026` | Hồ sơ `g_qt01`: Quốc tế (Nhật Bản, Hàn Quốc, JLPT N2, thủ tục xuất nhập cảnh). |
 | 20 | **HDV Đông Nam Á (`GUIDE`)** | `hdv015` | Mai Anh Thư | `hdv.thu@travel.vn` | `Travel@2026` | Hồ sơ `g_qt02`: Quốc tế (Thái Lan, Singapore, Malaysia, Tiếng Thái giao tiếp). |
 | 21 | **HDV Quốc Tế Trung - Hàn (`GUIDE`)** | `hdv016` | Vũ Hải Đăng | `hdv.dang@travel.vn` | `Travel@2026` | Hồ sơ `g_qt03`: Quốc tế (Seoul, Jeju, Bắc Kinh, Thượng Hải, TOPIK 4 & HSK). |
-| 22 | **Khách hàng mẫu (`CUSTOMER`)** | `kh001` | Nguyễn Văn An | `khachhang@travel.vn` | `Travel@2026` | Khách hàng mẫu: có sẵn các đơn đặt tour thực tế ở nhiều giai đoạn. |
+| 22 | **HDV Test Trống Lịch (`GUIDE`)** | `hdv_test` | Nguyễn Văn Test | `hdv.test@travel.vn` | `Travel@2026` | Hồ sơ `g_test`: Lịch trình 100% TRỐNG (busyDates = []), chuyên dùng để thử phân công tour, nhận tour và kiểm thử. |
+| 23 | **Khách hàng mẫu (`CUSTOMER`)** | `kh001` | Nguyễn Văn An | `khachhang@travel.vn` | `Travel@2026` | Khách hàng mẫu: có sẵn các đơn đặt tour thực tế ở nhiều giai đoạn. |
 
 ---
 
@@ -43,7 +44,9 @@
 Hệ thống đã được thiết lập sẵn **hơn 100+ đơn đặt tour, 60+ đánh giá review, 16 hồ sơ HDV đầy đủ lịch sử và ảnh chân dung thực tế, 6 báo cáo sự cố điều hành, 6 khiếu nại CSKH, 4 danh sách chờ (waitlist), 4 tour nháp biên tập, 14 bản đóng sổ và 4 giao dịch chuyển khoản lệch**. 100% tài khoản vai trò (Admin, Thu ngân, Điều hành, CSKH, Biên tập, 16 HDV và Khách hàng) đều có ảnh đại diện (avatar) chân dung AI / ảnh thật sắc nét:
 
 ### 2.1. Dành cho THU NGÂN (`CASHIER`) – Email: `thungan@travel.vn`
+
 Khi Thu ngân đăng nhập, giao diện sẽ có các danh mục số tiền và nghiệp vụ rõ ràng:
+
 1. **Đơn chờ xác nhận tiền (`pending_payment`):**
    - `TRAVEL1001`: Hà Nội – Hạ Long 3N2Đ (2 khách, tổng 5.000.000 ₫, **cọc 20%: 1.000.000 ₫**)
    - `TRAVEL2001`: Ninh Bình – Tràng An 2N1Đ (2 khách, tổng 3.600.000 ₫, **cọc 20%: 720.000 ₫**)
@@ -75,7 +78,9 @@ Khi Thu ngân đăng nhập, giao diện sẽ có các danh mục số tiền v�
 ---
 
 ### 2.2. Dành cho QUẢN TRỊ VIÊN (`ADMIN`) – Email: `admin@travel.vn`
+
 Khi Quản trị viên đăng nhập, các mục chờ duyệt và thống kê hiển thị:
+
 1. **Đơn chờ Admin xác nhận duyệt (`paid_deposit` & `paid_full`):**
    - `TRAVEL1002`: Đà Nẵng – Hội An 4N3Đ (đã cọc 1.600.000 ₫, còn nợ 6.400.000 ₫).
    - `TRAVEL2141`: Quy Nhơn – Kỳ Co – Eo Gió 4N3Đ (đã cọc 2.720.000 ₫).
@@ -95,7 +100,9 @@ Khi Quản trị viên đăng nhập, các mục chờ duyệt và thống kê h
 ---
 
 ### 2.3. Dành cho ĐIỀU HÀNH TOUR (`OPERATOR`) – Email: `dieuhanh@travel.vn`
+
 Khi Điều hành tour đăng nhập, các đơn cần phân công và lịch tour hiển thị:
+
 1. **Đơn đã xác nhận cần gán HDV (`confirmed`):**
    - `TRAVEL1003`: Tây Bắc – Hà Giang 4N3Đ (4 khách, ngày 08/11/2026, đã thu đủ 14.400.000 ₫).
    - `TRAVEL2131`: Cố đô Huế – Đại Nội 3N2Đ (3 khách, ngày 10/11/2026, gợi ý: Lê Hoàng Phúc `hdv006`).
@@ -115,7 +122,9 @@ Khi Điều hành tour đăng nhập, các đơn cần phân công và lịch to
 ---
 
 ### 2.4. Dành cho CHĂM SÓC KHÁCH HÀNG (`SUPPORT`) – Email: `cskh@travel.vn`
+
 Khi CSKH đăng nhập, trung tâm xử lý khiếu nại và phản ánh hiển thị:
+
 1. **Khiếu nại đang mở cần xử lý trong 24h (`open`):**
    - `cmp_01`: Đơn `TRAVEL1006` (Khách Nguyễn Văn An phản ánh xe đón trễ 30 phút tại Cần Thơ).
    - `cmp_04`: Đơn `TRAVEL2103` (Khách Trần Thị Bình phản ánh dời lịch trình sớm 1 tiếng tại Hội An).
@@ -130,7 +139,9 @@ Khi CSKH đăng nhập, trung tâm xử lý khiếu nại và phản ánh hiển
 ---
 
 ### 2.5. Dành cho BIÊN TẬP NỘI DUNG (`CONTENT`) – Email: `bientap@travel.vn`
+
 Khi Biên tập viên đăng nhập:
+
 1. **Tour bản nháp chờ Admin duyệt (`tour-drafts.json`):**
    - `dr_01`: *"Hành trình Mù Cang Chải mùa nước đổ – Ruộng bậc thang Tây Bắc 3N2Đ"* (trạng thái `draft`).
    - `dr_02`: *"Khám phá Đảo Phú Quý – Thiên đường hoang sơ biển xanh ngọc bích 3N2Đ"* (trạng thái `pending_approval`).
@@ -145,11 +156,13 @@ Khi Biên tập viên đăng nhập:
 ### 2.6. Dành cho HƯỚNG DẪN VIÊN (`GUIDE`) – TẤT CẢ 16 HDV ĐỀU CÓ LỊCH SỬ TOUR PHONG PHÚ
 
 Tất cả 16 Hướng dẫn viên trong hệ thống đều đã có:
+
 - **Nhiều tour đã hoàn thành trong quá khứ (`completed`)** trong các tháng 8, 9, 10/2026.
 - **Có đầy đủ điểm danh hành khách (`checkin: present`), đánh giá sao (4.8 - 5.0 ⭐) và lời khen ngợi từ khách hàng.**
 - **Có số liệu thù lao dẫn tour thực tế.**
 
-#### Một số tài khoản HDV tiêu biểu để đăng nhập kiểm tra:
+#### Một số tài khoản HDV tiêu biểu để đăng nhập kiểm tra
+
 1. **`hdv.quan@travel.vn` (Nguyễn Minh Quân - `hdv001` - Miền Bắc):**
    - Đã đi 4 tour hoàn thành (Hà Nội, Vịnh Hạ Long, Tràng An Bái Đính).
    - Có 1 tour đang đi hôm nay `TRAVEL2101` (Hà Nội – Hạ Long 3N2Đ, đoàn 4 khách).
@@ -176,7 +189,9 @@ Tất cả 16 Hướng dẫn viên trong hệ thống đều đã có:
 ---
 
 ### 2.7. Dành cho KHÁCH HÀNG (`CUSTOMER`) – Email: `khachhang@travel.vn`
+
 Khi Khách hàng Nguyễn Văn An đăng nhập, vào mục **"Đơn của tôi"** sẽ thấy:
+
 1. **Đơn `TRAVEL1001` & `TRAVEL2001` (`pending_payment`):** Xem mã QR chuyển khoản Vietcombank, hạn thanh toán 24h.
 2. **Đơn `TRAVEL1006` (`in_progress`):** Timeline chuyến đi Cần Thơ đang diễn ra hôm nay.
 3. **Đơn `TRAVEL2010` (`confirmed`):** Đã đi tour, công nợ 80% thu sau chuyến đi.
@@ -184,6 +199,7 @@ Khi Khách hàng Nguyễn Văn An đăng nhập, vào mục **"Đơn của tôi"
    - 👉 Nút *"Viết đánh giá"* (đã có đánh giá 5 sao).
    - 👉 Nút *"Tải hóa đơn xác nhận"* (file PDF).
 5. **Đơn khiếu nại `cmp_01`:** Theo dõi phản hồi từ bộ phận CSKH.
+
 ---
 
 ## 3. Bản Đồ Vòng Đời Đơn Tour Qua Các Vai Trò
@@ -229,4 +245,3 @@ Khi Khách hàng Nguyễn Văn An đăng nhập, vào mục **"Đơn của tôi"
 ## 5. Mã nguồn trang nội bộ
 
 Toàn bộ giao diện nội bộ (Admin, Thu ngân, Điều hành, CSKH, Nội dung, HDV) chạy từ `frontend/staff/*.js`, mỗi trang `/staff/<vai-trò>.html` nạp `staff.js` + `parts.js` + file của vai trò đó. Các bản cũ cùng tên trong `frontend/js/` (kể cả `admin-voucher-banner.js`, `admin-chat.js`) đã được xóa; tab Thù lao & đánh giá của HDV đã chuyển sang `staff/guide.js`.
-

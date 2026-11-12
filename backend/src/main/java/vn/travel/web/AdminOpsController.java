@@ -74,6 +74,13 @@ public class AdminOpsController {
         return Maps.of("ok", true, "booking", admin.reject(Api.actor(u), id, Api.s(body, "reason")));
     }
 
+    @PostMapping("/api/admin/bookings/import")
+    public Map<String, Object> importBookings(@RequestBody(required = false) Map<String, Object> body, HttpServletRequest req) {
+        Map<String, Object> u = current.requirePermission(req, Permission.BOOKING_MANAGE);
+        List<?> items = Api.body(body).get("items") instanceof List<?> l ? l : List.of();
+        return admin.importBookings(Api.actor(u), items);
+    }
+
     // ── hoàn tiền ──
     @GetMapping("/api/admin/refunds")
     public Map<String, Object> refundList(@RequestParam(required = false) String status, HttpServletRequest req) {
@@ -262,12 +269,27 @@ public class AdminOpsController {
         }
     }
 
-    // ── thống kê & doanh thu theo ngày ──
-    @GetMapping("/api/stats")
+    // ── thống kê & doanh thu theo ngày (Admin và Thu ngân đều có thể xem để số liệu đồng nhất) ──
+    @GetMapping({"/api/stats", "/api/cashier/stats-overview"})
     public Map<String, Object> stats(@RequestParam(required = false) String period, @RequestParam(required = false) Integer year, @RequestParam(required = false) Integer quarter,
                                      @RequestParam(required = false) Integer month, HttpServletRequest req) {
-        current.requirePermission(req, Permission.STATS_VIEW_FULL);
+        Map<String, Object> u = current.require(req);
+        Role r = current.getRole(u);
+        if (r != Role.ADMIN && r != Role.CASHIER) {
+            throw HttpError.forbidden();
+        }
         return stats.report(period, year, quarter, month);
+    }
+
+    // ── Quỹ tiền lưu động & đối soát thực thu (Chỉ Admin và Thu ngân truy cập) ──
+    @GetMapping({"/api/finance/working-capital", "/api/admin/working-capital", "/api/cashier/working-capital"})
+    public Map<String, Object> workingCapital(@RequestParam(required = false, defaultValue = "2026") int year, HttpServletRequest req) {
+        Map<String, Object> u = current.require(req);
+        Role r = current.getRole(u);
+        if (r != Role.ADMIN && r != Role.CASHIER) {
+            throw HttpError.forbidden();
+        }
+        return stats.workingCapital(year);
     }
 
     @GetMapping("/api/admin/daily-stats")
@@ -393,7 +415,8 @@ public class AdminOpsController {
 
         long now = core.now();
         core.db.edit("banners", all -> {
-            all.clear(); // Xóa các banner hot cũ lỗi thời
+            // Chỉ xóa các banner tự động bn_top cũ, giữ nguyên toàn bộ banner do người dùng/admin tùy chỉnh
+            all.removeIf(b -> Maps.str(b, "id").startsWith("bn_top_"));
             int priority = 100;
             for (Map<String, Object> t : topTours) {
                 String tid = Maps.str(t, "tourId");

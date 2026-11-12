@@ -1,0 +1,113 @@
+[
+  {
+    "id": "pool_001",
+    "tourId": 105,
+    "tourName": "Đà Nẵng – Hội An – Bà Nà Hills 4N3Đ",
+    "destination": "Đà Nẵng",
+    "date": "2026-11-18",
+    "minPax": 6,
+    "maxPax": 16,
+    "currentPax": 8,
+    "targetVehicle": "Xe 16 chỗ Ford Transit",
+    "discountPercent": 15,
+    "status": "ready_depart",
+    "bookings": [
+      "bk_1001",
+      "bk_1002"
+    ],
+    "createdAt": "2026-11-06T09:00:00.000Z",
+    "note": "Đoàn đã gom đủ điều kiện khởi hành tối thiểu (8/16 khách), xe 16 chỗ và 1 HDV đi kèm."
+  },
+  {
+    "id": "pool_002",
+    "tourId": 102,
+    "tourName": "Sa Pa – Fansipan Huyền Thoại 3N2Đ",
+    "destination": "Sapa",
+    "date": "2026-11-20",
+    "minPax": 8,
+    "maxPax": 16,
+    "currentPax": 4,
+    "targetVehicle": "Xe 16 chỗ Solati VIP",
+    "discountPercent": 20,
+    "status": "open",
+    "bookings": [
+      "bk_1003"
+    ],
+    "createdAt": "2026-11-07T10:00:00.000Z",
+    "note": "Đang gom khách, thiếu 4 khách để đạt số lượng tối thiểu 8 khách."
+  },
+  {
+    "id": "pool_003",
+    "tourId": 108,
+    "tourName": "Phú Quốc – Thiên Đường Biển Đảo 3N2Đ",
+    "destination": "Phú Quốc",
+    "date": "2026-11-22",
+    "minPax": 10,
+    "maxPax": 29,
+    "currentPax": 7,
+    "targetVehicle": "Xe 29 chỗ Thaco Universe",
+    "discountPercent": 15,
+    "status": "open",
+    "bookings": [
+      "bk_1004",
+      "bk_1005"
+    ],
+    "createdAt": "2026-11-08T14:00:00.000Z",
+    "note": "Đã có 7 khách đăng ký, gom thêm 3 khách để đảm bảo khởi hành xe 29 chỗ."
+  },
+  {
+    "id": "pool_004",
+    "tourId": 101,
+    "tourName": "Hà Nội – Vịnh Hạ Long Du Thuyền 3N2Đ",
+    "destination": "Hạ Long",
+    "date": "2026-11-15",
+    "minPax": 6,
+    "maxPax": 12,
+    "currentPax": 6,
+    "targetVehicle": "Xe Limousine 12 chỗ",
+    "discountPercent": 10,
+    "status": "ready_depart",
+    "bookings": [
+      "bk_1006"
+    ],
+    "createdAt": "2026-11-05T08:30:00.000Z",
+    "note": "Đủ 6 khách khởi hành limousine kết hợp ngủ đêm du thuyền 5 sao."
+  },
+  {
+    "id": "pool_005",
+    "tourId": 107,
+    "tourName": "Cần Thơ – Chợ Nổi Cái Răng – Cà Mau 3N2Đ",
+    "destination": "Cần Thơ",
+    "date": "2026-11-17",
+    "minPax": 8,
+    "maxPax": 20,
+    "currentPax": 12,
+    "targetVehicle": "Xe 29 chỗ Universe",
+    "discountPercent": 10,
+    "status": "ready_depart",
+    "bookings": [
+      "bk_1007",
+      "bk_1008"
+    ],
+    "createdAt": "2026-11-06T11:00:00.000Z",
+    "note": "Đoàn miền Tây đạt 12/20 khách, chuẩn bị chốt danh sách xuất phát."
+  },
+  {
+    "id": "pool_006",
+    "tourId": 109,
+    "tourName": "Hà Giang – Mã Pí Lèng – Sông Nho Quế 3N2Đ",
+    "destination": "Hà Giang",
+    "date": "2026-11-25",
+    "minPax": 6,
+    "maxPax": 16,
+    "currentPax": 3,
+    "targetVehicle": "Xe 16 chỗ Ford Transit",
+    "discountPercent": 25,
+    "status": "open",
+    "bookings": [
+      "bk_1009"
+    ],
+    "createdAt": "2026-11-09T16:00:00.000Z",
+    "note": "Tour mùa hoa tam giác mạch đang gom khách lẻ, hỗ trợ giảm 25% giá tour."
+  }
+]

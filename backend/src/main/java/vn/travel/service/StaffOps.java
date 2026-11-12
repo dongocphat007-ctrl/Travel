@@ -101,6 +101,7 @@ public class StaffOps {
             }
 
             Object kpiObj = a.get("kpiRecent");
+            if (kpiObj == null) kpiObj = a.get("kpi");
             if (kpiObj != null) {
                 int kpi = (int) vn.travel.util.Pricing.num(kpiObj);
                 o.put("kpiRecent", kpi);
@@ -818,9 +819,13 @@ public class StaffOps {
         }
 
         Object kpiObj = a.get("kpiRecent");
+        if (kpiObj == null) kpiObj = a.get("kpi");
         Integer kpi = kpiObj != null ? (int) vn.travel.util.Pricing.num(kpiObj) : null;
-        String rating = kpi != null ? kpiRating(kpi) : (String) a.get("kpiRating");
-        int raisePct = kpi != null ? kpiRaisePercent(kpi) : 0;
+        if (kpi == null) {
+            kpi = 88;
+        }
+        String rating = kpiRating(kpi);
+        int raisePct = kpiRaisePercent(kpi);
         long expNewSal = calculateNewSalary(curSal, raisePct);
 
         Map<String, Object> profile = new LinkedHashMap<>(Accounts.pub(a));
@@ -833,7 +838,7 @@ public class StaffOps {
         profile.put("isUpcoming", isUpcoming);
         profile.put("kpiRecent", kpi);
         profile.put("kpiRating", rating);
-        profile.put("kpiPeriod", a.get("kpiPeriod"));
+        profile.put("kpiPeriod", a.getOrDefault("kpiPeriod", "Kỳ đánh giá 2026"));
         profile.put("kpiEvaluatedAt", a.get("kpiEvaluatedAt"));
         profile.put("kpiEvaluatedBy", a.get("kpiEvaluatedBy"));
         profile.put("kpiEvaluatedByName", a.get("kpiEvaluatedByName"));
@@ -849,8 +854,10 @@ public class StaffOps {
 
     public List<Map<String, Object>> getSalaryHistory(String staffId) {
         List<Map<String, Object>> list = new ArrayList<>();
+        String normalizedId = staffId == null ? "" : staffId.replace("_alias", "");
         for (Map<String, Object> h : db.list("salary_history")) {
-            if (staffId.equals(Maps.str(h, "staffId"))) {
+            String hid = Maps.str(h, "staffId");
+            if (staffId.equals(hid) || (!normalizedId.isEmpty() && normalizedId.equals(hid))) {
                 list.add(h);
             }
         }

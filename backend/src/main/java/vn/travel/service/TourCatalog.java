@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.util.*;
 
 /**
@@ -156,12 +157,8 @@ public class TourCatalog {
         for (Map<String, Object> a : admin.values()) {
             String id = String.valueOf(a.get("id"));
             if (isHidden(a) || sample.contains(id) || !seen.add(id)) continue;
-            // Nhóm core: đưa toàn bộ tour admin mới mở bán lên đầu trang chủ
-            // Nhóm vùng miền: đưa tour admin thuộc vùng đó lên đầu
             if ("core".equals(g) || g.equals(groupOfAdmin(a))) {
                 Map<String, Object> pub = forPublic ? publicAdminTour(a, i++) : a;
-                pub.put("isNew", true);
-                pub.put("badge", "new");
                 out.add(pub);
             }
         }
@@ -179,6 +176,10 @@ public class TourCatalog {
         return out;
     }
 
+    public List<Map<String, Object>> list() {
+        return list(null);
+    }
+
     /** GET /api/tours[?group=] — khóa nhóm không hợp lệ → null. group rỗng/"all" = mọi nhóm. */
     public List<Map<String, Object>> list(String group) {
         if (group == null || group.isBlank() || "all".equals(group)) {
@@ -191,8 +192,6 @@ public class TourCatalog {
                 String id = String.valueOf(a.get("id"));
                 if (isHidden(a) || sample.contains(id) || !seen.add(id)) continue;
                 Map<String, Object> pub = publicAdminTour(a, out.size());
-                pub.put("isNew", true);
-                pub.put("badge", "new");
                 out.add(pub);
             }
             for (String g : GROUP_FILES.keySet()) {
@@ -227,13 +226,16 @@ public class TourCatalog {
             boolean active = !isHidden(a);
             base.put("active", active);
             base.put("isSample", false);
-            base.put("isNew", true);
-            base.put("badge", "new");
+            boolean isNew = isTourNew(a);
+            base.put("isNew", isNew);
+            if (isNew) base.put("badge", "new");
+            else base.remove("badge");
             Map<String, Object> pub = publicAdminTour(base, out.size());
             pub.put("active", active);
             pub.put("isSample", false);
-            pub.put("isNew", true);
-            pub.put("badge", "new");
+            pub.put("isNew", isNew);
+            if (isNew) pub.put("badge", "new");
+            else pub.remove("badge");
             out.add(pub);
         }
 
@@ -286,11 +288,45 @@ public class TourCatalog {
         t.putIfAbsent("itinerary", List.of());
         t.putIfAbsent("ord", ord);
         t.put("adminTour", true);
-        if (String.valueOf(a.get("id")).startsWith("tour_") || Boolean.TRUE.equals(a.get("isNew"))) {
-            t.put("isNew", true);
+        boolean isNew = isTourNew(a);
+        t.put("isNew", isNew);
+        if (isNew) {
             t.put("badge", "new");
+        } else {
+            t.remove("badge");
+        }
+        if (a.containsKey("newUntil")) {
+            t.put("newUntil", a.get("newUntil"));
+        } else if (isNew) {
+            String cr = Maps.str(a, "createdAt");
+            if (!cr.isEmpty()) {
+                try {
+                    t.put("newUntil", LocalDate.parse(cr.substring(0, 10)).plusDays(30).toString());
+                } catch (Exception e) {}
+            }
         }
         return t;
+    }
+
+    /** Kiểm tra xem tour còn trong thời hạn gắn mác MỚI hay không (mặc định 30 ngày từ khi tạo hoặc theo hạn newUntil). */
+    public static boolean isTourNew(Map<String, Object> a) {
+        if (a == null) return false;
+        String newUntil = Maps.str(a, "newUntil").trim();
+        String today = LocalDate.now().toString();
+        if (!newUntil.isEmpty()) {
+            return newUntil.compareTo(today) >= 0;
+        }
+        if (Boolean.TRUE.equals(a.get("isNew")) || "new".equals(a.get("badge")) || String.valueOf(a.get("id")).startsWith("tour_")) {
+            String created = Maps.str(a, "createdAt");
+            if (!created.isEmpty()) {
+                try {
+                    LocalDate createdDate = LocalDate.parse(created.substring(0, 10));
+                    return !createdDate.plusDays(30).isBefore(LocalDate.now());
+                } catch (Exception e) {}
+            }
+            return true;
+        }
+        return false;
     }
 
     /** GET /api/locations — toạ độ tour (data/locations.json) cho các tour đang hiển thị, kèm toạ độ do Admin nhập (lat/lng) nếu có. */

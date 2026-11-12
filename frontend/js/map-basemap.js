@@ -26,7 +26,7 @@
   var GOOGLE_API = "https://maps.googleapis.com/maps/api/js";
   var GOOGLE_MUTANT = "https://cdn.jsdelivr.net/npm/leaflet.gridlayer.googlemutant@0.13.5/dist/Leaflet.GoogleMutant.js";
   var OSM_URL = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
-  var CARTO_URL = "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png";   // dự phòng khi tile.openstreetmap.org bị chặn/lỗi
+  var CARTO_URL = "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png";   // dự phòng khi tile.openstreetmap.org bị chặn/lỗi
   var CARTO_ATTRIBUTION = '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a>';
   var OSM_ATTRIBUTION = '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors';
   var MAPTILER_ATTRIBUTION = '<a href="https://www.maptiler.com/copyright/" target="_blank" rel="noopener">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">&copy; OpenStreetMap contributors</a>';

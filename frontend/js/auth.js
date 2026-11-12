@@ -110,6 +110,7 @@ const Auth = (() => {
         { id: "hdv014", name: "Đặng Bảo Ngọc", email: "hdv.ngoc@travel.vn", role: "guide", guideId: "g_qt01", provider: "local", initials: "BN", bg: "#4338CA", passHash: "-g10hvh", isSample: true },
         { id: "hdv015", name: "Mai Anh Thư", email: "hdv.thu@travel.vn", role: "guide", guideId: "g_qt02", provider: "local", initials: "AT", bg: "#C026D3", passHash: "-g10hvh", isSample: true },
         { id: "hdv016", name: "Vũ Hải Đăng", email: "hdv.dang@travel.vn", role: "guide", guideId: "g_qt03", provider: "local", initials: "HD", bg: "#047857", passHash: "-g10hvh", isSample: true },
+        { id: "hdv_test", name: "Nguyễn Văn Test (HDV Trống Lịch)", email: "hdv.test@travel.vn", role: "guide", guideId: "g_test", provider: "local", initials: "VT", bg: "#10B981", passHash: "-g10hvh", isSample: true },
         { id: "kh001", name: "Nguyễn Văn An", email: "khachhang@travel.vn", role: "user", provider: "local", initials: "VA", bg: "#4F46E5", passHash: "-g10hvh", isSample: true }
       ];
       let dirty = false;
@@ -223,7 +224,20 @@ const Auth = (() => {
       session.permissions = srv.permissions || TravelRBAC.getPermissions(session.role);
     }
     localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+    try { localStorage.setItem("travel_session_v1", JSON.stringify({ user: session })); } catch (e) {}
     return session;
+  };
+  const syncSession = async () => {
+    if (!hasApi()) return getUser();
+    try {
+      const res = await Api.get("/api/auth/me");
+      if (res && res.ok && res.data && res.data.user) {
+        return mirrorUser(res.data.user);
+      }
+    } catch (e) {
+      // Offline hoặc mở tĩnh: giữ nguyên phiên đăng nhập localStorage
+    }
+    return getUser();
   };
   const afterAuth = () => { if (hasApi()) Api.refreshBookings(true); };
 
@@ -309,7 +323,11 @@ const Auth = (() => {
 
     // 1) Server xác thực trước
     const srv = await serverCall("/api/auth/login", { email, password });
-    if (srv && srv.ok) { const session = mirrorUser(srv.data.user, password); afterAuth(); return { ok: true, user: session }; }
+    if (srv && srv.ok) {
+      const session = mirrorUser(srv.data.user, password);
+      afterAuth();
+      return { ok: true, user: session, welcomeVoucher: srv.data.welcomeVoucher, isFirstLogin: srv.data.isFirstLogin };
+    }
     if (srv && srv.status !== 404) return { ok: false, field: srv.data.field || "li-pass", msg: srv.data.msg || "Đăng nhập thất bại" };
 
     // 2) Server chưa có tài khoản (tài khoản cũ chỉ ở localStorage) hoặc không có server → kiểm tra localStorage
@@ -429,7 +447,11 @@ const Auth = (() => {
   };
 
   // ---- ĐĂNG XUẤT ----
-  const logout = () => { localStorage.removeItem(SESSION_KEY); if (hasApi()) Api.post("/api/auth/logout").catch(() => {}); };
+  const logout = () => {
+    localStorage.removeItem(SESSION_KEY);
+    try { localStorage.removeItem("travel_session_v1"); } catch (e) {}
+    if (hasApi()) Api.post("/api/auth/logout").catch(() => {});
+  };
 
   // ---- ĐĂNG NHẬP BẰNG GOOGLE (GSI credential JWT) ----
   /**
@@ -448,7 +470,13 @@ const Auth = (() => {
 
   const loginWithGoogle = async (credential) => {
     const srv = await serverCall("/api/auth/google", { credential });
-    if (srv && srv.ok) { const session = mirrorUser(srv.data.user); afterAuth(); return session; }
+    if (srv && srv.ok) {
+      const session = mirrorUser(srv.data.user);
+      session.isFirstLogin = srv.data.isFirstLogin;
+      session.welcomeVoucher = srv.data.welcomeVoucher;
+      afterAuth();
+      return session;
+    }
     if (srv) return null;   // server đã trả lời và từ chối token → không tự cho đăng nhập bằng token chưa xác minh
     const payload = parseJwt(credential);
     if (!payload || !payload.email) return null;
@@ -525,6 +553,9 @@ const Auth = (() => {
 
     return {
       getUser,
+      currentUser: getUser,
+      openLoginModal: (cb) => (typeof showLoginModal === "function" ? showLoginModal(cb) : null),
+      syncSession,
       isLoggedIn,
       register,
       login,

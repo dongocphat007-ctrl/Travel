@@ -89,9 +89,9 @@ public class ContentController {
         return Maps.of("ok", true, "review", reviews.create(current.requirePermission(req, vn.travel.security.Permission.REVIEW_CREATE_OWN), body == null ? Map.of() : body));
     }
 
-    @PostMapping("/api/reviews/comment")
+    @PostMapping({"/api/reviews/comment", "/api/feedback"})
     public Map<String, Object> postComment(@RequestBody(required = false) Map<String, Object> body, HttpServletRequest req) {
-        return Maps.of("ok", true, "review", reviews.addComment(current.require(req), body == null ? Map.of() : body));
+        return Maps.of("ok", true, "review", reviews.addComment(current.optional(req), body == null ? Map.of() : body));
     }
 
     /** Phản hồi công khai trong chuỗi bình luận của một đánh giá. */

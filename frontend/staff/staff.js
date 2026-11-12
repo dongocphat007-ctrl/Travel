@@ -209,16 +209,23 @@ const Staff = (() => {
     const legend = series.length > 1 ? `<div class="legend">${series.map((s, j) => `<span><i style="background:${s.color || PALETTE[j]}"></i>${esc(s.name)}</span>`).join("")}</div>` : "";
     return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(opts.label || "Biểu đồ cột")}">${g}</svg>${legend}`;
   }
-  function lineChart(labels, values, opts) {
+  function lineChart(labels, seriesOrValues, opts) {
     opts = opts || {}; const W = 640, H = 220, L = 72, B = 26, T = 12, R = 10;
-    const max = Math.max(1, ...values), n = Math.max(1, labels.length - 1);
-    const pts = values.map((v, i) => [L + (W - L - R) * i / n, T + (H - T - B) * (1 - v / max)]);
+    const isMulti = Array.isArray(seriesOrValues) && seriesOrValues.length > 0 && typeof seriesOrValues[0] === "object" && seriesOrValues[0].values;
+    const series = isMulti ? seriesOrValues : [{ name: opts.label || "Giá trị", values: seriesOrValues, color: PALETTE[0] }];
+    const allVals = series.flatMap(s => s.values);
+    const max = Math.max(1, ...allVals), n = Math.max(1, labels.length - 1);
     const axisFmt = opts.axisFmt || (v => (max >= 1e5 ? compactMoney(v) : (opts.fmt ? opts.fmt(v) : Math.round(v).toLocaleString("vi-VN"))));
     let g = "";
     for (let i = 0; i <= 4; i++) { const y = T + (H - T - B) * (1 - i / 4); g += `<line x1="${L}" x2="${W - R}" y1="${y}" y2="${y}" stroke="currentColor" stroke-opacity=".12"/><text x="${L - 8}" y="${y + 4}" text-anchor="end">${axisFmt(max * i / 4)}</text>`; }
-    g += `<polyline fill="none" stroke="${PALETTE[0]}" stroke-width="2.5" points="${pts.map(p => p.join(",")).join(" ")}"/>` + pts.map((p, i) => `<circle cx="${p[0]}" cy="${p[1]}" r="3.5" fill="${PALETTE[0]}"><title>${esc(labels[i])}: ${opts.fmt ? opts.fmt(values[i]) : values[i]}</title></circle>`).join("");
+    series.forEach((s, j) => {
+      const color = s.color || PALETTE[j % PALETTE.length];
+      const pts = (s.values || []).map((v, i) => [L + (W - L - R) * i / n, T + (H - T - B) * (1 - v / max)]);
+      g += `<polyline fill="none" stroke="${color}" stroke-width="2.5" points="${pts.map(p => p.join(",")).join(" ")}"/>` + pts.map((p, i) => `<circle cx="${p[0]}" cy="${p[1]}" r="3.5" fill="${color}"><title>${esc(labels[i])} – ${esc(s.name)}: ${opts.fmt ? opts.fmt(s.values[i]) : s.values[i]}</title></circle>`).join("");
+    });
     labels.forEach((lb, i) => { g += `<text x="${L + (W - L - R) * i / n}" y="${H - 8}" text-anchor="middle">${esc(lb)}</text>`; });
-    return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(opts.label || "Biểu đồ đường")}">${g}</svg>`;
+    const legend = isMulti ? `<div class="legend">${series.map((s, j) => `<span><i style="background:${s.color || PALETTE[j % PALETTE.length]}"></i>${esc(s.name)}</span>`).join("")}</div>` : "";
+    return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(opts.label || "Biểu đồ đường")}">${g}</svg>${legend}`;
   }
   function donut(items, opts) {
     opts = opts || {}; const total = items.reduce((a, b) => a + b.value, 0), R = 70, C = 2 * Math.PI * R;
@@ -238,11 +245,7 @@ const Staff = (() => {
   function gate(inner) { document.body.innerHTML = `<div class="gate"><div class="box">${inner}</div></div>`; }
 
   function loginScreen(cfg, msg) {
-    try {
-      localStorage.removeItem("travel_auth_v1");
-      localStorage.removeItem("travel_session_v1");
-    } catch (e) {}
-    // 1 chỗ đăng nhập duy nhất: chuyển hướng về modal đăng nhập trang chủ
+    // 1 chỗ đăng nhập duy nhất: chuyển hướng về modal đăng nhập trang chủ (không tự ý xóa phiên của khách)
     const target = encodeURIComponent(location.pathname + location.search + location.hash);
     location.href = `/?login=1&redirect=${target}`;
   }
@@ -262,23 +265,86 @@ const Staff = (() => {
   }
 
   function changePasswordScreen(user, forced) {
-    gate(`<h1>${forced ? "Đổi mật khẩu lần đầu" : "Đổi mật khẩu"}</h1><p class="muted">${forced ? "Mật khẩu của bạn do quản trị viên cấp. Hãy đặt mật khẩu mới (ít nhất 8 ký tự, gồm cả chữ hoa, chữ thường, số và ký tự đặc biệt) trước khi tiếp tục." : ""}</p>
+    if (forced) {
+      gate(`<h1>Đổi mật khẩu lần đầu</h1><p class="muted">Mật khẩu của bạn do quản trị viên cấp. Hãy đặt mật khẩu mới (ít nhất 8 ký tự, gồm cả chữ hoa, chữ thường, số và ký tự đặc biệt) trước khi tiếp tục.</p>
       <form id="cf"><label>Mật khẩu hiện tại</label><input id="op" type="password" autocomplete="current-password" required>
       <label>Mật khẩu mới</label><input id="np" type="password" autocomplete="new-password" placeholder="Tối thiểu 8 ký tự (hoa, thường, số, ký tự đặc biệt)" required>
       <label>Nhập lại mật khẩu mới</label><input id="cp" type="password" autocomplete="new-password" placeholder="Nhập lại mật khẩu mới" required>
       <div class="field-err" id="ce"></div><button class="btn primary" type="submit">Đổi mật khẩu</button></form>`);
-    $("#cf").onsubmit = async e => {
-      e.preventDefault(); $("#ce").textContent = "";
-      const np = $("#np").value;
-      if (!np || np.length < 8) { $("#ce").textContent = "Mật khẩu phải có ít nhất 8 ký tự"; return; }
-      if (!/[A-Z]/.test(np)) { $("#ce").textContent = "Mật khẩu phải có ít nhất 1 chữ in hoa (A-Z)"; return; }
-      if (!/[a-z]/.test(np)) { $("#ce").textContent = "Mật khẩu phải có ít nhất 1 chữ thường (a-z)"; return; }
-      if (!/[0-9]/.test(np)) { $("#ce").textContent = "Mật khẩu phải có ít nhất 1 chữ số (0-9)"; return; }
-      if (!/[^A-Za-z0-9]/.test(np)) { $("#ce").textContent = "Mật khẩu phải có ít nhất 1 ký tự đặc biệt (!@#$%...)"; return; }
-      if (np !== $("#cp").value) { $("#ce").textContent = "Mật khẩu xác nhận không khớp"; return; }
-      try { await post("/api/auth/change-password", { oldPassword: $("#op").value, newPassword: np, confirm: $("#cp").value }); location.reload(); }
-      catch (err) { $("#ce").textContent = err.message; }
-    };
+      $("#cf").onsubmit = async e => {
+        e.preventDefault(); $("#ce").textContent = "";
+        const np = $("#np").value;
+        if (!np || np.length < 8) { $("#ce").textContent = "Mật khẩu phải có ít nhất 8 ký tự"; return; }
+        if (!/[A-Z]/.test(np)) { $("#ce").textContent = "Mật khẩu phải có ít nhất 1 chữ in hoa (A-Z)"; return; }
+        if (!/[a-z]/.test(np)) { $("#ce").textContent = "Mật khẩu phải có ít nhất 1 chữ thường (a-z)"; return; }
+        if (!/[0-9]/.test(np)) { $("#ce").textContent = "Mật khẩu phải có ít nhất 1 chữ số (0-9)"; return; }
+        if (!/[^A-Za-z0-9]/.test(np)) { $("#ce").textContent = "Mật khẩu phải có ít nhất 1 ký tự đặc biệt (!@#$%...)"; return; }
+        if (np !== $("#cp").value) { $("#ce").textContent = "Mật khẩu xác nhận không khớp"; return; }
+        try { await post("/api/auth/change-password", { oldPassword: $("#op").value, newPassword: np, confirm: $("#cp").value }); location.reload(); }
+        catch (err) { $("#ce").textContent = err.message; }
+      };
+      return;
+    }
+
+    // Modal đổi mật khẩu đẹp và tiện lợi cho nhân viên
+    modal("🔑 Đổi mật khẩu tài khoản", `
+      <div style="font-size:13px;color:var(--muted);margin-bottom:14px">
+        Đổi mật khẩu đăng nhập cho tài khoản nhân viên <b>${esc(user.name)}</b> (${esc(user.id)}).
+      </div>
+      <div class="note bad" id="m-pw-err" style="display:none;margin-bottom:12px;padding:8px 12px;font-size:13px"></div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div>
+          <label style="display:block;font-weight:600;font-size:13px;margin-bottom:4px">Mật khẩu hiện tại <span style="color:var(--bad)">*</span></label>
+          <input type="password" id="m-op" class="input" style="width:100%" placeholder="Nhập mật khẩu đang dùng" autocomplete="current-password">
+        </div>
+        <div>
+          <label style="display:block;font-weight:600;font-size:13px;margin-bottom:4px">Mật khẩu mới <span style="color:var(--bad)">*</span></label>
+          <input type="password" id="m-np" class="input" style="width:100%" placeholder="Tối thiểu 8 ký tự (hoa, thường, số, ký tự đặc biệt)" autocomplete="new-password">
+        </div>
+        <div>
+          <label style="display:block;font-weight:600;font-size:13px;margin-bottom:4px">Xác nhận mật khẩu mới <span style="color:var(--bad)">*</span></label>
+          <input type="password" id="m-cp" class="input" style="width:100%" placeholder="Nhập lại mật khẩu mới" autocomplete="new-password">
+        </div>
+      </div>
+      <div style="margin-top:14px;padding:8px 10px;background:var(--bg);border-radius:6px;font-size:11.5px;color:var(--muted);line-height:1.4">
+        🔒 <b>Tiêu chuẩn bảo mật:</b> Tối thiểu 8 ký tự, gồm chữ hoa, chữ thường, số và ký tự đặc biệt (!@#$%...).
+      </div>
+    `, [
+      { label: "Hủy bỏ", value: null },
+      { label: "Cập nhật mật khẩu", kind: "primary", value: "ok" }
+    ], {
+      onOpen: (ov, close) => {
+        const okBtn = $(".acts button.primary", ov);
+        if (okBtn) {
+          okBtn.onclick = async () => {
+            const errEl = $("#m-pw-err", ov);
+            const op = $("#m-op", ov).value.trim();
+            const np = $("#m-np", ov).value;
+            const cp = $("#m-cp", ov).value;
+            errEl.style.display = "none";
+            if (!op) { errEl.textContent = "Vui lòng nhập mật khẩu hiện tại"; errEl.style.display = "block"; return; }
+            if (!np || np.length < 8) { errEl.textContent = "Mật khẩu mới phải có ít nhất 8 ký tự"; errEl.style.display = "block"; return; }
+            if (!/[A-Z]/.test(np)) { errEl.textContent = "Mật khẩu mới phải có ít nhất 1 chữ in hoa (A-Z)"; errEl.style.display = "block"; return; }
+            if (!/[a-z]/.test(np)) { errEl.textContent = "Mật khẩu mới phải có ít nhất 1 chữ thường (a-z)"; errEl.style.display = "block"; return; }
+            if (!/[0-9]/.test(np)) { errEl.textContent = "Mật khẩu mới phải có ít nhất 1 chữ số (0-9)"; errEl.style.display = "block"; return; }
+            if (!/[^A-Za-z0-9]/.test(np)) { errEl.textContent = "Mật khẩu mới phải có ít nhất 1 ký tự đặc biệt (!@#$%...)"; errEl.style.display = "block"; return; }
+            if (np !== cp) { errEl.textContent = "Mật khẩu xác nhận không khớp"; errEl.style.display = "block"; return; }
+            try {
+              okBtn.disabled = true;
+              okBtn.textContent = "Đang xử lý...";
+              await post("/api/auth/change-password", { oldPassword: op, newPassword: np, confirm: cp });
+              toast("Đã đổi mật khẩu thành công! ✅", "ok");
+              close("ok");
+            } catch (err) {
+              okBtn.disabled = false;
+              okBtn.textContent = "Cập nhật mật khẩu";
+              errEl.textContent = err.message || "Không thể đổi mật khẩu";
+              errEl.style.display = "block";
+            }
+          };
+        }
+      }
+    });
   }
 
   // ───────── khung chính ─────────
@@ -316,17 +382,36 @@ const Staff = (() => {
               </div>
 
               <div class="grid g3" style="margin-top:16px">
-                <div class="kpi ok"><div class="l">Số dư khả dụng</div><div class="v">${money(curBal)}</div></div>
-                <div class="kpi"><div class="l">Tổng thu nhập</div><div class="v">${money(w.totalEarned || 0)}</div></div>
-                <div class="kpi"><div class="l">Đã rút thành công</div><div class="v">${money(w.totalWithdrawn || 0)}</div></div>
+                <div class="kpi ok"><div class="l">Số dư khả dụng</div><div class="v">${money(curBal)}</div><div class="s">Thu nhập thực tế trong ví</div></div>
+                <div class="kpi"><div class="l">Tổng thu nhập đã nhận</div><div class="v">${money(w.totalEarned || 0)}</div><div class="s">Lương, thù lao, thưởng tích lũy</div></div>
+                <div class="kpi"><div class="l">Đã rút về tài khoản</div><div class="v">${money(w.totalWithdrawn || 0)}</div><div class="s">Đã giải ngân qua ngân hàng</div></div>
+              </div>
+              <div class="note info" style="margin-top:12px;font-size:0.85rem">
+                <b>Đối soát số dư:</b> Tổng thu nhập đã nhận (<b>${money(w.totalEarned || 0)}</b>) - Đã rút thành công (<b>${money(w.totalWithdrawn || 0)}</b>) = Số dư ví khả dụng (<b>${money(curBal)}</b>).
               </div>
             </div>
 
             <div class="card">
-              <h2>Lịch sử yêu cầu rút tiền (${(w.withdrawals || []).length})</h2>
+              <div class="card-header-acts" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+                <h2 style="margin:0">📜 Lịch sử nhận lương & thù lao (${(w.salaryHistory || []).length})</h2>
+                <span class="small muted">Toàn bộ các khoản lương định kỳ, thưởng và thù lao tour</span>
+              </div>
+              ${table([
+                { t: "Thời gian", html: s => dt(s.at), sort: s => s.at },
+                { t: "Khoản thu nhập", html: s => `<b>${esc(s.note || (s.type === 'guide_fee' ? 'Thù lao tour' : 'Lương định kỳ'))}</b>` },
+                { t: "Người phát / Duyệt", html: s => esc(s.byName || "Quản trị viên") },
+                { t: "Số tiền", num: true, html: s => `<b style="color:var(--ok);font-size:1.05rem">+${money(s.amount)}</b>` }
+              ], (w.salaryHistory || []).slice(0, 50), { empty: "Chưa có bản ghi nhận lương nào" })}
+            </div>
+
+            <div class="card">
+              <div class="card-header-acts" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+                <h2 style="margin:0">💳 Lịch sử yêu cầu rút tiền (${(w.withdrawals || []).length})</h2>
+                <span class="small muted">Các lệnh giải ngân về tài khoản ngân hàng cá nhân</span>
+              </div>
               ${table([
                 { t: "Thời gian", html: r => dt(r.createdAt), sort: r => r.createdAt },
-                { t: "Số tiền", num: true, html: r => `<b>${money(r.amount)}</b>` },
+                { t: "Số tiền", num: true, html: r => `<b style="color:var(--bad)">-${money(r.amount)}</b>` },
                 { t: "Ngân hàng", html: r => `<b>${esc(r.bankName)}</b>` },
                 { t: "Số tài khoản", html: r => `<span class="mono">${esc(r.accountNumber)}</span>` },
                 { t: "Chủ thẻ", html: r => `<b>${esc(r.accountHolder)}</b>` },
@@ -361,6 +446,296 @@ const Staff = (() => {
     };
   }
 
+  // Module Hồ sơ & Thông tin cá nhân dùng chung cho mọi vai trò nhân viên
+  function staffProfileSection() {
+    return {
+      id: "profile",
+      label: "Hồ sơ cá nhân",
+      icon: "👤",
+      group: "Tài khoản",
+      async render(el, ctx) {
+        async function reload() {
+          const res = await get("/api/auth/me");
+          const u = res.user || ctx.user;
+          Staff.user = u;
+          ctx.user = u;
+
+          const degreesList = (u.degrees || "").split(/[\n,;]+/).map(s => s.trim()).filter(Boolean);
+          const ST_ROLE = Staff.ROLE_NAME[u.role] || u.role;
+
+          let guideInfoHtml = "";
+          if (u.role === "guide") {
+            try {
+              const gp = (await get("/api/guide/profile")).profile;
+              if (gp) {
+                guideInfoHtml = `
+                  <div class="note info" style="margin-bottom:14px">
+                    <b>Thông tin Nghiệp vụ Hướng dẫn viên:</b> ${gp.employmentType === "freelance" ? "Cộng tác viên" : "Nhân viên chính thức"} · ${gp.guideType === "international" ? "HDV quốc tế" : "HDV nội địa"} · Đã hoàn thành <b>${gp.toursCompleted || 0} tour</b>.
+                  </div>
+                `;
+              }
+            } catch (e) {}
+          }
+
+          el.innerHTML = `
+            <div class="card" style="margin-bottom:16px">
+              <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+                <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+                  <div class="profile-avatar-box" style="position:relative;display:inline-block">
+                    <div id="staff-avatar-trigger" style="cursor:pointer;position:relative" title="Nhấp để xem ảnh phóng to hoặc đổi ảnh đại diện">
+                      ${(u.avatar || u.picture)
+                        ? `<img src="${esc(/^(https?:|\/|data:)/.test(u.avatar || u.picture) ? (u.avatar || u.picture) : "/" + (u.avatar || u.picture))}" alt="${esc(u.name)}" style="width:82px;height:82px;border-radius:50%;object-fit:cover;border:3px solid var(--amber,#f59e0b);box-shadow:0 3px 12px rgba(0,0,0,0.15);display:block">`
+                        : `<div style="width:82px;height:82px;border-radius:50%;background:linear-gradient(135deg,#0891b2,#0284c7);color:#fff;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:700;box-shadow:0 3px 12px rgba(0,0,0,0.15)">${esc((u.initials || u.name || "?").slice(0, 2))}</div>`}
+                      <button type="button" id="staff-avatar-cam-btn" title="Đổi ảnh đại diện" style="position:absolute;bottom:0;right:0;width:28px;height:28px;border-radius:50%;background:#0d2137;color:#fff;border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,0.3)">📷</button>
+                    </div>
+                    <input type="file" id="staff-avatar-file" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
+                  </div>
+                  <div>
+                    <h2 style="margin:0;display:flex;align-items:center;gap:8px">
+                      <span>${esc(u.name)}</span>
+                      <span class="badge ok">${esc(ST_ROLE)}</span>
+                    </h2>
+                    <div class="muted small" style="margin-top:4px">
+                      Mã tài khoản: <b class="mono">${esc(u.id)}</b> · Đăng nhập: <b>${esc(u.email || u.id)}</b> · Trạng thái: <span class="badge ok">Hoạt động</span>
+                    </div>
+                  </div>
+                </div>
+                <div style="display:flex;gap:8px">
+                  <button class="btn ok" id="btn-edit-staff-profile">✏️ Chỉnh sửa hồ sơ</button>
+                  <button class="btn" id="btn-change-staff-pw">🔑 Đổi mật khẩu</button>
+                </div>
+              </div>
+            </div>
+
+            ${guideInfoHtml}
+
+            <div class="grid g2" style="gap:16px;margin-bottom:16px">
+              <!-- Cột 1: Thông tin liên lạc & Mạng xã hội -->
+              <div class="card">
+                <h3 style="margin:0 0 14px;display:flex;align-items:center;gap:6px">
+                  <span>📱 Thông tin liên lạc & Mạng xã hội</span>
+                </h3>
+                <dl class="kv">
+                  <dt>Số điện thoại</dt>
+                  <dd>${u.phone ? `<b>${esc(u.phone)}</b>` : `<span class="muted">Chưa cập nhật</span>`}</dd>
+                  <dt>Email hệ thống</dt>
+                  <dd>${esc(u.email || "—")}</dd>
+                  <dt>Gmail liên hệ</dt>
+                  <dd>${u.gmail ? `<a href="mailto:${esc(u.gmail)}" target="_blank" style="color:var(--teal)">${esc(u.gmail)}</a>` : `<span class="muted">Chưa cập nhật</span>`}</dd>
+                  <dt>Facebook</dt>
+                  <dd>${u.facebook ? `<a href="${esc(u.facebook.startsWith('http') ? u.facebook : 'https://' + u.facebook)}" target="_blank" rel="noopener noreferrer" style="color:#2563eb;font-weight:600">🌐 ${esc(u.facebook)}</a>` : `<span class="muted">Chưa cập nhật</span>`}</dd>
+                  <dt>Địa chỉ liên hệ</dt>
+                  <dd>${esc(u.address || "Chưa cập nhật")}</dd>
+                </dl>
+              </div>
+
+              <!-- Cột 2: Thông tin định danh & Cá nhân -->
+              <div class="card">
+                <h3 style="margin:0 0 14px;display:flex;align-items:center;gap:6px">
+                  <span>🪪 Định danh & Thông tin cá nhân</span>
+                </h3>
+                <dl class="kv">
+                  <dt>Số CCCD / CMND</dt>
+                  <dd>${u.idCard ? `<b class="mono" style="font-size:1.05rem;color:#0F766E">${esc(u.idCard)}</b>` : `<span class="muted">Chưa cập nhật</span>`}</dd>
+                  <dt>Ngày sinh</dt>
+                  <dd>${u.birthday ? day(u.birthday) : `<span class="muted">Chưa cập nhật</span>`}</dd>
+                  <dt>Giới tính</dt>
+                  <dd>${u.gender === "male" ? "Nam" : u.gender === "female" ? "Nữ" : (u.gender || "—")}</dd>
+                  <dt>Trạng thái hồ sơ</dt>
+                  <dd>${u.profileVerified ? `<span class="badge ok">✓ Đã xác thực</span>` : `<span class="badge warn">Chờ xác thực</span>`}</dd>
+                  <dt>Ngày gia nhập</dt>
+                  <dd>${dt(u.createdAt)}</dd>
+                </dl>
+              </div>
+            </div>
+
+            <!-- Hàng 2: Bằng cấp chứng chỉ & Tài khoản ngân hàng nhận lương -->
+            <div class="grid g2" style="gap:16px;margin-bottom:16px">
+              <div class="card">
+                <h3 style="margin:0 0 14px;display:flex;align-items:center;gap:6px">
+                  <span>🎓 Bằng cấp & Chứng chỉ chuyên môn</span>
+                </h3>
+                ${degreesList.length ? `
+                  <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+                    ${degreesList.map(d => `<span class="badge info" style="font-size:0.9rem;padding:6px 12px;border-radius:6px;background:#e0f2fe;color:#0369a1;border:1px solid #bae6fd">🎓 ${esc(d)}</span>`).join("")}
+                  </div>
+                ` : `<div class="empty" style="padding:16px">Chưa cập nhật bằng cấp, chứng chỉ chuyên môn. Nhấn "Chỉnh sửa hồ sơ" để bổ sung.</div>`}
+                <div class="small muted" style="margin-top:8px">Bao gồm bằng cử nhân, cao đẳng, chứng chỉ ngoại ngữ (TOEIC, IELTS), chứng chỉ nghiệp vụ du lịch, thẻ HDV...</div>
+              </div>
+
+              <div class="card">
+                <h3 style="margin:0 0 14px;display:flex;align-items:center;gap:6px">
+                  <span>💳 Tài khoản ngân hàng nhận lương & thù lao</span>
+                </h3>
+                <dl class="kv">
+                  <dt>Ngân hàng</dt>
+                  <dd>${u.bankName ? `<b>${esc(u.bankName)}</b>` : `<span class="muted">Chưa cập nhật</span>`}</dd>
+                  <dt>Số tài khoản</dt>
+                  <dd>${u.accountNumber ? `<b class="mono" style="font-size:1.1rem;color:#0F766E">${esc(u.accountNumber)}</b>` : `<span class="muted">Chưa cập nhật</span>`}</dd>
+                  <dt>Chủ tài khoản</dt>
+                  <dd>${u.accountHolder ? `<b>${esc(u.accountHolder.toUpperCase())}</b>` : `<span class="muted">Chưa cập nhật</span>`}</dd>
+                </dl>
+                <div class="note info" style="margin-top:12px;font-size:0.85rem">
+                  Thông tin này được dùng tự động khi Thu ngân chi trả lương định kỳ hoặc duyệt lệnh rút tiền từ Ví thu nhập.
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <h3 style="margin:0 0 10px">📝 Giới thiệu bản thân & Kinh nghiệm công tác</h3>
+              <p style="white-space:pre-wrap;line-height:1.6;margin:0;color:var(--text-2,#334155)">${esc(u.bio || "Chưa có giới thiệu bản thân.")}</p>
+            </div>
+          `;
+
+          // Gán sự kiện chỉnh sửa
+          $("#btn-edit-staff-profile", el).onclick = async () => {
+            const v = await ask("Cập nhật thông tin cá nhân", [
+              { name: "name", label: "Họ và tên", type: "text", required: true, value: u.name },
+              { name: "phone", label: "Số điện thoại di động", type: "text", value: u.phone || "", placeholder: "0912345678" },
+              { name: "gmail", label: "Gmail liên hệ", type: "text", value: u.gmail || "", placeholder: "example@gmail.com" },
+              { name: "facebook", label: "Link Facebook cá nhân", type: "text", value: u.facebook || "", placeholder: "https://facebook.com/username" },
+              { name: "idCard", label: "Số CCCD / CMND", type: "text", value: u.idCard || "", placeholder: "12 chữ số CCCD" },
+              { name: "degrees", label: "Bằng cấp & Chứng chỉ chuyên môn (cách nhau bởi dấu phẩy)", type: "textarea", value: u.degrees || "", placeholder: "Cử nhân Quản trị Du lịch, TOEIC 850, Thẻ HDV Quốc tế..." },
+              { name: "birthday", label: "Ngày sinh", type: "date", value: u.birthday || "" },
+              { name: "gender", label: "Giới tính", type: "select", options: [["", "-- Chọn giới tính --"], ["male", "Nam"], ["female", "Nữ"], ["other", "Khác"]], value: u.gender || "" },
+              { name: "address", label: "Địa chỉ liên hệ / Thường trú", type: "text", value: u.address || "", placeholder: "Số nhà, đường, quận/huyện, tỉnh/thành" },
+              { name: "bankName", label: "Tên Ngân hàng nhận lương", type: "text", value: u.bankName || "", placeholder: "Vietcombank, MB Bank, Techcombank..." },
+              { name: "accountNumber", label: "Số tài khoản ngân hàng", type: "text", value: u.accountNumber || "", placeholder: "Số tài khoản ngân hàng" },
+              { name: "accountHolder", label: "Tên chủ tài khoản (In hoa không dấu)", type: "text", value: u.accountHolder || "", placeholder: "NGUYEN VAN A" },
+              { name: "bio", label: "Giới thiệu bản thân & Kinh nghiệm", type: "textarea", value: u.bio || "", placeholder: "Kinh nghiệm làm việc, kỹ năng, ghi chú..." }
+            ], { submit: "Lưu thay đổi", kind: "ok", intro: "Cập nhật hồ sơ cá nhân sẽ được lưu trữ an toàn trong hệ thống." });
+
+            if (v) {
+              await act(null, () => post("/api/auth/profile", {
+                name: v.name,
+                phone: v.phone,
+                gmail: v.gmail,
+                facebook: v.facebook,
+                idCard: v.idCard,
+                degrees: v.degrees,
+                birthday: v.birthday,
+                gender: v.gender,
+                address: v.address,
+                bankName: v.bankName,
+                accountNumber: v.accountNumber,
+                accountHolder: (v.accountHolder || "").toUpperCase(),
+                bio: v.bio
+              }), "Đã cập nhật hồ sơ cá nhân thành công!", reload);
+            }
+          };
+
+          $("#btn-change-staff-pw", el).onclick = () => {
+            changePasswordScreen(u, false);
+          };
+
+          // ── Xử lý xem ảnh và thay ảnh đại diện nhân viên (lưu vào frontend/img/avatars/staff/) ──
+          const trig = $("#staff-avatar-trigger", el);
+          const cam = $("#staff-avatar-cam-btn", el);
+          const fileInp = $("#staff-avatar-file", el);
+
+          const openAvatarMenu = async (e) => {
+            if (e) e.stopPropagation();
+            const curPic = u.avatar || u.picture;
+            if (curPic) {
+              const fullPicUrl = /^(https?:|\/|data:)/.test(curPic) ? curPic : "/" + curPic;
+              const choice = await modal(`Ảnh đại diện: ${esc(u.name)}`, `
+                <div style="text-align:center;padding:12px">
+                  <img src="${esc(fullPicUrl)}" alt="${esc(u.name)}" style="max-width:100%;max-height:55vh;border-radius:12px;box-shadow:0 4px 18px rgba(0,0,0,0.2);object-fit:contain">
+                  <div style="margin-top:12px;font-size:12px;color:var(--muted)">Đường dẫn ảnh: <span class="mono">${esc(curPic)}</span></div>
+                </div>
+              `, [
+                { label: "Đóng", value: null },
+                { label: "🗑️ Xóa ảnh", kind: "bad", value: "remove" },
+                { label: "📷 Chọn ảnh mới từ máy", kind: "primary", value: "change" }
+              ]);
+              if (choice === "change") {
+                fileInp.click();
+              } else if (choice === "remove") {
+                if (await confirmBox("Xóa ảnh đại diện", "Bạn có chắc muốn xóa ảnh đại diện nhân viên và quay về chữ cái đại diện mặc định?", "bad")) {
+                  await act(null, () => post("/api/upload/staff-avatar", { remove: true }), "Đã xóa ảnh đại diện.", async () => {
+                    u.avatar = null;
+                    u.picture = null;
+                    try {
+                      const sess = JSON.parse(localStorage.getItem("travel_session_v1") || "{}");
+                      if (sess.user) { sess.user.avatar = null; sess.user.picture = null; localStorage.setItem("travel_session_v1", JSON.stringify(sess)); }
+                    } catch (err) {}
+                    const topWho = document.querySelector(".who");
+                    const topImg = topWho?.querySelector("img.avatar");
+                    if (topImg) {
+                      const sp = document.createElement("span");
+                      sp.className = "avatar";
+                      sp.textContent = (u.initials || u.name || "?").slice(0, 2);
+                      topImg.replaceWith(sp);
+                    }
+                    reload();
+                  });
+                }
+              }
+            } else {
+              fileInp.click();
+            }
+          };
+
+          if (trig) trig.onclick = openAvatarMenu;
+          if (cam) cam.onclick = e => { e.stopPropagation(); fileInp?.click(); };
+
+          if (fileInp) {
+            fileInp.onchange = async () => {
+              const file = fileInp.files && fileInp.files[0];
+              fileInp.value = "";
+              if (!file) return;
+              if (!/^image\/(png|jpeg|webp|gif)$/.test(file.type)) {
+                toast("Chỉ nhận ảnh PNG, JPG, WEBP hoặc GIF", "bad");
+                return;
+              }
+              if (file.size > 5 * 1024 * 1024) {
+                toast("Ảnh quá lớn (tối đa 5MB)", "bad");
+                return;
+              }
+              try {
+                toast("Đang thu nhỏ và tải ảnh nhân viên lên máy chủ...", "info");
+                const dataUrl = await fileToJpegDataUrl(file, 600);
+                const res = await post("/api/upload/staff-avatar", { dataUrl });
+                if (res && res.picture) {
+                  u.avatar = res.picture;
+                  u.picture = res.picture;
+                  try {
+                    const sess = JSON.parse(localStorage.getItem("travel_session_v1") || "{}");
+                    if (sess.user) {
+                      sess.user.avatar = res.picture;
+                      sess.user.picture = res.picture;
+                      localStorage.setItem("travel_session_v1", JSON.stringify(sess));
+                    }
+                  } catch (e) {}
+                  const topWho = document.querySelector(".who");
+                  const topImg = topWho?.querySelector("img.avatar");
+                  if (topImg) {
+                    topImg.src = res.picture;
+                  } else if (topWho) {
+                    const sp = topWho.querySelector("span.avatar");
+                    if (sp) {
+                      const img = document.createElement("img");
+                      img.src = res.picture;
+                      img.className = "avatar";
+                      img.style.cssText = "width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid #f59e0b;padding:0";
+                      sp.replaceWith(img);
+                    }
+                  }
+                  toast("Đã cập nhật ảnh đại diện nhân viên thành công! ✅", "ok");
+                  await reload();
+                }
+              } catch (err) {
+                toast("Không thể tải ảnh: " + (err.message || err), "bad");
+              }
+            };
+          }
+        }
+
+        await reload();
+      }
+    };
+  }
+
   async function boot(cfg) {
     onUnauth = () => loginScreen(cfg, "Phiên đăng nhập đã hết, vui lòng đăng nhập lại.");
     let user;
@@ -369,8 +744,12 @@ const Staff = (() => {
     if (!cfg.roles.includes(user.role)) return deniedScreen(cfg, user);
     const perms = new Set(user.permissions || []);
     const has = p => !p || perms.has(p);
-    const extraSec = user.role !== "admin" ? [staffWalletSection()] : [];
-    const sections = cfg.sections.concat(extraSec).concat(window.Inbox ? [window.Inbox.section()] : []).filter(s => has(s.perm));
+    const extraSec = [staffProfileSection()];
+    if (user.role !== "admin") {
+      extraSec.unshift(staffWalletSection());
+    }
+    const filteredCfgSections = (cfg.sections || []).filter(s => s.id !== "profile");
+    const sections = filteredCfgSections.concat(extraSec).concat(window.Inbox ? [window.Inbox.section()] : []).filter(s => has(s.perm));
     const links = (cfg.links || []).filter(l => has(l.perm));
     if (!sections.length) return deniedScreen(cfg, user);
     const ctx = { user, perms, has, refresh: () => show(current, true) };
@@ -388,20 +767,34 @@ const Staff = (() => {
         }).join("");
       })()}
       ${links.length ? `<div class="sep"></div><div class="grp">Làm thay</div>${links.map(l => `<a href="${l.href}"><span class="ic">${l.icon || "↗"}</span><span>${esc(l.label)}</span></a>`).join("")}` : ""}</nav>
-      <div class="side-foot"><a href="#" id="chpw" style="color:#9fc3e6">Đổi mật khẩu</a> · <a href="#" id="lout" style="color:#9fc3e6">Đăng xuất</a></div></aside>
+      <div class="side-foot">
+        <a href="#profile" class="side-foot-profile" title="Xem & quản lý hồ sơ cá nhân">
+          <span>👤</span><span>Hồ sơ cá nhân</span>
+        </a>
+        <div class="side-foot-actions">
+          <button type="button" class="side-btn-action" id="chpw" title="Đổi mật khẩu tài khoản">
+            <span>🔑</span><span>Đổi MK</span>
+          </button>
+          <button type="button" class="side-btn-action side-btn-logout" id="lout" title="Đăng xuất khỏi hệ thống">
+            <span>🚪</span><span>Đăng xuất</span>
+          </button>
+        </div>
+      </div></aside>
       <div class="main"><header class="top"><button class="menu-btn" id="mb" aria-label="Mở menu">☰</button><h1 id="ttl" style="margin-right:auto"></h1>
       ${user.role !== "admin" ? `<a href="#my-wallet" class="btn sm" id="staff-wallet-pill" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px;font-weight:700;background:#ecfdf5;border:1px solid #a7f3d0;color:#047857;margin-right:10px" title="Ví thu nhập cá nhân"><span>💳 <span id="staff-wallet-quick-lbl">Thu nhập:</span></span><span id="staff-wallet-quick-amt">15.000.000 ₫</span></a>` : ""}
       <button class="bell" id="bell" aria-label="Thông báo">🔔<span class="n hidden" id="bn"></span></button>
-      <div class="who">
+      <a href="#profile" class="who" style="text-decoration:none;color:inherit;cursor:pointer" title="Xem & chỉnh sửa hồ sơ cá nhân">
         ${(user.avatar || user.picture)
           ? `<img src="${esc(user.avatar || user.picture)}" alt="${esc(user.name)}" class="avatar" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid #f59e0b;padding:0">`
           : `<span class="avatar">${esc((user.initials || user.name || "?").slice(0, 2))}</span>`}
         <div><b>${esc(user.name)}</b> <span class="badge info" style="margin-left:4px;font-size:0.75rem">${esc(ROLE_NAME[user.role] || user.role)}</span><small style="display:block">${esc(user.id)}</small></div>
-      </div></header>
+      </a></header>
       <main class="content" id="view" tabindex="-1"></main></div></div>`;
     $("#mb").onclick = () => $("#side").classList.toggle("open");
     $("#lout").onclick = async e => {
       e.preventDefault();
+      const ok = await confirmBox("Xác nhận đăng xuất", "Bạn có chắc chắn muốn đăng xuất khỏi phiên làm việc hiện tại?", "bad");
+      if (!ok) return;
       try { await post("/api/auth/logout"); } catch (x) { /* ignore */ }
       localStorage.removeItem("travel_auth_v1");
       localStorage.removeItem("travel_session_v1");

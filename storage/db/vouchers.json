@@ -1,0 +1,33 @@
+[
+  {
+    "id": "vouch_01",
+    "code": "WELCOME2026",
+    "discountPercent": 10,
+    "maxDiscount": 500000,
+    "minOrder": 2000000,
+    "expiryDate": "2026-12-31",
+    "active": true,
+    "usageCount": 48,
+    "note": "Mã giảm giá chào đón thành viên mới"
+  },
+  {
+    "id": "vouch_02",
+    "code": "TRIAN500",
+    "discountAmount": 500000,
+    "minOrder": 5000000,
+    "expiryDate": "2026-11-30",
+    "active": true,
+    "usageCount": 25,
+    "note": "Tri ân khách hàng thân thiết mùa thu"
+  },
+  {
+    "id": "vouch_03",
+    "code": "HANOI200",
+    "discountAmount": 200000,
+    "minOrder": 2000000,
+    "expiryDate": "2026-12-15",
+    "active": true,
+    "usageCount": 62,
+    "note": "Ưu đãi tour miền Bắc"
+  }
+]

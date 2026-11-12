@@ -150,3 +150,283 @@ svg {
     flex-wrap: wrap;
   }
 }
+
+/* ═════════════════════════════════════════════════════════════════════════
+   TOÀN DIỆN CHO ĐIỆN THOẠI DI ĐỘNG (SMARTPHONE ≤ 768px & ≤ 480px)
+   ═════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  /* 1. Header & Mobile Navigation Menu */
+  .nav {
+    padding: 0 14px;
+    height: 60px;
+  }
+  .nav-mobile-toggle {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    font-size: 24px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+  }
+  .nav-right {
+    display: none;
+    position: absolute;
+    top: 60px;
+    left: 0;
+    right: 0;
+    background: rgba(13, 33, 55, 0.98);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 2px solid var(--amber, #f59e0b);
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4);
+    flex-direction: column;
+    align-items: stretch;
+    padding: 16px 16px 22px;
+    gap: 6px;
+    z-index: 999;
+  }
+  .nav-right.open {
+    display: flex;
+    animation: mobileNavSlideDown 0.22s ease-out;
+  }
+  @keyframes mobileNavSlideDown {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .nav-btn {
+    width: 100%;
+    text-align: left;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 11px 16px;
+    border-radius: 8px;
+    color: #e2e8f0;
+    display: flex;
+    align-items: center;
+  }
+  .nav-btn:hover, .nav-btn.active {
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+  }
+  #nav-auth-area {
+    width: 100%;
+    margin-top: 6px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+  }
+  #nav-auth-area .user-chip {
+    width: 100%;
+    justify-content: flex-start;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.08);
+  }
+  #nav-auth-area .nav-btn-login {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+    background: var(--amber, #f59e0b);
+    color: #0d2137;
+    font-weight: 700;
+  }
+
+  /* 2. Banner & Slider trên mobile */
+  .bn-wrap {
+    border-radius: 12px;
+    margin-bottom: 16px;
+  }
+  .bn-slide {
+    min-height: 220px !important;
+    padding: 22px 18px !important;
+  }
+  .bn-inner h2 {
+    font-size: 1.35rem !important;
+    line-height: 1.3 !important;
+    margin-bottom: 6px !important;
+  }
+  .bn-inner p {
+    font-size: 0.88rem !important;
+    margin-bottom: 12px !important;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .bn-cta {
+    padding: 9px 18px !important;
+    font-size: 0.88rem !important;
+  }
+
+  /* 3. Hero & Tuyến Bắc - Nam trên mobile */
+  .hm-hero {
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+    min-height: auto !important;
+    padding: 16px 0 20px !important;
+  }
+  .hm-title {
+    font-size: 2.2rem !important;
+    line-height: 1.15 !important;
+  }
+  .hm-lead {
+    font-size: 0.98rem !important;
+    margin-bottom: 18px !important;
+  }
+  .hm-regions {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+    padding: 8px !important;
+  }
+  .hm-reg {
+    padding: 10px 10px !important;
+  }
+  .hm-reg-n {
+    font-size: 1.35rem !important;
+  }
+  .hm-route {
+    max-width: 320px;
+    margin: 0 auto !important;
+  }
+
+  /* 4. Tour Ghép Đoàn & Danh sách Tour trên mobile */
+  #homeTourPoolList {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+  .tour-card {
+    border-radius: 12px !important;
+    padding: 14px 14px !important;
+  }
+  .tour-card .tc-name {
+    font-size: 1.05rem !important;
+  }
+
+  /* 5. Bản đồ thế giới & Tìm tour trên mobile */
+  .wm-layout,
+  .tf-layout {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+  }
+  .wm-map-wrap,
+  .tf-map-wrap {
+    height: 320px !important;
+    min-height: 320px !important;
+    order: -1; /* Đưa bản đồ lên trên danh sách để thấy ngay */
+  }
+  #wm-map-container,
+  #tf-map-container {
+    height: 320px !important;
+    min-height: 320px !important;
+  }
+  .wm-tours {
+    max-height: 380px !important;
+  }
+
+  /* 6. Chi tiết tour trang riêng (.tp-layout) trên mobile */
+  .tp-layout {
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+  }
+  .tp-hero {
+    height: 200px !important;
+  }
+  .tp-side {
+    position: static !important;
+    width: 100% !important;
+  }
+  .tp-card {
+    padding: 18px 16px !important;
+  }
+  .tp-price {
+    font-size: 2rem !important;
+  }
+
+  /* 7. Modal đặt tour & xem nhanh (.tdm-sheet) trên mobile */
+  .tdm-sheet {
+    width: 95vw !important;
+    max-width: 500px !important;
+    max-height: 90vh !important;
+    padding: 18px 14px !important;
+    border-radius: 14px !important;
+  }
+  .tdm-hero {
+    height: 160px !important;
+  }
+  .tdm-title {
+    font-size: 1.25rem !important;
+  }
+  .tdm-meta-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+  }
+  .tdm-pax-grid {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+  .tdm-booking-actions {
+    flex-direction: column-reverse !important;
+    gap: 10px !important;
+  }
+  .tdm-booking-actions button {
+    width: 100% !important;
+  }
+
+  /* 8. Trang cá nhân Profile & Tabs trên mobile */
+  .profile-tabs-header {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    flex-wrap: nowrap !important;
+    scrollbar-width: none !important;
+    padding-bottom: 6px !important;
+  }
+  .profile-tabs-header::-webkit-scrollbar {
+    display: none;
+  }
+  .profile-tab-btn {
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+    padding: 8px 14px !important;
+    font-size: 13px !important;
+  }
+  .tl-stats-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+  }
+  .tl-order-card {
+    padding: 14px !important;
+  }
+  .tl-order-acts {
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+  }
+  .tl-order-acts .btn {
+    flex: 1 1 calc(50% - 6px) !important;
+    text-align: center !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .tl-stats-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .hm-title {
+    font-size: 1.9rem !important;
+  }
+  .bn-inner h2 {
+    font-size: 1.2rem !important;
+  }
+  .tour-card .tc-right {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+  }
+  .tour-card .btn-detail {
+    width: 100% !important;
+    text-align: center !important;
+  }
+  .tdm-meta-grid {
+    grid-template-columns: 1fr !important;
+  }
+}

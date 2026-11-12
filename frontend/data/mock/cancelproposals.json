@@ -1,0 +1,54 @@
+[
+  {
+    "id": "cp_001",
+    "tourId": "101",
+    "tourName": "Hà Nội – Hạ Long 3N2Đ",
+    "date": "2026-11-14",
+    "pax": 3,
+    "minGuests": 10,
+    "reason": "Không đủ số lượng khách tối thiểu để khởi hành chuyến riêng (3/10 khách).",
+    "status": "pending",
+    "proposedBy": "dh001",
+    "proposedByName": "Trần Điều Hành",
+    "createdAt": "2026-11-09T10:00:00Z"
+  },
+  {
+    "id": "cp_002",
+    "tourId": "105",
+    "tourName": "Phú Quốc – Thiên Đường Đảo Ngọc 3N2Đ",
+    "date": "2026-11-15",
+    "pax": 8,
+    "minGuests": 10,
+    "reason": "Không thể bố trí HDV phù hợp do tất cả HDV biển đảo đều kẹt lịch tour quốc tế.",
+    "status": "pending",
+    "proposedBy": "dh001",
+    "proposedByName": "Trần Điều Hành",
+    "createdAt": "2026-11-10T08:45:00Z"
+  },
+  {
+    "id": "cp_003",
+    "tourId": "103",
+    "tourName": "Đà Nẵng – Hội An – Bà Nà Hills 4N3Đ",
+    "date": "2026-11-16",
+    "pax": 4,
+    "minGuests": 10,
+    "reason": "Dự báo thời tiết áp thấp nhiệt đới gây mưa bão lớn tại miền Trung.",
+    "status": "pending",
+    "proposedBy": "dh001",
+    "proposedByName": "Trần Điều Hành",
+    "createdAt": "2026-11-10T09:30:00Z"
+  },
+  {
+    "id": "cp_004",
+    "tourId": "102",
+    "tourName": "Sa Pa – Fansipan Huyền Thoại 3N2Đ",
+    "date": "2026-11-18",
+    "pax": 5,
+    "minGuests": 10,
+    "reason": "Bảo trì định kỳ tuyến cáp treo Fansipan trùng ngày khởi hành của đoàn.",
+    "status": "pending",
+    "proposedBy": "dh001",
+    "proposedByName": "Trần Điều Hành",
+    "createdAt": "2026-11-10T10:15:00Z"
+  }
+]

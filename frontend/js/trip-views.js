@@ -447,6 +447,52 @@ function renderProfile() {
   $id("pf-name-display").textContent = user.name;
   $id("pf-email").textContent        = user.email;
 
+  const phoneEl = $id("pf-phone");
+  if (phoneEl) phoneEl.textContent = user.phone || "Chưa có số điện thoại";
+
+  const gmailEl = $id("pf-gmail");
+  if (gmailEl) {
+    if (user.gmail) {
+      gmailEl.innerHTML = `<a href="mailto:${esc(user.gmail)}" style="color:var(--primary,#0284c7)">${esc(user.gmail)}</a>`;
+    } else {
+      gmailEl.textContent = "Chưa có Gmail liên hệ";
+    }
+  }
+
+  const fbEl = $id("pf-facebook");
+  if (fbEl) {
+    if (user.facebook) {
+      const fbUrl = user.facebook.startsWith("http") ? user.facebook : "https://" + user.facebook;
+      fbEl.innerHTML = `<a href="${esc(fbUrl)}" target="_blank" rel="noopener noreferrer" style="color:#2563eb;font-weight:600">🌐 ${esc(user.facebook)}</a>`;
+    } else {
+      fbEl.textContent = "Chưa liên kết Facebook";
+    }
+  }
+
+  const degEl = $id("pf-degrees");
+  if (degEl) {
+    if (user.degrees) {
+      degEl.innerHTML = `<b style="color:#0369a1">${esc(user.degrees)}</b>`;
+    } else {
+      degEl.textContent = "Chưa cập nhật bằng cấp / chứng chỉ";
+    }
+  }
+
+  const idCardEl = $id("pf-idcard");
+  if (idCardEl) idCardEl.textContent = user.idCard || "Chưa cập nhật CCCD/CMND";
+
+  const addrEl = $id("pf-address");
+  if (addrEl) addrEl.textContent = user.address || "Chưa cập nhật địa chỉ";
+
+  // Điền sẵn vào form sửa thông tin
+  if ($id("pf-name-input")) $id("pf-name-input").value = user.name || "";
+  if ($id("pf-phone-input")) $id("pf-phone-input").value = user.phone || "";
+  if ($id("pf-gmail-input")) $id("pf-gmail-input").value = user.gmail || "";
+  if ($id("pf-facebook-input")) $id("pf-facebook-input").value = user.facebook || "";
+  if ($id("pf-degrees-input")) $id("pf-degrees-input").value = user.degrees || "";
+  if ($id("pf-idcard-input")) $id("pf-idcard-input").value = user.idCard || "";
+  if ($id("pf-address-input")) $id("pf-address-input").value = user.address || "";
+
   const providerMap = {
     google:   "Đăng nhập bằng Google",
     facebook: "Đăng nhập bằng Facebook",

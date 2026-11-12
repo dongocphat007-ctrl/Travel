@@ -10,19 +10,44 @@
 
   async function pick(b, after, replace) {
     const r = await get(`/api/operator/bookings/${b.id}/candidates`);
-    const body = `<p class="muted">Đơn <b>${esc(b.payCode)}</b> – ${esc(b.tourName)} – đi ${day(b.date)} (cần HDV ${esc(GT[b.requiredGuideType] || "phù hợp")}). HDV không rảnh / không phù hợp bị khóa và hiện lý do.</p>` +
+    const availCount = (r.guides || []).filter(g => g.available).length;
+    const warnNoGuide = availCount === 0
+      ? `<div class="note bad" style="margin-bottom:12px"><b>⚠️ Không có HDV khả dụng:</b> Tất cả ${r.guides.length} HDV đều bận, đang nghỉ hoặc không phụ trách khu vực này. Bạn có thể bấm nút <b>"🚫 Không có HDV – Đề xuất hủy tour"</b> bên dưới để gửi Admin duyệt hủy tour và hoàn tiền cho khách.</div>`
+      : "";
+    const body = warnNoGuide + `<p class="muted">Đơn <b>${esc(b.payCode)}</b> – ${esc(b.tourName)} – đi ${day(b.date)} (cần HDV ${esc(GT[b.requiredGuideType] || "phù hợp")}). HDV không rảnh / không phù hợp bị khóa và hiện lý do.</p>` +
       table([{ t: "HDV", html: g => `<b>${esc(g.name)}</b><div class="small muted">${esc(GT[g.guideType] || g.guideType)} · ${esc(ET[g.employmentType] || g.employmentType)}</div>` }, { t: "Khu vực", html: g => esc((g.regions || []).join(", ")) }, { t: "Đánh giá", num: true, html: g => g.rating ? esc(g.rating) + " ★" : "—" }, { t: "Số tour tháng", num: true, k: "workload" },
         { t: "", html: g => g.available ? `<button class="btn ok sm" data-g="${esc(g.id)}">Chọn</button>` : `<span class="small" style="color:var(--bad)">${esc([g.fitProblem].concat(g.reasons || []).filter(Boolean).join("; "))}</span>` }], r.guides, { empty: "Chưa có HDV" });
-    await Staff.modal("Chọn hướng dẫn viên", body, [{ label: "Đóng" }], { wide: true, onOpen: (ov, close) => $$("[data-g]", ov).forEach(btn => btn.onclick = async () => {
-      if (replace) {   // 6.6: thay HDV giữa chừng – bắt buộc lý do, HDV mới dẫn tiếp ngay
-        const v = await ask("Thay HDV giữa chừng", [{ name: "reason", label: "Lý do thay HDV (ốm, tai nạn...)", type: "textarea", required: true }], { kind: "bad", submit: "Thay HDV" }); if (!v) return;
+
+    const modalBtns = [{ label: "Đóng" }];
+    if (!replace) {
+      modalBtns.push({ label: "🚫 Không có HDV – Đề xuất hủy tour", kind: "bad", value: "cancel_dep" });
+    }
+
+    await Staff.modal("Chọn hướng dẫn viên – " + b.payCode, body, modalBtns, { wide: true, onOpen: (ov, close) => {
+      $$("[data-g]", ov).forEach(btn => btn.onclick = async () => {
+        if (replace) {   // 6.6: thay HDV giữa chừng – bắt buộc lý do, HDV mới dẫn tiếp ngay
+          const v = await ask("Thay HDV giữa chừng", [{ name: "reason", label: "Lý do thay HDV (ốm, tai nạn...)", type: "textarea", required: true }], { kind: "bad", submit: "Thay HDV" }); if (!v) return;
+          const lock = $$("[data-g]", ov); lock.forEach(x => x.disabled = true);   // chặn bấm hai lần khi máy chủ đang xử lý
+          const ok = await act(null, () => post(`/api/operator/bookings/${b.id}/replace-guide`, { guideId: btn.dataset.g, reason: v.reason }), "Đã thay HDV, khách và HDV mới đã được báo.");
+          if (ok) { close(true); if (after) after().catch(fail); } else lock.forEach(x => x.disabled = false); return;
+        }
         const lock = $$("[data-g]", ov); lock.forEach(x => x.disabled = true);   // chặn bấm hai lần khi máy chủ đang xử lý
-        const ok = await act(null, () => post(`/api/operator/bookings/${b.id}/replace-guide`, { guideId: btn.dataset.g, reason: v.reason }), "Đã thay HDV, khách và HDV mới đã được báo.");
-        if (ok) { close(true); if (after) after().catch(fail); } else lock.forEach(x => x.disabled = false); return;
+        const ok = await act(null, () => post(`/api/operator/bookings/${b.id}/assign`, { guideId: btn.dataset.g }), "Đã gán HDV, chờ HDV trả lời.");
+        if (ok) { close(true); if (after) after().catch(fail); } else lock.forEach(x => x.disabled = false);
+      });
+
+      const cancelBtn = $$(".acts button", ov).find(btn => btn.textContent.includes("Đề xuất hủy tour"));
+      if (cancelBtn) {
+        cancelBtn.onclick = async () => {
+          const v = await ask("Đề xuất hủy tour do thiếu HDV", [
+            { name: "reason", label: "Lý do đề xuất hủy tour (gửi Admin duyệt)", type: "textarea", value: `Không thể bố trí HDV phù hợp cho chuyến khởi hành ngày ${day(b.date)} (đơn ${b.payCode}).`, required: true }
+          ], { kind: "bad", intro: `Chuyến <b>${esc(b.tourName)}</b> – ngày <b>${day(b.date)}</b>. Đề xuất sẽ gửi đến Admin phê duyệt hủy và hoàn tiền 100% cho khách hàng.`, submit: "Gửi Admin duyệt hủy" });
+          if (!v) return;
+          const ok = await act(cancelBtn, () => post("/api/operator/cancel-proposals", { tourId: b.tourId, date: b.date, reason: v.reason }), "Đã gửi đề xuất hủy tour do thiếu HDV cho Admin.");
+          if (ok) { close(true); if (after) after().catch(fail); }
+        };
       }
-      const lock = $$("[data-g]", ov); lock.forEach(x => x.disabled = true);   // chặn bấm hai lần khi máy chủ đang xử lý
-      const ok = await act(null, () => post(`/api/operator/bookings/${b.id}/assign`, { guideId: btn.dataset.g }), "Đã gán HDV, chờ HDV trả lời.");
-      if (ok) { close(true); if (after) after().catch(fail); } else lock.forEach(x => x.disabled = false); }) });
+    } });
   }
   const orderCols = (extra) => [{ t: "Mã đơn", html: b => `<a href="#" data-view="${esc(b.id)}" class="mono">${esc(b.payCode)}</a>` }, { t: "Tour", html: b => `${esc(b.tourName)}<div class="small muted">${b.pax} khách</div>` }, { t: "Ngày đi", html: b => day(b.date), sort: b => b.date }, ...extra];
   const bindView = el => $$("[data-view]", el).forEach(a => a.onclick = e => { e.preventDefault(); Parts.showOrder(`/api/operator/bookings/${a.dataset.view}`, "Chi tiết đơn").catch(fail); });
@@ -30,21 +55,72 @@
   const sections = [
     { id: "home", label: "Tổng quan", icon: "📈", perm: "stats:view_operator", async render(el) {
       const s = (await get("/api/operator/stats")).stats;
-      const k = (l, v, c) => `<div class="kpi ${v && c ? c : ""}"><div class="l">${l}</div><div class="v">${v}</div></div>`;
-      el.innerHTML = `<div class="grid g3">${k("Đơn chưa có HDV", s.unassigned, "warn")}${k("Chờ HDV trả lời", s.guidePending)}${k("HDV đã nhận", s.guideAccepted, "ok")}${k("Chuyến đi trong 7 ngày", s.upcoming7d)}${k("Sự cố đang mở", s.openIncidents, "bad")}${k("Chuyến có nguy cơ thiếu khách", s.atRiskDepartures, "warn")}</div>
+      const k = (l, v, c, href) => `<a href="${href || '#'}" class="kpi ${v && c ? c : ""}" style="text-decoration:none;cursor:pointer"><div class="l">${l}</div><div class="v">${v}</div></a>`;
+      el.innerHTML = `<div class="grid g3">${k("Đơn chưa có HDV", s.unassigned, "warn", "#assign")}${k("Chờ HDV trả lời", s.guidePending, "", "#assign")}${k("HDV đã nhận", s.guideAccepted, "ok", "#assign")}${k("Chuyến đi trong 7 ngày", s.upcoming7d, "", "#departures")}${k("Sự cố đang mở", s.openIncidents, "bad", "#incidents")}${k("Chuyến có nguy cơ thiếu khách", s.atRiskDepartures, "warn", "#departures")}</div>
         <div class="note info">Trang này không hiển thị số tiền. Việc thanh toán do Thu ngân và Admin phụ trách.</div>`;
     } },
-    { id: "assign", label: "Gán HDV", icon: "🧭", perm: "tour:assign_guide", async badge() { return (await get("/api/operator/queue")).unassigned.length; }, async render(el) {
+    { id: "assign", label: "Gán HDV", icon: "🧭", perm: "tour:assign_guide", async badge() {
+        const q = await get("/api/operator/queue");
+        return (q.unassigned.length || 0) + (q.rejected.length || 0);
+      }, async render(el) {
       async function reload() {
         const q = await get("/api/operator/queue");
-        tabs(el, [{ id: "u", label: "Chưa có HDV", n: q.unassigned.length }, { id: "r", label: "HDV đã từ chối / quá hạn", n: q.rejected.length }, { id: "p", label: "Chờ HDV trả lời", n: q.pending.length }, { id: "a", label: "HDV đã nhận", n: q.accepted.length }, { id: "g", label: "Đang đi tour", n: (q.running || []).length }], (id, box) => {
-          const list = { u: q.unassigned, r: q.rejected, p: q.pending, a: q.accepted, g: q.running || [] }[id];
-          const actCol = { t: "", html: b => id === "g" ? `<button class="btn bad sm" data-rp="${esc(b.id)}">Thay HDV</button>` : id === "a" ? `<button class="btn sm" data-un="${esc(b.id)}">Gỡ / đổi</button>` : id === "p" ? `<button class="btn sm" data-un="${esc(b.id)}">Gỡ</button>` : `<button class="btn primary sm" data-as="${esc(b.id)}">Chọn HDV</button>` };
-          box.innerHTML = table(orderCols([{ t: "HDV", html: b => esc(b.guideName || "—") + issueBadge(b) + (b.assignment && b.assignment.deadline && id === "p" ? `<div class="small muted">Hạn trả lời ${dt(b.assignment.deadline)}</div>` : "") + (b.assignment && (b.assignment.rejected || []).length ? `<div class="small" style="color:var(--bad)">${b.assignment.rejected.map(r => esc(r.reason)).join("; ")}</div>` : "") }, actCol]), list, { sortable: true, empty: "Không có đơn nào" });
+        const allList = [
+          ...q.unassigned.map(x => ({ ...x, _tab: "u" })),
+          ...q.rejected.map(x => ({ ...x, _tab: "r" })),
+          ...q.pending.map(x => ({ ...x, _tab: "p" })),
+          ...q.accepted.map(x => ({ ...x, _tab: "a" })),
+          ...(q.running || []).map(x => ({ ...x, _tab: "g" }))
+        ];
+        allList.sort((a, b) => (a.date || "").localeCompare(b.date || ""));
+
+        const tabItems = [
+          { id: "u", label: "Chưa có HDV", n: q.unassigned.length },
+          { id: "r", label: "HDV đã từ chối / quá hạn", n: q.rejected.length },
+          { id: "p", label: "Chờ HDV trả lời", n: q.pending.length },
+          { id: "a", label: "HDV đã nhận", n: q.accepted.length },
+          { id: "g", label: "Đang đi tour", n: (q.running || []).length },
+          { id: "all", label: "Tất cả đơn", n: allList.length }
+        ];
+
+        tabs(el, tabItems, (id, box) => {
+          const list = id === "all" ? allList : { u: q.unassigned, r: q.rejected, p: q.pending, a: q.accepted, g: q.running || [] }[id];
+          const actCol = { t: "Thao tác", nowrap: true, html: b => {
+            const curState = id === "all" ? (b._tab || "u") : id;
+            if (curState === "g") return `<button class="btn bad sm" data-rp="${esc(b.id)}">Thay HDV</button>`;
+            if (curState === "a") return `<button class="btn sm" data-un="${esc(b.id)}">Gỡ / đổi</button>`;
+            if (curState === "p") return `<button class="btn sm" data-un="${esc(b.id)}">Gỡ</button>`;
+            return `<div class="row" style="gap:4px"><button class="btn primary sm" data-as="${esc(b.id)}">Chọn HDV</button><button class="btn bad sm" data-cancel-dep="${esc(b.id)}" title="Đề xuất hủy tour nếu thiếu HDV">🚫 Hủy tour</button></div>`;
+          }};
+          const stBadge = b => {
+            const curState = id === "all" ? (b._tab || "u") : id;
+            if (curState === "u") return `<span class="badge warn">Chưa có HDV</span>`;
+            if (curState === "r") return `<span class="badge bad">Từ chối / quá hạn</span>`;
+            if (curState === "p") return `<span class="badge info">Chờ HDV duyệt</span>`;
+            if (curState === "a") return `<span class="badge ok">HDV đã nhận</span>`;
+            if (curState === "g") return `<span class="badge">Đang đi</span>`;
+            return "";
+          };
+          const extraCols = id === "all" ? [{ t: "Trạng thái", html: stBadge }] : [];
+
+          let alertHtml = "";
+          if (id === "u" && q.unassigned.length === 0 && q.pending.length > 0) {
+            alertHtml = `<div class="note info" style="margin-bottom:12px">💡 <b>Hệ thống tự động điều phối:</b> Hiện không có đơn nào chưa có HDV. Có <b>${q.pending.length} đơn</b> vừa được hệ thống tự động gán HDV phù hợp nhất và đang ở tab <b>"Chờ HDV trả lời"</b> (hoặc bấm xem ở tab <b>"Tất cả đơn"</b>).</div>`;
+          }
+
+          box.innerHTML = alertHtml + table(orderCols([...extraCols, { t: "HDV", html: b => esc(b.guideName || "—") + issueBadge(b) + (b.assignment && b.assignment.deadline && (id === "p" || b._tab === "p") ? `<div class="small muted">Hạn trả lời ${dt(b.assignment.deadline)}</div>` : "") + (b.assignment && (b.assignment.rejected || []).length ? `<div class="small" style="color:var(--bad)">${b.assignment.rejected.map(r => esc(r.reason)).join("; ")}</div>` : "") }, actCol]), list, { sortable: true, empty: "Không có đơn nào" });
           bindView(box);
           $$("[data-rp]", box).forEach(btn => btn.onclick = () => pick(list.find(x => x.id === btn.dataset.rp), reload, true).catch(fail));
           $$("[data-as]", box).forEach(btn => btn.onclick = () => pick(list.find(x => x.id === btn.dataset.as), reload).catch(fail));
           $$("[data-un]", box).forEach(btn => btn.onclick = async () => { const v = await ask("Gỡ HDV khỏi đơn", [{ name: "reason", label: "Lý do", type: "textarea", required: true }], { kind: "bad", submit: "Gỡ HDV" }); if (v) act(null, () => post(`/api/operator/bookings/${btn.dataset.un}/unassign`, { reason: v.reason }), "Đã gỡ HDV.", reload); });
+          $$("[data-cancel-dep]", box).forEach(btn => btn.onclick = async () => {
+            const b = list.find(x => x.id === btn.dataset.cancelDep);
+            if (!b) return;
+            const v = await ask("Đề xuất hủy tour do thiếu HDV", [
+              { name: "reason", label: "Lý do đề xuất hủy tour (gửi Admin duyệt)", type: "textarea", value: `Không thể bố trí HDV phù hợp cho chuyến khởi hành ngày ${day(b.date)} (đơn ${b.payCode}).`, required: true }
+            ], { kind: "bad", intro: `Chuyến <b>${esc(b.tourName)}</b> – ngày <b>${day(b.date)}</b>. Đề xuất sẽ gửi đến Admin phê duyệt hủy và hoàn tiền 100% cho khách hàng.`, submit: "Gửi Admin duyệt hủy" });
+            if (v) act(null, () => post("/api/operator/cancel-proposals", { tourId: b.tourId, date: b.date, reason: v.reason }), "Đã gửi đề xuất hủy tour do thiếu HDV cho Admin.", reload);
+          });
         }, "u");
       }
       await reload();
@@ -123,6 +199,134 @@
         });
         $$("[data-p]", el).forEach(b => b.onclick = async () => { const d = find(b.dataset.p); const v = await ask("Đề xuất hủy / dồn tour", [{ name: "reason", label: "Lý do đề xuất", type: "textarea", required: true }], { intro: `${esc(d.tourName)} – ${day(d.date)} – hiện ${d.pax}/${d.minGuests} khách tối thiểu. Đề xuất sẽ gửi Admin quyết định.`, submit: "Gửi Admin" }); if (v) act(null, () => post("/api/operator/cancel-proposals", { tourId: d.tourId, date: d.date, reason: v.reason }), "Đã gửi đề xuất cho Admin.", reload); });
       }
+      await reload();
+    } },
+
+    { id: "tour-pool", label: "Ghép tour & Gom đoàn", icon: "🤝", perm: "tour:schedule_manage", async render(el) {
+      el.innerHTML = `
+        <div class="card">
+          <div class="card-header-acts" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+            <div>
+              <h2 style="margin:0">🤝 Ghép Tour & Gom Đoàn Điều Hành</h2>
+              <div class="muted small" style="margin-top:4px">Quét AI & RAG ghép các đoàn khách nhỏ lẻ, gom đủ số lượng tối thiểu để khởi hành hoặc ghép tay trực tiếp.</div>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button class="btn ok" id="op-btn-ai-scan">🤖 AI Quét & Gợi ý ghép (RAG)</button>
+              <button class="btn" id="op-btn-manual-merge">✋ Ghép đoàn bằng tay</button>
+            </div>
+          </div>
+        </div>
+        <div id="op-pool-ai-box" style="display:none;margin-bottom:16px"></div>
+        <div id="op-pool-list-box"></div>
+      `;
+
+      const aiBox = $("#op-pool-ai-box", el);
+      const listBox = $("#op-pool-list-box", el);
+
+      async function reload() {
+        const [poolsRes, bookingsRes] = await Promise.all([
+          get("/api/admin/tours/pool").catch(() => ({ pools: [] })),
+          get("/api/operator/queue").catch(() => ({ unassigned: [], accepted: [] }))
+        ]);
+        const pools = poolsRes.pools || [];
+
+        listBox.innerHTML = `
+          <div class="card">
+            <h3 style="margin:0 0 12px">Danh sách các đoàn đang gom khách (${pools.length})</h3>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));gap:14px">
+              ${pools.map(p => {
+                const cur = p.currentPax || 0, min = p.minPax || 10, max = p.maxPax || 16;
+                const isReady = cur >= min;
+                const pct = Math.min(100, Math.round((cur / min) * 100));
+                return `
+                <div class="card" style="border:1px solid var(--border);border-radius:8px;padding:14px;background:var(--surface)">
+                  <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+                    <span class="badge ${p.status === 'open' ? 'ok' : 'info'}">${p.status === 'open' ? 'Đang gom' : 'Chờ đi'}</span>
+                    <span class="badge amber">Ưu đãi -${p.discountPercent || 10}%</span>
+                  </div>
+                  <h4 style="margin:0 0 4px">${esc(p.tourName)}</h4>
+                  <div class="small muted" style="margin-bottom:8px">📍 ${esc(p.destination)} · Ngày: <b>${day(p.date)}</b></div>
+                  <div style="margin-bottom:10px">
+                    <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+                      <span>Tiến độ: <b>${cur}/${min} khách</b></span>
+                      <b style="color:${isReady ? 'var(--ok)' : 'var(--accent)'}">${pct}%</b>
+                    </div>
+                    <div style="width:100%;height:8px;background:var(--border);border-radius:99px;overflow:hidden">
+                      <div style="width:${pct}%;height:100%;background:${isReady ? 'var(--ok)' : 'var(--accent)'};border-radius:99px"></div>
+                    </div>
+                  </div>
+                  <button class="btn sm ok" style="width:100%" data-op-merge-to="${esc(p.id)}">➕ Chọn đơn ghép vào đoàn này</button>
+                </div>`;
+              }).join("")}
+            </div>
+          </div>
+        `;
+
+        $("#op-btn-ai-scan", el).onclick = async () => {
+          aiBox.style.display = "block";
+          aiBox.innerHTML = `<div class="note info">🤖 AI & RAG đang quét đối chiếu các đơn tour lẻ và gợi ý tuyến ghép...</div>`;
+          const aiRes = await post("/api/admin/tours/pool/ai-match", {});
+          const sugs = aiRes.smartSuggestions || [];
+          aiBox.innerHTML = `
+            <div class="card" style="border:2px solid var(--primary);background:#f0fdf4">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+                <b style="color:var(--ok)">🤖 Đề xuất ghép từ AI & RAG (${sugs.length} cặp ghép):</b>
+                <button class="btn sm" id="op-close-ai">Đóng</button>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));gap:12px">
+                ${sugs.map(s => `
+                  <div class="card" style="background:#fff;border:1px solid #bbf7d0;padding:12px;border-radius:8px">
+                    <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px">
+                      <span class="badge ok">Độ khớp: ${s.confidence}%</span>
+                      <span class="badge info">${esc(s.targetVehicle)}</span>
+                    </div>
+                    <div style="font-weight:700;margin-bottom:4px">${esc(s.destination)} · Ngày ${day(s.suggestedDate)}</div>
+                    <div class="small muted" style="margin-bottom:8px">Ghép Đơn <b>${esc(s.booking1.code)}</b> (${s.booking1.pax}k) + Đơn <b>${esc(s.booking2.code)}</b> (${s.booking2.pax}k) ➔ Đoàn <b>${s.combinedPax} khách</b>.</div>
+                    <div class="small" style="color:#166534;margin-bottom:8px">${esc(s.aiReason)}</div>
+                    <button class="btn ok sm" style="width:100%" data-op-ai-act="${esc(s.booking1.id)},${esc(s.booking2.id)}">⚡ Duyệt ghép ngay</button>
+                  </div>
+                `).join("")}
+              </div>
+            </div>`;
+          $("#op-close-ai", aiBox).onclick = () => aiBox.style.display = "none";
+          $$("[data-op-ai-act]", aiBox).forEach(b => b.onclick = async () => {
+            const bids = b.dataset.opAiAct.split(",");
+            if (await confirmBox("Xác nhận ghép đoàn", `Điều hành xác nhận ghép 2 đơn ${bids.join(" & ")} thành chuyến đi chung?`)) {
+              act(null, () => post("/api/admin/tours/pool/merge", { poolId: "pool_dn_2026", bookingIds: bids, note: "Điều hành duyệt ghép đoàn theo gợi ý AI" }), "Đã ghép đoàn thành công!", reload);
+              aiBox.style.display = "none";
+            }
+          });
+        };
+
+        $("#op-btn-manual-merge", el).onclick = async () => {
+          const bks = (await get("/api/admin/bookings?status=")).bookings || [];
+          const eligible = bks.filter(b => !['cancelled','refunded'].includes(b.status));
+          const pOpts = pools.map(p => [p.id, `${p.tourName} (${day(p.date)})`]);
+          const bOpts = eligible.map(b => [b.id, `${b.payCode} – ${b.customerName} (${b.pax}k - ${b.tourName})`]);
+
+          const v = await ask("✋ Ghép đoàn bằng tay", [
+            { name: "poolId", label: "Đoàn ghép đích", type: "select", options: pOpts },
+            { name: "b1", label: "Đơn tour 1", type: "select", options: bOpts },
+            { name: "b2", label: "Đơn tour 2", type: "select", options: bOpts },
+            { name: "note", label: "Ghi chú điều hành", type: "textarea" }
+          ]);
+          if (v && v.b1 !== v.b2) {
+            act(null, () => post("/api/admin/tours/pool/merge", { poolId: v.poolId, bookingIds: [v.b1, v.b2], note: v.note }), "Đã ghép đoàn.", reload);
+          }
+        };
+
+        $$("[data-op-merge-to]", listBox).forEach(btn => btn.onclick = async () => {
+          const pid = btn.dataset.opMergeTo;
+          const bks = (await get("/api/admin/bookings?status=")).bookings || [];
+          const eligible = bks.filter(b => !['cancelled','refunded'].includes(b.status));
+          const v = await ask("Ghép thêm đơn vào đoàn", [
+            { name: "bid", label: "Chọn đơn cần ghép", type: "select", options: eligible.map(b => [b.id, `${b.payCode} – ${b.customerName} (${b.pax}k)`]) },
+            { name: "note", label: "Ghi chú", type: "text" }
+          ]);
+          if (v) act(null, () => post("/api/admin/tours/pool/merge", { poolId: pid, bookingIds: [v.bid], note: v.note }), "Đã ghép đơn.", reload);
+        });
+      }
+
       await reload();
     } },
     { id: "reschedule", label: "Đổi ngày", icon: "📅", perm: "tour:schedule_manage", async badge() { return (await get("/api/operator/reschedule")).requests.length; }, async render(el) {

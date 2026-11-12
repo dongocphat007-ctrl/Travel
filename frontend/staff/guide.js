@@ -59,24 +59,183 @@
   const stars = n => `<span class="stars" aria-label="${n} sao">${"★".repeat(Math.round(n))}${"☆".repeat(5 - Math.round(n))}</span>`;
   const MONTH_FMT = m => m.slice(5) + "/" + m.slice(2, 4);
 
-  /** Báo cáo tour gọn: số liệu lấy từ điểm danh + sự cố có sẵn, HDV chỉ thêm ghi chú (gồm chi phí phát sinh nếu có). */
+  /** Báo cáo tour: hiển thị đầy đủ KPI, cho phép HDV trực tiếp chỉnh sửa điểm danh từng hành khách, sửa số người có mặt/vắng, ghi chú và nộp báo cáo. */
   async function reportDialog(id, after) {
     const r = (await get(`/api/guide/tours/${id}/report`)).report;
-    const inc = r.incidents.length ? r.incidents.map(i => `<li>${pill(...(SEV[i.severity] || SEV.medium))} ${esc(i.description)} <span class="small muted">· ${dt(i.createdAt)}</span></li>`).join("") : '<li class="muted">Không có sự cố nào được báo.</li>';
-    const body = `<div class="grid g4" style="margin-bottom:12px">
-        <div class="kpi"><div class="l">Tổng khách</div><div class="v">${r.total}</div></div>
-        <div class="kpi ok"><div class="l">Có mặt</div><div class="v">${r.present}</div>${r.late ? `<div class="s">trong đó đến trễ ${r.late}</div>` : ""}</div>
-        <div class="kpi ${r.absent ? "bad" : ""}"><div class="l">Vắng</div><div class="v">${r.absent}</div></div>
-        <div class="kpi ${r.unmarked ? "warn" : ""}"><div class="l">Chưa điểm danh</div><div class="v">${r.unmarked}</div></div></div>
-      <h3>Sự cố trong chuyến</h3><ul style="margin:0 0 10px;padding-left:18px">${inc}</ul>
+    const ps = r.passengers || [];
+    const inc = r.incidents && r.incidents.length ? r.incidents.map(i => `<li>${pill(...(SEV[i.severity] || SEV.medium))} ${esc(i.description)} <span class="small muted">· ${dt(i.createdAt)}</span></li>`).join("") : '<li class="muted">Không có sự cố nào được báo.</li>';
+
+    const psTableHtml = ps.length ? `
+      <div style="margin-top:14px;margin-bottom:12px;background:#f8fafc;padding:10px 12px;border-radius:8px;border:1px solid #e2e8f0;">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px">
+          <b style="font-size:0.95rem">👥 Danh sách hành khách & Chỉnh sửa điểm danh:</b>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <button type="button" class="btn sm ok" id="rp-all-present">✅ Tất cả có mặt</button>
+            <button type="button" class="btn sm warn" id="rp-all-late">⏱️ Tất cả trễ</button>
+            <button type="button" class="btn sm bad" id="rp-all-absent">❌ Tất cả vắng</button>
+            <button type="button" class="btn sm" id="rp-all-reset">🔄 Đặt lại</button>
+          </div>
+        </div>
+        <div style="max-height:220px;overflow-y:auto;border:1px solid #e2e8f0;border-radius:6px;background:#fff">
+          ${table([
+            { t: "STT", html: (p, i) => `<b>${i + 1}</b>` },
+            { t: "Họ tên hành khách", html: (p, i) => `<b>${esc(p.name || ("Khách " + (i + 1)))}</b>` },
+            { t: "Ngày sinh", html: p => esc(p.dob || "—") },
+            { t: "Điểm danh thực tế", html: (p, i) => `
+              <select class="rp-chk-select" data-i="${i}" style="padding:4px 8px;border-radius:4px;font-size:0.85rem">
+                <option value="" ${!p.checkin ? "selected" : ""}>— Chưa điểm danh —</option>
+                <option value="present" ${p.checkin === "present" ? "selected" : ""}>✅ Có mặt</option>
+                <option value="late" ${p.checkin === "late" ? "selected" : ""}>⏱️ Đến trễ</option>
+                <option value="absent" ${p.checkin === "absent" ? "selected" : ""}>❌ Vắng</option>
+              </select>` }
+          ], ps)}
+        </div>
+      </div>` : `
+      <div style="margin-top:14px;margin-bottom:12px;background:#f8fafc;padding:12px;border-radius:8px;border:1px solid #e2e8f0;">
+        <b style="font-size:0.95rem">👥 Điều chỉnh số lượng khách tham gia thực tế:</b>
+        <div class="row" style="gap:12px;margin-top:8px;flex-wrap:wrap">
+          <div><label class="small muted">Có mặt</label><input type="number" id="rp-manual-pres" min="0" max="${r.total || 99}" value="${r.present || 0}" style="width:100px"></div>
+          <div><label class="small muted">Đến trễ</label><input type="number" id="rp-manual-late" min="0" max="${r.total || 99}" value="${r.late || 0}" style="width:100px"></div>
+          <div><label class="small muted">Vắng</label><input type="number" id="rp-manual-abs" min="0" max="${r.total || 99}" value="${r.absent || 0}" style="width:100px"></div>
+        </div>
+      </div>`;
+
+    const body = `
+      <div class="grid g4" style="margin-bottom:12px">
+        <div class="kpi"><div class="l">Tổng khách</div><div class="v" id="rp-kpi-total">${r.total}</div></div>
+        <div class="kpi ok"><div class="l">Có mặt</div><div class="v" id="rp-kpi-present">${r.present}</div><div class="s" id="rp-kpi-late">${r.late ? `trong đó đến trễ ${r.late}` : ""}</div></div>
+        <div class="kpi ${r.absent ? "bad" : ""}"><div class="l">Vắng</div><div class="v" id="rp-kpi-absent">${r.absent}</div></div>
+        <div class="kpi ${r.unmarked ? "warn" : ""}"><div class="l">Chưa điểm danh</div><div class="v" id="rp-kpi-unmarked">${r.unmarked}</div></div>
+      </div>
+      ${psTableHtml}
+      <h3 style="margin-top:12px">Sự cố trong chuyến</h3><ul style="margin:0 0 10px;padding-left:18px">${inc}</ul>
       ${r.canSubmit ? "" : '<div class="note">Chỉ nộp được báo cáo sau khi bạn kết thúc chuyến đi.</div>'}
-      <label for="rp-note">Ghi chú</label><textarea id="rp-note" rows="5" maxlength="2000" ${r.canSubmit ? "" : "disabled"} placeholder="Diễn biến chuyến đi, góp ý, chi phí phát sinh nếu có (VD: vé gửi xe 150.000 ₫)…">${esc(r.note || "")}</textarea>
-      ${r.submittedAt ? `<div class="small muted">Đã nộp ${dt(r.submittedAt)}${r.updatedAt !== r.submittedAt ? ", cập nhật " + dt(r.updatedAt) : ""}.</div>` : ""}`;
+      <label for="rp-note" style="margin-top:8px">Ghi chú & Chi phí phát sinh</label>
+      <textarea id="rp-note" rows="4" maxlength="2000" ${r.canSubmit ? "" : "disabled"} placeholder="Diễn biến chuyến đi, góp ý đoàn, chi phí phát sinh nếu có (VD: vé gửi xe 150.000 ₫)…">${esc(r.note || "")}</textarea>
+      ${r.submittedAt ? `<div class="small muted" style="margin-top:6px">Đã nộp ${dt(r.submittedAt)}${r.updatedAt !== r.submittedAt ? ", cập nhật " + dt(r.updatedAt) : ""}.</div>` : ""}`;
+
     let note = r.note || "";
+    let marksToSend = [];
+
     const btns = [{ label: "Đóng" }];
-    if (r.canSubmit) btns.push({ label: r.submittedAt ? "Cập nhật báo cáo" : "Nộp báo cáo", kind: "primary", value: "ok", validate: ov => { note = $("#rp-note", ov).value.trim(); return true; } });
-    const v = await Staff.modal(`Báo cáo tour – ${r.payCode}`, body, btns, { wide: true, sticky: true });
-    if (v === "ok") await act(null, () => post(`/api/guide/tours/${id}/report`, { note }), "Đã lưu báo cáo tour.", after);
+    if (r.canSubmit) {
+      btns.push({
+        label: r.submittedAt ? "Cập nhật báo cáo" : "Lưu & Nộp báo cáo",
+        kind: "primary",
+        value: "ok",
+        validate: ov => {
+          note = ($("#rp-note", ov) || {}).value.trim();
+          const selects = $$(".rp-chk-select", ov);
+          if (selects.length) {
+            marksToSend = selects.map(s => ({ index: +s.dataset.i, state: s.value }));
+          }
+          return true;
+        }
+      });
+    }
+
+    const v = await Staff.modal(`Báo cáo tour – ${r.payCode}`, body, btns, {
+      wide: true,
+      sticky: true,
+      onOpen: ov => {
+        function updateCounters() {
+          const selects = $$(".rp-chk-select", ov);
+          if (selects.length) {
+            let pres = 0, lt = 0, ab = 0, un = 0;
+            selects.forEach(s => {
+              const val = s.value;
+              if (val === "present") pres++;
+              else if (val === "late") { pres++; lt++; }
+              else if (val === "absent") ab++;
+              else un++;
+            });
+            const elP = $("#rp-kpi-present", ov); if (elP) elP.textContent = pres;
+            const elL = $("#rp-kpi-late", ov); if (elL) elL.textContent = lt ? `trong đó đến trễ ${lt}` : "";
+            const elA = $("#rp-kpi-absent", ov); if (elA) elA.textContent = ab;
+            const elU = $("#rp-kpi-unmarked", ov); if (elU) elU.textContent = un;
+          }
+        }
+
+        $$(".rp-chk-select", ov).forEach(s => s.onchange = updateCounters);
+
+        const btnAllPres = $("#rp-all-present", ov);
+        if (btnAllPres) btnAllPres.onclick = () => {
+          $$(".rp-chk-select", ov).forEach(s => s.value = "present");
+          updateCounters();
+        };
+
+        const btnAllLate = $("#rp-all-late", ov);
+        if (btnAllLate) btnAllLate.onclick = () => {
+          $$(".rp-chk-select", ov).forEach(s => s.value = "late");
+          updateCounters();
+        };
+
+        const btnAllAbs = $("#rp-all-absent", ov);
+        if (btnAllAbs) btnAllAbs.onclick = () => {
+          $$(".rp-chk-select", ov).forEach(s => s.value = "absent");
+          updateCounters();
+        };
+
+        const btnAllReset = $("#rp-all-reset", ov);
+        if (btnAllReset) btnAllReset.onclick = () => {
+          $$(".rp-chk-select", ov).forEach(s => s.value = "");
+          updateCounters();
+        };
+      }
+    });
+
+    if (v === "ok") {
+      await act(null, () => post(`/api/guide/tours/${id}/report`, {
+        note,
+        marks: marksToSend
+      }), "Đã lưu báo cáo tour thành công.", after);
+    }
+  }
+
+  /** Nghiệp vụ HDV: Ghép đoàn / ghép khách tại chỗ khi dẫn tour (thủ công bằng tay hoặc theo chỉ đạo điều hành) */
+  async function guideMergeDialog(b, after) {
+    let codeVal = "", noteVal = "", paxVal = 2;
+    const body = `
+      <div style="margin-bottom:12px">
+        <div class="note info">
+          <b>Đoàn hiện tại của bạn:</b> ${esc(b.tourName)} (Mã: <b>${esc(b.payCode)}</b>)<br>
+          Khởi hành: <b>${day(b.date)}</b> · Số khách hiện tại: <b>${esc(b.pax)} khách</b>
+        </div>
+      </div>
+      <p class="muted small">HDV có thể ghép khách hoặc gộp đơn lẻ tại hiện trường (ví dụ: ghép chung xe trung chuyển, gộp 2 nhóm khách đi cùng tuyến điểm).</p>
+      <div style="margin-bottom:10px">
+        <label for="g-merge-code">Mã đơn / Mã thanh toán cần ghép vào đoàn <span class="req-star">*</span></label>
+        <input id="g-merge-code" placeholder="VD: TV1004, BK_1002 hoặc số điện thoại trưởng nhóm..." style="width:100%">
+      </div>
+      <div style="margin-bottom:10px">
+        <label for="g-merge-pax">Số lượng khách ghép thêm (ước tính)</label>
+        <input id="g-merge-pax" type="number" min="1" max="50" value="2" style="width:100%">
+      </div>
+      <div style="margin-bottom:10px">
+        <label for="g-merge-note">Ghi chú hiện trường <span class="req-star">*</span></label>
+        <textarea id="g-merge-note" rows="3" placeholder="Lý do ghép: Khách cùng tuyến đường, gộp xe 16 chỗ theo chỉ đạo Điều hành..."></textarea>
+      </div>
+    `;
+
+    const v = await Staff.modal("🤝 Ghép đoàn & Gộp khách tại chỗ – " + b.payCode, body, [
+      { label: "Hủy" },
+      { label: "Xác nhận ghép đoàn", kind: "primary", value: "ok", validate: ov => {
+        codeVal = ($("#g-merge-code", ov) || {}).value || "";
+        noteVal = ($("#g-merge-note", ov) || {}).value || "";
+        paxVal = Number(($("#g-merge-pax", ov) || {}).value || 2);
+        if (!codeVal.trim()) { Staff.toast("Vui lòng nhập mã đơn hoặc số điện thoại khách cần ghép", "bad"); return false; }
+        if (!noteVal.trim()) { Staff.toast("Vui lòng nhập ghi chú hiện trường", "bad"); return false; }
+        return true;
+      }}
+    ], { wide: false });
+
+    if (v === "ok") {
+      await act(null, () => post("/api/guide/tours/pool/merge-onsite", {
+        poolId: b.poolId || ("pool_onsite_" + b.id),
+        bookingIds: [b.id, codeVal.trim()],
+        note: `[HDV ghép tại chỗ (+${paxVal} khách)] ${noteVal.trim()} (Mã ghép: ${codeVal.trim()})`
+      }), "Đã xác nhận ghép đoàn tại hiện trường thành công.", after);
+    }
   }
 
   function card(b, kind, after) {
@@ -106,8 +265,10 @@
     } else if (kind === "upcoming") {
       btn("Bắt đầu chuyến đi", "primary", async x => { if (!b.canStart) return Staff.toast("Chỉ bắt đầu được từ ngày khởi hành " + day(b.date), "bad"); if (await confirmBox("Bắt đầu chuyến đi", "Xác nhận bắt đầu tour " + esc(b.payCode) + "?")) act(x, () => post(`/api/guide/tours/${b.id}/start`), "Chuyến đi đã bắt đầu.", after); });
       if (b.canStart) btn("Điểm danh", "", () => checkinDialog(b, after));
+      btn("🤝 Ghép đoàn tại chỗ", "amber", () => guideMergeDialog(b, after));
     } else if (kind === "running") {
       btn("Điểm danh", "", () => checkinDialog(b, after));
+      btn("🤝 Ghép khách tại chỗ", "amber", () => guideMergeDialog(b, after));
       btn("Báo sự cố", "bad", () => reportIncident(b, after));
       btn("Kết thúc chuyến đi", "primary", async x => { if (await confirmBox("Kết thúc chuyến đi", "Xác nhận kết thúc tour " + esc(b.payCode) + "? Đơn chuyển sang hoàn thành.")) act(x, () => post(`/api/guide/tours/${b.id}/end`), "Đã kết thúc chuyến đi.", after); });
     }
@@ -163,9 +324,9 @@
       async function load(all) {
         const r = last = await get("/api/guide/earnings?month=" + (all ? "" : $("#em", el).value));
         const k = (l, v, c, sub) => `<div class="kpi ${c || ""}"><div class="l">${l}</div><div class="v">${v}</div>${sub ? `<div class="s">${sub}</div>` : ""}</div>`;
-        $("#eb", el).innerHTML = `<div class="grid g4">${k("Tour đã dẫn (tổng)", r.toursLed, "", "Thù lao: 20% giá tour")}${k("Phí HDV " + (all ? "(tất cả)" : "trong tháng"), money(r.total), "", r.count + " chuyến")}${k("Tiền đã nhận", money(r.paidTotal), "ok", "tổng cả đời: " + money(r.allPaid))}${k("Đang chờ thanh toán", money(r.pendingTotal), r.pendingTotal ? "warn" : "", "tổng cả đời: " + money(r.allPending))}</div>
+        $("#eb", el).innerHTML = `<div class="grid g4">${k("Tour đã dẫn (tổng)", r.toursLed, "", "Thù lao: 3–12% theo quy chế")}${k("Phí HDV " + (all ? "(tất cả)" : "trong tháng"), money(r.total), "", r.count + " chuyến")}${k("Tiền đã nhận", money(r.paidTotal), "ok", "tổng cả đời: " + money(r.allPaid))}${k("Đang chờ thanh toán", money(r.pendingTotal), r.pendingTotal ? "warn" : "", "tổng cả đời: " + money(r.allPending))}</div>
           <div class="card"><h2>6 tháng gần nhất</h2>${Staff.barChart(r.monthly.map(x => MONTH_FMT(x.month)), [{ name: "Đã nhận", values: r.monthly.map(x => x.paid), color: "#059669" }, { name: "Chờ thanh toán", values: r.monthly.map(x => x.pending), color: "#f59e0b" }], { fmt: money, label: "Thu nhập 6 tháng" })}</div>`
-          + `<div class="card"><h2>Các tour đã dẫn</h2>` + table([{ t: "Hoàn thành", html: i => day(i.completedAt), sort: i => i.completedAt }, { t: "Tour", k: "tourName" }, { t: "Mã", html: i => `<span class="mono">${esc(i.payCode)}</span>` }, { t: "Giá tour", num: true, html: i => money(i.price || 0) }, { t: "Thù lao HDV (20%)", num: true, html: i => `<b style="color:var(--ok)">${money(i.fee)}</b>`, sort: i => i.fee },
+          + `<div class="card"><h2>Các tour đã dẫn</h2>` + table([{ t: "Hoàn thành", html: i => day(i.completedAt), sort: i => i.completedAt }, { t: "Tour", k: "tourName" }, { t: "Mã", html: i => `<span class="mono">${esc(i.payCode)}</span>` }, { t: "Giá tour", num: true, html: i => money(i.price || 0) }, { t: "Thù lao HDV", num: true, html: i => `<div><b style="color:var(--ok)">${money(i.fee)}</b> ${i.rate ? `<span class="badge info" style="font-size:11px">${esc(i.rate)}</span>` : ''}</div>${i.tier ? `<div class="small muted">${esc(i.tier)}</div>` : ''}`, sort: i => i.fee },
             { t: "Thanh toán", html: i => i.paid ? pill("Đã nhận", "ok") + `<div class="small muted">${dt(i.paidAt)}</div>` : pill("Đang chờ", "warn") }], r.items, { sortable: true, empty: "Chưa có chuyến hoàn thành" }) + "</div>";
       }
       $("#em", el).onchange = () => load(false);

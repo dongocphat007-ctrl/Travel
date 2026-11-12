@@ -24,6 +24,11 @@ Các sơ đồ dưới đây được tách theo chức năng để dễ mở, g
 - `15_WORKFLOW_BIEN_TAP_NOI_DUNG.md` — soạn tour/nội dung, hình ảnh và kiểm duyệt.
 - `16_WORKFLOW_ADMIN.md` — quản trị, duyệt, cấu hình, nhân sự và báo cáo.
 
+## Phân hệ Nghiệp vụ Mở rộng
+
+- `18_WORKFLOW_GHEP_TOUR_VA_DON_DOAN.md` — ghép tour đa vai trò: khách ghép đoàn trên web, AI RAG quét tour thiếu người, Điều hành quản lý pool, HDV ghép khách tại chỗ.
+- `19_WORKFLOW_QUY_LUU_DONG_VA_LUONG_KPI.md` — dòng tiền quỹ lưu động khớp thực thu, phát lương toàn công ty định kỳ ngày 25, xét tăng lương theo KPI và khấu trừ Dashboard.
+
 ## Nền tảng
 
 - `17_WORKFLOW_KIEN_TRUC_API_VA_DU_LIEU.md` — đường đi chung từ trình duyệt qua API tới JSON store và dịch vụ ngoài.

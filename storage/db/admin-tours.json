@@ -1,0 +1,29 @@
+[
+  {
+    "id": "tour_686f945b",
+    "createdAt": "2026-11-06T02:49:24.019Z",
+    "isNew": true,
+    "badge": "new",
+    "active": true,
+    "name": "Mũi Né",
+    "price": 15000000,
+    "subtitle": "",
+    "desc": "",
+    "destination": "Mũi Né, Bình Thuận",
+    "dest": "Mũi Né, Bình Thuận",
+    "region": "Miền Nam",
+    "duration": "3 ngày 2 đêm",
+    "image": "img/tours_mau/mien-nam/binh-thuan/mui-ne-mw4dlp5s.jpg",
+    "guideType": "domestic",
+    "guide": "guided",
+    "capacity": 30,
+    "minGuests": 10,
+    "allowExtension": true,
+    "hidden": false,
+    "highlights": [],
+    "highlight": "",
+    "itinerary": [],
+    "updatedAt": "2026-11-06T02:49:24.021Z",
+    "newUntil": "2026-12-06"
+  }
+]

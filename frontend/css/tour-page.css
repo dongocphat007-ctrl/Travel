@@ -84,7 +84,7 @@
   color: var(--primary);
 }
 .tp-title {
-  font-family: "DM Serif Display", serif;
+  font-family: "Playfair Display", "Be Vietnam Pro", serif;
   font-size: 2rem;
   line-height: 1.2;
   color: var(--primary-dark);

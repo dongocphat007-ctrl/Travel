@@ -33,15 +33,37 @@ public class UploadController {
     public Map<String, Object> avatar(@RequestBody(required = false) Map<String, Object> body, HttpServletRequest req) {
         Map<String, Object> u = current.require(req);
         String uid = Maps.str(u, "id");
+        String role = Maps.str(u, "role");
+        boolean isStaff = "admin".equals(role) || "cashier".equals(role) || "operator".equals(role)
+                || "support".equals(role) || "content".equals(role) || "guide".equals(role);
         Map<String, Object> b = Api.body(body);
         if (Maps.bool(b, "remove")) {
+            if (isStaff) images.deleteStaffAvatar(uid);
             images.deleteAvatar(uid);
             accounts.setAvatar(uid, null);
-            return Maps.of("ok", true, "picture", "");
+            return Maps.of("ok", true, "picture", "", "path", "");
         }
-        String path = images.saveAvatar(uid, ImageStore.decode(Maps.str(b, "dataUrl")));
+        String path = isStaff
+                ? images.saveStaffAvatar(uid, ImageStore.decode(Maps.str(b, "dataUrl")))
+                : images.saveAvatar(uid, ImageStore.decode(Maps.str(b, "dataUrl")));
         accounts.setAvatar(uid, path);
-        return Maps.of("ok", true, "picture", path);
+        return Maps.of("ok", true, "picture", path, "path", path);
+    }
+
+    /** Ảnh đại diện riêng cho nhân viên: lưu vào thư mục riêng frontend/img/avatars/staff/ có tên file chứa mã nhân viên. */
+    @PostMapping({"/api/upload/staff-avatar", "/api/staff/upload-avatar"})
+    public Map<String, Object> staffAvatar(@RequestBody(required = false) Map<String, Object> body, HttpServletRequest req) {
+        Map<String, Object> u = current.require(req);
+        String uid = Maps.str(u, "id");
+        Map<String, Object> b = Api.body(body);
+        if (Maps.bool(b, "remove")) {
+            images.deleteStaffAvatar(uid);
+            accounts.setAvatar(uid, null);
+            return Maps.of("ok", true, "picture", "", "path", "");
+        }
+        String path = images.saveStaffAvatar(uid, ImageStore.decode(Maps.str(b, "dataUrl")));
+        accounts.setAvatar(uid, path);
+        return Maps.of("ok", true, "picture", path, "path", path);
     }
 
     /** Ảnh bài viết/bình luận cộng đồng; gắn với tài khoản tải lên. */

@@ -1,0 +1,57 @@
+[
+  {
+    "id": "inc_001",
+    "bookingId": "bk_1086",
+    "payCode": "TV1086",
+    "guideId": "g3",
+    "guideName": "Lê Hoàng Long",
+    "tourName": "Hà Nội – Hạ Long 3N2Đ",
+    "type": "delay",
+    "severity": "low",
+    "description": "Tắc đường tại ngã tư cầu Bãi Cháy, đoàn đến cảng tàu muộn 15 phút. Đã chủ động liên hệ tàu lùi giờ xuất bến.",
+    "status": "open",
+    "createdAt": "2026-11-10T09:30:00Z"
+  },
+  {
+    "id": "inc_002",
+    "bookingId": "bk_1059",
+    "payCode": "TV1059",
+    "guideId": "g6",
+    "guideName": "Đặng Hữu Phúc",
+    "tourName": "TP.HCM – Miền Tây Sông Nước 2N1Đ",
+    "type": "health",
+    "severity": "medium",
+    "description": "Một khách nữ bị tụt huyết áp do nắng gắt tại cồn Phụng. Đã đưa vào trạm y tế sơ cứu, sức khỏe đã ổn định.",
+    "status": "in_progress",
+    "note": "Khách đang nghỉ ngơi, tiếp tục đi tour bằng xe trung chuyển có máy lạnh.",
+    "createdAt": "2026-11-09T11:20:00Z"
+  },
+  {
+    "id": "inc_003",
+    "bookingId": "bk_1055",
+    "payCode": "TV1055",
+    "guideId": "g1",
+    "guideName": "Trần Văn Quân",
+    "tourName": "Sa Pa – Fansipan 3N2Đ",
+    "type": "lost",
+    "severity": "low",
+    "description": "Khách để quên máy ảnh tại quán cà phê bản Cát Cát. HDV đã liên hệ chủ quán lấy lại cho khách.",
+    "status": "resolved",
+    "note": "Đã trao trả máy ảnh nguyên vẹn cho khách.",
+    "createdAt": "2026-11-08T15:00:00Z"
+  },
+  {
+    "id": "inc_004",
+    "bookingId": "bk_1057",
+    "payCode": "TV1057",
+    "guideId": "g2",
+    "guideName": "Nguyễn Thu Hà",
+    "tourName": "Đà Nẵng – Hội An 4N3Đ",
+    "type": "vehicle",
+    "severity": "medium",
+    "description": "Xe 29 chỗ bị nổ lốp trên đường đi Bà Nà. Đã điều xe dự phòng tới đón sau 20 phút.",
+    "status": "resolved",
+    "note": "Đoàn chuyển sang xe mới an toàn, không ai bị thương.",
+    "createdAt": "2026-11-07T08:30:00Z"
+  }
+]

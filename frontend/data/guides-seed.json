@@ -1,4 +1,4 @@
-﻿[
+[
   {
     "id": "g_hn01",
     "name": "Nguyễn Minh Quân",
@@ -643,6 +643,46 @@
     "certifications": [
       "Thẻ HDV du lịch quốc tế",
       "TOPIK 4"
+    ]
+  },
+  {
+    "id": "g_test",
+    "name": "Nguyễn Văn Test (HDV Trống Lịch)",
+    "avatar": "img/guides/g_hn01.jpg",
+    "bio": "Hướng dẫn viên dự bị kiểm thử hệ thống. Lịch trình hoàn toàn trống cả năm, sẵn sàng để Điều hành phân công và thử nghiệm các luồng nhận tour, check-in, báo sự cố.",
+    "languages": [
+      "Tiếng Việt",
+      "English"
+    ],
+    "experience": 5,
+    "regions": [
+      "Miền Bắc",
+      "Miền Trung",
+      "Miền Nam",
+      "Quốc tế"
+    ],
+    "status": "active",
+    "busyDates": [],
+    "demo": true,
+    "title": "HDV Trống Lịch (Test)",
+    "rating": 5.0,
+    "reviewCount": 0,
+    "toursLed": 0,
+    "specialties": [
+      "Tour đoàn riêng",
+      "Tour linh hoạt",
+      "Tour khám phá"
+    ],
+    "provinces": [
+      "Hà Nội",
+      "Đà Nẵng",
+      "Hồ Chí Minh",
+      "Quảng Ninh",
+      "Khánh Hòa"
+    ],
+    "certifications": [
+      "Thẻ HDV du lịch quốc tế",
+      "Sơ cấp cứu"
     ]
   }
 ]

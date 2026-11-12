@@ -1,0 +1,58 @@
+[
+  {
+    "id": "pay_disc_01",
+    "txId": "cashier-vc01",
+    "bookingId": "bk_1060",
+    "payCode": "TV1060",
+    "amount": 1570000,
+    "problem": "short",
+    "status": "mismatch",
+    "handoff": true,
+    "reason": "Chuyển thiếu: nhận 1.570.000 ₫, cần 1.620.000 ₫ (thiếu 50.000 ₫ phí CK)",
+    "handoffNote": "CSKH gọi điện nhắc khách nộp bổ sung 50.000 ₫ lúc khởi hành",
+    "source": "cashier",
+    "createdAt": "2026-11-10T09:00:00Z"
+  },
+  {
+    "id": "pay_disc_02",
+    "txId": "cashier-tc02",
+    "bookingId": "bk_1061",
+    "payCode": "TV1061",
+    "amount": 3000000,
+    "problem": "excess",
+    "status": "mismatch",
+    "handoff": true,
+    "reason": "Chuyển thừa: nhận 3.000.000 ₫, cần 2.460.000 ₫ (thừa 540.000 ₫)",
+    "handoffNote": "Khách đồng ý cấn trừ 540.000 ₫ vào khoản thu nốt trước ngày đi",
+    "source": "cashier",
+    "createdAt": "2026-11-10T09:30:00Z"
+  },
+  {
+    "id": "pay_disc_03",
+    "txId": "cashier-mb03",
+    "bookingId": "",
+    "payCode": "",
+    "amount": 2500000,
+    "problem": "wrong_content",
+    "status": "unmatched",
+    "handoff": true,
+    "reason": "Sai nội dung: 'Nguyen Van B ck tien tour' không có mã TVxxxx",
+    "handoffNote": "CSKH đang tra cứu số điện thoại người chuyển để xác định đúng đơn",
+    "source": "bank",
+    "createdAt": "2026-11-10T10:00:00Z"
+  },
+  {
+    "id": "pay_disc_04",
+    "txId": "cashier-ac04",
+    "bookingId": "bk_1062",
+    "payCode": "TV1062",
+    "amount": 2970000,
+    "problem": "double",
+    "status": "mismatch",
+    "handoff": true,
+    "reason": "Chuyển hai lần: Khách bấm 2 lần chuyển 2.970.000 ₫ trên App ngân hàng",
+    "handoffNote": "Đã liên hệ khách xin số tài khoản để làm thủ tục hoàn trả lệnh thứ 2",
+    "source": "bank",
+    "createdAt": "2026-11-10T10:30:00Z"
+  }
+]

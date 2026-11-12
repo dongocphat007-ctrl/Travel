@@ -143,6 +143,33 @@ public class ImageStore {
         }
     }
 
+    private static String staffAvatarBase(String uid) {
+        String s = slug(uid);
+        if (s.isEmpty()) throw HttpError.bad("Mã nhân viên không hợp lệ");
+        return "staff_" + s + "_" + System.currentTimeMillis();
+    }
+
+    /**
+     * Ảnh đại diện riêng cho nhân viên: lưu vào thư mục riêng frontend/img/avatars/staff/
+     * Tên file có định dạng: staff_<mã-nhân-viên>_<thời-gian>.<ext> để không nhầm lẫn với nhân viên khác.
+     * Khi nhân viên cập nhật ảnh mới, ảnh cũ của nhân viên đó trong thư mục staff/ được dọn dẹp tự động.
+     */
+    public String saveStaffAvatar(String uid, Image img) {
+        deleteStaffAvatar(uid);
+        return "/" + write("avatars/staff", staffAvatarBase(uid), img, false);
+    }
+
+    public void deleteStaffAvatar(String uid) {
+        Path dir = imgRoot.resolve("avatars/staff");
+        if (!Files.isDirectory(dir)) return;
+        String prefix = "staff_" + slug(uid) + "_";
+        try (DirectoryStream<Path> ds = Files.newDirectoryStream(dir, prefix + "*")) {
+            for (Path p : ds) Files.deleteIfExists(p);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
     /**
      * Ảnh tour: img/tours_mau/<vùng>/[<tỉnh>/]<tên-tour>-<mã>.<ext>. Tỉnh lấy từ "điểm đến" nếu đã có thư mục tỉnh đó.
      * Trả về đường dẫn tương đối "img/..." (đúng quy ước trường image của tour).

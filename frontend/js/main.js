@@ -115,14 +115,21 @@ function initProfileActions() {
     if (errEl) errEl.textContent = "";
   });
 
-  // Lưu tên mới
-  $id("pf-save-btn")?.addEventListener("click", () => {
-    const newName = ($id("pf-name-input")?.value || "").trim();
+  // Lưu thông tin cá nhân mới
+  $id("pf-save-btn")?.addEventListener("click", async () => {
+    const newName     = ($id("pf-name-input")?.value || "").trim();
+    const newPhone    = ($id("pf-phone-input")?.value || "").trim();
+    const newGmail    = ($id("pf-gmail-input")?.value || "").trim();
+    const newFacebook = ($id("pf-facebook-input")?.value || "").trim();
+    const newDegrees  = ($id("pf-degrees-input")?.value || "").trim();
+    const newIdCard   = ($id("pf-idcard-input")?.value || "").trim();
+    const newAddress  = ($id("pf-address-input")?.value || "").trim();
+
     const errEl   = $id("err-pf-name");
     if (errEl) errEl.textContent = "";
 
     if (!newName || newName.length < 2) {
-      if (errEl) { errEl.textContent = "Tên ít nhất 2 ký tự"; errEl.classList.add("show"); }
+      if (errEl) { errEl.textContent = "Họ tên ít nhất 2 ký tự"; errEl.classList.add("show"); }
       return;
     }
 
@@ -130,25 +137,52 @@ function initProfileActions() {
     const user = Auth.getUser();
     if (!user) return;
     user.name     = newName;
+    user.phone    = newPhone;
+    user.gmail    = newGmail;
+    user.facebook = newFacebook;
+    user.degrees  = newDegrees;
+    user.idCard   = newIdCard;
+    user.address  = newAddress;
     user.initials = newName.trim().split(/\s+/).reduce((acc, w, i, arr) =>
       i === 0 || i === arr.length - 1 ? acc + w[0].toUpperCase() : acc, "");
     localStorage.setItem("travel_auth_v1", JSON.stringify(user));
 
-    // Cập nhật users store (mọi loại tài khoản: email, Google...) — khớp theo email
+    // Cập nhật users store
     const users = JSON.parse(localStorage.getItem("travel_users_v1") || "[]");
     const mail  = String(user.email || "").trim().toLowerCase();
     users.forEach(u => {
-      if (String(u.email || "").trim().toLowerCase() === mail) { u.name = newName; u.initials = user.initials; }
+      if (String(u.email || "").trim().toLowerCase() === mail) {
+        u.name = newName;
+        u.phone = newPhone;
+        u.gmail = newGmail;
+        u.facebook = newFacebook;
+        u.degrees = newDegrees;
+        u.idCard = newIdCard;
+        u.address = newAddress;
+        u.initials = user.initials;
+      }
     });
     localStorage.setItem("travel_users_v1", JSON.stringify(users));
 
     // Cập nhật UI
     $id("pf-edit-form").style.display = "none";
     $id("pf-edit-btn").style.display  = "";
-    Auth.saveProfile({ name: newName });   // đồng bộ tên lên server (không chờ)
+    try {
+      await Auth.saveProfile({
+        name: newName,
+        phone: newPhone,
+        gmail: newGmail,
+        facebook: newFacebook,
+        degrees: newDegrees,
+        idCard: newIdCard,
+        address: newAddress
+      });
+    } catch (e) {
+      console.warn("Could not save to server:", e);
+    }
     updateNavAuth();
     renderProfile();
-    showToast("Đã cập nhật tên hiển thị ✅", "success");
+    showToast("Đã cập nhật thông tin hồ sơ thành công! ✅", "success");
   });
 
   // Enter trong input tên
@@ -367,12 +401,28 @@ async function handleGoogleCredential(response) {
   $id("modal-login").classList.remove("open");
   updateNavAuth();
   showToast(`Chào mừng, ${user.name.split(" ").pop()}! 👋`, "success");
+  if (user.welcomeVoucher && user.isFirstLogin) {
+    setTimeout(() => {
+      showToast(`🎉 Chào mừng bạn đăng nhập lần đầu! Bạn nhận được Voucher: ${user.welcomeVoucher.code || "WELCOME10"} (Giảm 10%)`, "success", 8000);
+    }, 600);
+  }
   window.AccountExtras?.onLoggedIn();   // xác thực hồ sơ + tải thông báo
   const staffUrl = staffHomeUrl(user);
   if (user.role === "admin" || (staffUrl && !afterLoginCallback)) {
     location.href = staffUrl;
     return;
   }
+  // Dọn query param ?login trên URL nếu khách ở lại trang
+  try {
+    const cleanParams = new URLSearchParams(location.search);
+    if (cleanParams.has("login") || cleanParams.has("redirect")) {
+      cleanParams.delete("login");
+      cleanParams.delete("redirect");
+      const qs = cleanParams.toString();
+      history.replaceState(null, "", location.pathname + (qs ? "?" + qs : "") + location.hash);
+    }
+  } catch (e) {}
+
   if (afterLoginCallback) { afterLoginCallback(); afterLoginCallback = null; }
   else renderHome();
 }
@@ -443,6 +493,11 @@ async function doEmailLogin() {
   $id("modal-login").classList.remove("open");
   updateNavAuth();
   showToast(`Chào mừng, ${result.user.name.split(" ").pop()}! 👋`, "success");
+  if (result.welcomeVoucher && result.isFirstLogin) {
+    setTimeout(() => {
+      showToast(`🎉 Chào mừng bạn đăng nhập lần đầu! Bạn nhận được Voucher: ${result.welcomeVoucher.code || "WELCOME10"} (Giảm 10%)`, "success", 8000);
+    }, 600);
+  }
   window.AccountExtras?.onLoggedIn();   // xác thực hồ sơ + tải thông báo
 
   // Đăng nhập 1 nơi duy nhất:
@@ -462,6 +517,17 @@ async function doEmailLogin() {
     location.href = redirectUrl;
     return;
   }
+
+  // Dọn query param ?login trên URL nếu khách ở lại trang
+  try {
+    const cleanParams = new URLSearchParams(location.search);
+    if (cleanParams.has("login") || cleanParams.has("redirect")) {
+      cleanParams.delete("login");
+      cleanParams.delete("redirect");
+      const qs = cleanParams.toString();
+      history.replaceState(null, "", location.pathname + (qs ? "?" + qs : "") + location.hash);
+    }
+  } catch (e) {}
 
   if (afterLoginCallback) { afterLoginCallback(); afterLoginCallback = null; }
   else renderHome();
@@ -637,6 +703,17 @@ async function verifyOtpAndRegister() {
   updateNavAuth();
   showToast(`Đăng ký thành công! Chào mừng ${result.user.name.split(" ").pop()} 🎉`, "success", 4000);
   window.AccountExtras?.onLoggedIn(result.welcomeVoucher);   // xác thực hồ sơ + tải thông báo
+  // Dọn query param ?login trên URL nếu khách ở lại trang
+  try {
+    const cleanParams = new URLSearchParams(location.search);
+    if (cleanParams.has("login") || cleanParams.has("redirect")) {
+      cleanParams.delete("login");
+      cleanParams.delete("redirect");
+      const qs = cleanParams.toString();
+      history.replaceState(null, "", location.pathname + (qs ? "?" + qs : "") + location.hash);
+    }
+  } catch (e) {}
+
   if (afterLoginCallback) { afterLoginCallback(); afterLoginCallback = null; }
   else renderHome();
 }
@@ -900,6 +977,40 @@ function navigate(page, opts = {}) { // Default parameter (ES6+)
   if (page === "about") {
     $id("contact-success").classList.remove("show");
     $id("form-contact").style.display = "";
+  }
+  if (page === "world-map") {
+    setTimeout(() => {
+      if (typeof WorldMap !== "undefined") {
+        if (!WorldMap.getMapInstance()) {
+          WorldMap.initWorldMap("wm-map-container");
+          if (typeof initWorldMapSearch === "function") initWorldMapSearch();
+          if (window.WorldTours) WorldTours.init();
+        } else {
+          const inst = WorldMap.getMapInstance();
+          if (inst) {
+            inst.invalidateSize();
+            setTimeout(() => inst.invalidateSize(), 200);
+          }
+        }
+      }
+    }, 80);
+  }
+  if (page === "tour-finder") {
+    setTimeout(() => {
+      if (typeof TourMap !== "undefined") {
+        if (!TourMap.getMapInstance()) {
+          TourMap.initMap("tf-map-container");
+        } else {
+          const inst = TourMap.getMapInstance();
+          if (inst) {
+            inst.invalidateSize();
+            setTimeout(() => inst.invalidateSize(), 200);
+          }
+        }
+        const ph = $id("tf-map-placeholder");
+        if (ph) ph.style.display = "none";
+      }
+    }, 80);
   }
 
   window.scrollTo({ top: 0, behavior: "smooth" });
@@ -1513,19 +1624,30 @@ document.addEventListener("DOMContentLoaded", () => {
   seedAdminAccount();
   renderEmojiPicker();
   updateNavAuth();
+  if (typeof Auth !== "undefined" && Auth.syncSession) {
+    Auth.syncSession().then(() => updateNavAuth()).catch(() => {});
+  }
   initCoverUpload();  // Task 3.1
 
   // Tự động mở modal đăng nhập khi có tham số ?login=1 hoặc ?login=admin
   try {
     const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get("login") && !Auth.isLoggedIn()) {
-      setTimeout(() => {
-        showLoginModal();
-        if (urlParams.get("login") === "admin") {
-          const emailInput = $id("li-email");
-          if (emailInput && !emailInput.value) emailInput.value = "admin@travel.vn";
-        }
-      }, 250);
+    if (urlParams.get("login")) {
+      if (Auth.isLoggedIn()) {
+        // Đã đăng nhập: dọn sạch param ?login trên URL để không bị hỏi lại
+        urlParams.delete("login");
+        const newSearch = urlParams.toString();
+        const newUrl = location.pathname + (newSearch ? "?" + newSearch : "") + location.hash;
+        history.replaceState(null, "", newUrl);
+      } else {
+        setTimeout(() => {
+          showLoginModal();
+          if (urlParams.get("login") === "admin") {
+            const emailInput = $id("li-email");
+            if (emailInput && !emailInput.value) emailInput.value = "admin@travel.vn";
+          }
+        }, 250);
+      }
     }
   } catch (e) { /* không cản init */ }
 
@@ -1822,8 +1944,78 @@ Trả về duy nhất định dạng JSON chuẩn:
   $id("login-close-btn")?.addEventListener("click", () => $id("modal-login").classList.remove("open"));
   $id("modal-login").addEventListener("click", e => { if (e.target === e.currentTarget) $id("modal-login").classList.remove("open"); });
 
-  // ---- Form liên hệ ----
-  $id("form-contact").addEventListener("submit", e => {
+  // ---- Form liên hệ & Giải đáp phản hồi Footer ----
+  async function renderFooterFeedbackReplies() {
+    const listEl = $id("sf-feedback-replies-list");
+    if (!listEl) return;
+
+    let items = [];
+    try {
+      const res = await fetch("/api/reviews?targetType=contact").then(r => r.json());
+      if (res && res.reviews) items = res.reviews;
+    } catch (e) { /* fallback */ }
+
+    try {
+      const local = JSON.parse(localStorage.getItem("travel_feedback_v1") || "[]");
+      local.forEach(l => {
+        if (!items.some(i => i.id === l.id)) {
+          items.push({
+            id: l.id,
+            name: l.name,
+            content: l.message,
+            categoryName: l.topic === "bug" ? "Báo lỗi" : (l.topic === "question" ? "Câu hỏi" : "Góp ý"),
+            createdAt: l.createdAt,
+            reply: l.reply || null
+          });
+        }
+      });
+    } catch (e) {}
+
+    items.sort((a, b) => (b.reply ? 1 : 0) - (a.reply ? 1 : 0));
+
+    const repliedCount = items.filter(i => i.reply && i.reply.content).length;
+    const cntEl = $id("sf-replies-count");
+    if (cntEl) cntEl.textContent = `${repliedCount} câu trả lời chính thức`;
+
+    if (!items.length) {
+      listEl.innerHTML = `<div style="grid-column:1/-1; color:rgba(255,255,255,0.6); font-size:13px; font-style:italic">Chưa có phản hồi nào. Hãy gửi ý kiến đóng góp đầu tiên của bạn cho Travel nhé!</div>`;
+      return;
+    }
+
+    listEl.innerHTML = items.slice(0, 6).map(it => {
+      const hasReply = it.reply && it.reply.content;
+      const safeName = (it.name || "Khách hàng").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      const safeMsg = (it.content || it.comment || "").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      const safeRep = hasReply ? String(it.reply.content).replace(/</g, "&lt;").replace(/>/g, "&gt;") : "";
+      return `
+        <div style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); border-radius:10px; padding:14px 16px; color:#fff; display:flex; flex-direction:column; justify-content:space-between">
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px">
+              <div style="font-weight:700; font-size:13.5px; color:#38bdf8">👤 ${safeName}</div>
+              <span style="font-size:11px; opacity:0.6">${it.createdAt ? it.createdAt.slice(0, 10) : "Mới đây"}</span>
+            </div>
+            <div style="font-size:13px; line-height:1.5; color:rgba(255,255,255,0.9); margin-bottom:10px">
+              "${safeMsg}"
+            </div>
+          </div>
+          ${hasReply ? `
+            <div style="background:rgba(2,132,199,0.15); border-left:3px solid #38bdf8; border-radius:6px; padding:8px 12px; margin-top:6px; font-size:12.5px; line-height:1.5">
+              <div style="font-weight:700; color:#7dd3fc; margin-bottom:3px; display:flex; align-items:center; gap:4px">
+                🛡️ Phản hồi từ Travel CSKH:
+              </div>
+              <div style="color:rgba(255,255,255,0.92)">${safeRep}</div>
+            </div>
+          ` : `
+            <div style="margin-top:6px; font-size:11.5px; color:#fde047; font-style:italic">
+              ⏳ Đã tiếp nhận – CSKH Travel đang soạn câu trả lời...
+            </div>
+          `}
+        </div>
+      `;
+    }).join("");
+  }
+
+  $id("form-contact").addEventListener("submit", async e => {
     e.preventDefault();
     const d = {
       name:    $id("cf-name").value,
@@ -1832,6 +2024,27 @@ Trả về duy nhất định dạng JSON chuẩn:
       message: $id("cf-msg").value
     };
     if (!Validator.validateContact(d)) return;
+
+    const topic = $id("cf-topic")?.value || "feedback";
+    const payload = {
+      targetType: "contact",
+      category: topic,
+      content: d.message.trim(),
+      name: d.name.trim(),
+      email: d.email.trim(),
+      phone: (d.phone || "").trim()
+    };
+
+    // Gửi lên backend server để Admin & CSKH kiểm duyệt & trả lời
+    try {
+      await fetch("/api/reviews/comment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+    } catch (err) {
+      console.warn("Gửi phản hồi lên server:", err);
+    }
 
     // Lưu phản hồi để Admin xem ở tab "Phản hồi"
     try {
@@ -1843,7 +2056,7 @@ Trả về duy nhất định dạng JSON chuẩn:
         name:      d.name.trim(),
         email:     d.email.trim(),
         phone:     (d.phone || "").trim(),
-        topic:     $id("cf-topic")?.value || "feedback",
+        topic:     topic,
         message:   d.message.trim(),
         status:    "new",
         userId:    u?.id || null,
@@ -1856,7 +2069,10 @@ Trả về duy nhất định dạng JSON chuẩn:
     $id("form-contact").style.display = "none";
     $id("contact-success").classList.add("show");
     showToast("Phản hồi đã được gửi!", "success");
+    renderFooterFeedbackReplies();
   });
+
+  renderFooterFeedbackReplies();
 
   navigate("home");
 
@@ -2383,11 +2599,20 @@ function openTourDetail(tour, opts) {
   if (typeof TourImages !== "undefined") TourImages.attach(modal.querySelector("#tdm-hero"), tour);
   if (window.Weather) Weather.renderWeather(modal.querySelector("#tdm-weather"), tour.id);
   else modal.querySelector("#tdm-weather").textContent = "Chưa có dữ liệu thời tiết";
-  if (window.TourLocationMap) TourLocationMap.renderMap(modal.querySelector("#tdm-map"), tour.id);
+  if (window.TourLocationMap) {
+    setTimeout(() => {
+      const mapEl = modal.querySelector("#tdm-map");
+      if (mapEl) TourLocationMap.renderMap(mapEl, tour.id);
+    }, 60);
+  }
 
   // Events
-  modal.querySelector(".tdm-backdrop").addEventListener("click", () => modal.remove());
-  modal.querySelector(".tdm-close").addEventListener("click", () => modal.remove());
+  const closeModal = () => {
+    if (window.TourLocationMap) TourLocationMap.destroy();
+    modal.remove();
+  };
+  modal.querySelector(".tdm-backdrop").addEventListener("click", closeModal);
+  modal.querySelector(".tdm-close").addEventListener("click", closeModal);
 
   // Xem lịch trình (dưới cùng)
   $id("tdm-itin-toggle").addEventListener("click", () => {

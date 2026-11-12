@@ -71,17 +71,20 @@ public class Refunds {
         return switch (s) {
             case SRC_CUSTOMER -> "khách hủy";
             case SRC_ADMIN -> "admin từ chối đơn";
-            case SRC_COMPANY -> "công ty hủy";
+            case SRC_COMPANY -> "công ty hủy tour";
             case SRC_COMPLAINT -> "đền bù khiếu nại";
-            case SRC_OVERDUE -> "quá hạn thu nốt";
-            default -> s;
+            case SRC_OVERDUE -> "quá hạn thanh toán";
+            default -> s == null ? "" : s;
         };
     }
 
+    /** Danh sách yêu cầu hoàn tiền (lọc theo trạng thái: pending_approval, approved, paid, rejected). */
     public List<Map<String, Object>> list(String status) {
         List<Map<String, Object>> out = new ArrayList<>();
-        for (Map<String, Object> r : db.list("refunds")) if (status == null || status.isEmpty() || status.equals(Maps.str(r, "status"))) out.add(r);
-        out.sort((a, b) -> Maps.str(b, "requestedAt").compareTo(Maps.str(a, "requestedAt")));
+        for (Map<String, Object> r : db.list("refunds")) {
+            if (status == null || status.isBlank() || status.equalsIgnoreCase(Maps.str(r, "status"))) out.add(r);
+        }
+        out.sort((a, b) -> Objects.compare(Maps.str(b, "requestedAt"), Maps.str(a, "requestedAt"), Comparator.naturalOrder()));
         return out;
     }
 
@@ -109,11 +112,14 @@ public class Refunds {
                 r.put("approvedById", admin.id());
                 r.put("approvedByName", admin.name());
                 r.put("approvedAt", Times.iso(core.now()));
-                r.put("approveNote", note == null ? "" : note);
+                r.put("approveNote", note == null ? "" : note.trim());
                 out[0] = r;
             }
         });
-        if (b != null) core.edit(Maps.str(b, "id"), x -> core.note(x, "refund", admin, "Admin duyệt hoàn " + amount + " ₫" + (Refunds.SRC_COMPLAINT.equals(rf.get("source")) ? " (đền bù khiếu nại)" : "") + (note == null || note.isEmpty() ? "" : " – " + note)));   // 6.8: ghi kết quả vào history
+        if (out[0] == null) throw HttpError.notFound("Không tìm thấy yêu cầu hoàn tiền");
+        if (!Maps.str(rf, "bookingId").isEmpty() && core.find(Maps.str(rf, "bookingId")) != null) {
+            core.edit(Maps.str(rf, "bookingId"), x -> core.note(x, "refund", admin, "Admin duyệt hoàn " + amount + " ₫" + (note == null || note.isBlank() ? "" : ": " + note.trim())));
+        }
         core.audit.log(admin.id(), admin.name(), admin.role(), "refund.approve", Maps.str(rf, "payCode"), amount + " ₫" + (note == null || note.isEmpty() ? "" : " – " + note));
         core.notifyRoles("💸 Có khoản hoàn tiền cần thực hiện", "Đơn " + rf.get("payCode") + ": hoàn " + amount + " ₫", "cashier.html#refunds", "rf-" + refundId, Role.CASHIER);
         core.notifyUser(Maps.str(rf, "userId"), "✅ Yêu cầu hoàn tiền đã được duyệt", "Đơn " + rf.get("payCode") + ": " + amount + " ₫ sẽ được chuyển về tài khoản của bạn.", "profile", "rfok-" + refundId);
@@ -144,6 +150,7 @@ public class Refunds {
 
     /** CASHIER bấm "Đã hoàn tiền": ghi sổ, đơn refund_pending → refunded. */
     public Map<String, Object> pay(Actor cashier, String refundId, String note) {
+        if (!Role.CASHIER.name().equals(cashier.role())) throw HttpError.forbidden();
         Map<String, Object> rf = find(refundId);
         if (rf == null) throw HttpError.notFound("Không tìm thấy yêu cầu hoàn tiền");
         if (!"approved".equals(rf.get("status"))) throw HttpError.conflict("Khoản hoàn này chưa được admin duyệt hoặc đã hoàn rồi", null);

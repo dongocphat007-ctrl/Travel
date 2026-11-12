@@ -116,6 +116,33 @@ public class ContentOpsController {
         return content.replyReview(Api.actor(u), id, reply);
     }
 
+    @PostMapping("/api/content/reviews/{id}/tag")
+    public Map<String, Object> tagReview(@PathVariable String id, @RequestBody(required = false) Map<String, Object> body, HttpServletRequest req) {
+        Map<String, Object> u = current.requirePermission(req, Permission.REVIEW_MODERATE);
+        String category = Api.s(body, "category");
+        return content.tagReview(Api.actor(u), id, category);
+    }
+
+    @PostMapping("/api/content/reviews/{id}/forward")
+    public Map<String, Object> forwardReview(@PathVariable String id, @RequestBody(required = false) Map<String, Object> body, HttpServletRequest req) {
+        Map<String, Object> u = current.requirePermission(req, Permission.REVIEW_MODERATE);
+        String to = Api.s(body, "to");
+        String note = Api.s(body, "note");
+        return content.forwardReview(Api.actor(u), id, to, note);
+    }
+
+    @DeleteMapping("/api/content/reviews/{id}")
+    public Map<String, Object> deleteReview(@PathVariable String id, HttpServletRequest req) {
+        Map<String, Object> u = current.requireAdmin(req);
+        return content.deleteReview(Api.actor(u), id);
+    }
+
+    @GetMapping("/api/content/reviews/{id}/history")
+    public Map<String, Object> reviewHistory(@PathVariable String id, HttpServletRequest req) {
+        current.requirePermission(req, Permission.REVIEW_MODERATE);
+        return Maps.of("ok", true, "history", content.reviewAuditHistory(id));
+    }
+
     @GetMapping("/api/content/stats")
     public Map<String, Object> stats(HttpServletRequest req) {
         current.requirePermission(req, Permission.STATS_VIEW_CONTENT);
